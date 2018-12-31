@@ -1,0 +1,79 @@
+{% extends "template.html" %}
+{% block main %}
+
+<body id="LoginForm">
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+
+            <!--<form action="/aaa" method="POST">-->
+        <form action="/aaa" method="POST" role="form" class="form-horizontal" id="AnswerForm">
+            <fieldset>
+            <legend>Command Input</legend>
+                <!--<label for="comment">Implant Command:</label>-->
+                <div class="form-group row" >
+                    <label class="col-md-3 control-label" for="comment">Implant Command:</label>
+                    <input type="email" class="form-control" id="inputEmail" placeholder="Email Address">
+                <textarea class="form-control" name="ta" rows="5" id="comment"></textarea>
+                </div>
+            </fieldset>
+                <button type="submit" class="btn btn-default" id="AnswerBtn">Submit</button>
+        </form>
+
+
+        </div>
+        <div class="col-md-6" id="Response"></div>
+    </div>
+</div>
+
+<script>
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function get_command_response (){
+    while(true){
+    $.ajax({
+        url:"/aab",
+        type:"GET",
+        success: function (response) {
+            console.log("++"+response+"++")
+            document.getElementById('Response').innerHTML =(response);
+
+            }
+
+    })
+    await sleep(7000);
+    }
+}
+get_command_response()
+$(function() {
+    $('#AnswerBtn').on('click', function (e) {
+        e.preventDefault(); // disable the default form submit event
+
+
+        var $form = $('#AnswerForm');
+        console.log($form.serialize())
+        $.ajax({
+            url: $form.attr("action"),
+            type: $form.attr("method"),
+            data: $form.serialize(),
+            success: function (response) {
+                // if response
+                //alert('response received');
+                console.log("++"+response+"++")
+                document.getElementById('Response').innerHTML =(response['msg']);
+                // ajax success callback
+            },
+            error: function (response) {
+                alert('ajax failed');
+                // ajax error callback
+            },
+        });
+        document.getElementById('comment').innerHTML=("");
+    });
+});
+</script>
+</body>
+
+{% endblock %}

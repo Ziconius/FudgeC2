@@ -1,13 +1,14 @@
 # Fudge
-HamAE's sucessor.
+Powershell implant backed by a Python framework - designed for team collaboration and improved reporting.
 
-### Infrastructure
-To configure:
-    Snort
-    Docker
-    Push to server.
-    
-### Code Base
-Endpoint
-server & processor
-Web App
+
+
+
+
+## Implant builder
+TODO:
+
+* Webapp
+* Implant builder
+* Comms obfuscation
+* Multi implant support

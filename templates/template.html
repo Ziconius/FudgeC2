@@ -1,0 +1,16 @@
+<html lang = "en">
+<head>
+<!-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> -->
+    <title>Fudge</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='login-style.css') }}">
+  <script src="{{ url_for('static', filename='filter.js') }}"></script>
+  <!--<script src="{{ url_for('static', filename='vee.js') }}" defer></script>-->
+
+</head>
+<body>
+    {%  block main %}{% endblock %}
+</body>
+</html>
