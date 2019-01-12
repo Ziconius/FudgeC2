@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block main %}
+<div class="row justify-content-md-center m-4">
+    <div class="col-l-12 ">
+
+    <form id="Login" method="POST" action="CreateCampaign" name="CC">
+        <div class="form-group">Campaign Title
+            <input type="text" class="form-control" id="inputEmail" name="title" placeholder="Campaign Title">
+        </div>
+        <div class="form-group">Campaign Description
+            <input type="text" class="form-control" name="description" id="description" placeholder="Description">
+        </div>
+
+        <button type="submit" name="CreateCampaign" class="btn btn-primary" id="CampaignButton">Create Campaign</button>
+
+    </form>
+
+    </div>
+</div>
+{% endblock %}

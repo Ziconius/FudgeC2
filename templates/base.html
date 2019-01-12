@@ -30,22 +30,24 @@
   <div class="collapse navbar-collapse" id="navbarNavDropdown">
     <ul class="navbar-nav">
       <li class="nav-item active">
-        <a class="nav-link" href="#">New Campaign <span class="sr-only">(current)</span></a>
+        <a class="nav-link" href="/CreateCampaign">New Campaign <span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="#">Global Settings</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">Logout</a>
+        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="/1234" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Your Campaigns
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" href="/1234">ACME Ltd.</a>
-          <a class="dropdown-item" href="/1234">Random Inc</a>
-          <a class="dropdown-item" href="/1234">Test Campaign</a>
+        {% if campaignlist %}
+          {% for key  in campaignlist %}
+          <a class="dropdown-item" href="/{{ key }}">{{ campaignlist[key]}}</a>
+          {% endfor %}
+        {% endif %}
         </div>
       </li>
     </ul>
