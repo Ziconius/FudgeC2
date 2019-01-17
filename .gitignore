@@ -1,0 +1,7 @@
+# Ignore all SQL
+*.sql
+# No xml in use - this is likely pycharm stuff.
+*.xml
+
+.__pycharm__/*
+.idea/*

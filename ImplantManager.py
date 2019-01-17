@@ -18,11 +18,15 @@ login = LoginManager(app)
 login.init_app(app)
 
 @app.context_processor
-def inject_dict_for_all_templates():
+def inject_dict_for_all_auth_templates():
     # -- Confirm if this is secure --#
-    if current_user:
+    print(dir(current_user),current_user.is_authenticated)
+    if current_user.is_authenticated:
         print(current_user)
+        # Return the list of the users avaliable campaigns for the navbar dropdown.
         return dict(campaignlist=db.Get_AllUserCampaigns(current_user.user_email))
+    else:
+        return dict()
     # return dict(mydict=code_to_generate_dict())
 
 ## GARBAGE
@@ -41,24 +45,35 @@ def page_not_found(e):
 @app.errorhandler(401)
 def page_not_found(e):
     return redirect(url_for(('login')), 401)
+
 # -- AUTHENTICATION --#
 def AUTO_LOGIN_REMOVE():
-    a = db.Get_UserObjectLogin("admin","password")
+    a = db.Get_UserObjectLogin("admin","letmein")
     # a.authenticated=True
-    print(a.is_authenticated())
+    #print("###",type(a),a)
+    #print(a.is_authenticated())
     login_user(a)
-    print("::", a.is_authenticated())
-@app.route("/login", methods =['GET','POST'])
+    #print("::", a.is_authenticated())
+@app.route("/login", methods=['GET','POST'])
 def login():
-    AUTO_LOGIN_REMOVE()
+    #AUTO_LOGIN_REMOVE()
     if request.method=="POST":
-        a = db.Get_UserObjectLogin(request.form['email'],request.form['password'])
-        #a.authenticated=True
-        print(a.is_authenticated())
-        login_user(a)
-        print("::",a.is_authenticated())
-        return redirect(url_for("BaseHomePage"))
-    return render_template('login.html')
+        print("POST /login")
+        if 'email' in request.form and 'password' in request.form and request.form['email'] != None and request.form['password'] != None:
+            print("a",type(request.form['email']),type(request.form['password']))
+
+            a = db.Get_UserObjectLogin(request.form['email'],request.form['password'])
+            print(type(a),a)
+            if a == False:
+                return render_template("login.html", error="Incorrect Username/Password")
+            #a.authenticated=True
+            print(a.is_authenticated())
+            login_user(a)
+            print("::",a.is_authenticated())
+            return redirect(url_for("BaseHomePage"))
+    print("GET /login")
+    return render_template("login.html")
+
 @app.route("/logout")
 @login_required
 def logout():
@@ -106,19 +121,25 @@ def BaseHomePage():
     return render_template("welcome.html")
 
 
-@app.route("/<id>/")
+@app.route("/<cid>/")
 @login_required
-def BaseImplantPage(id):
-    return render_template("ImplantMain.html")
+def BaseImplantPage(cid):
+    # -- This needs to return the implant_input.html template if any implants exist, if not reuturn ImplantMain
+    # --    also need to work out the CID across the pages...
+    return render_template("ImplantMain.html",cid=cid)
+@app.route("/<cid>/<iid>")
 @login_required
-@app.route ("/<id>/settings")
-def BaseImplantSettings(id):
+def ImplantInputPage(cid,iid):
+    return render_template("implant_input.html")
+
+@login_required
+@app.route ("/<cid>/settings")
+def BaseImplantSettings(cid):
     return "2"
 
 
 
 @app.route("/CreateCampaign", methods=['GET','POST'])
-@app.route("/Implant/New", methods=['GET','POST'])
 @login_required
 def CreateNewItem():
     if request.method=="POST":
@@ -137,6 +158,12 @@ def CreateNewItem():
     else:
         return render_template('CreateCampaign.html')
 
+@app.route("/<cid>/implant/create", methods=['GET','POST'])
+@login_required
+def NewImplant(cid):
+
+    print("Create Form: ",request.form)
+    return render_template('CreateImplant.html', cid=cid)
 
 @app.route("/Implant/<iid>/Generate", methods=["GET"])
 @login_required

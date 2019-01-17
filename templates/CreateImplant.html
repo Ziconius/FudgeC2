@@ -1,0 +1,20 @@
+{% extends "ImplantMain.html" %}
+{% block main2 %}
+<div class="row justify-content-md-center m-4">
+    <div class="col-l-4 ">
+
+    <form id="Login" method="POST" action="create" name="CI">
+        <div class="form-group">Campaign Title
+            <input type="text" class="form-control" id="url" name="url" placeholder="Callback URL">
+        </div>
+        <div class="form-group">Campaign Description
+            <input type="text" class="form-control" name="description" id="description" placeholder="Description">
+        </div>
+
+        <button type="submit" name="CreateImplant" class="btn btn-primary" id="ImplantButton">Create Implant</button>
+
+    </form>
+
+    </div>
+</div>
+{% endblock %}

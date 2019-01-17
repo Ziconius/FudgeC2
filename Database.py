@@ -128,10 +128,14 @@ class Database():
     # -- LOGIN CONTENT --#
     def Get_UserObjectLogin(self, email, password):
         # Auths a user and returns user object:
-        user = self.Session.query(Users).filter(Users.user_email==email).first()
-        #user = Users.query.filter_by(user_email==email).first()
-        print(user.password)
-        return user
+        user = self.Session.query(Users).filter(Users.user_email==email, Users.password==password).first()
+        if user != None:
+            #print("@@@",user.password)
+            return user
+        else:
+            print(type(user),user)
+            return False
+
     def Get_UserObject(self, email):
         # Auths a user and returns user object:
         user = self.Session.query(Users).filter(Users.user_email==email).first()

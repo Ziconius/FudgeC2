@@ -1,0 +1,12 @@
+body {
+    background-image:url("/static/bg.jpeg");
+    background-repeat:no-repeat;
+    background-position:center;
+    background-size:cover;
+    padding:0px;
+    }
+
+.col-l-1, .col-l-11 {
+    background-color: #f5f3f3;
+
+}

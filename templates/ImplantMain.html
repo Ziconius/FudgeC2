@@ -1,17 +1,16 @@
 {% extends "base.html" %}
 {% block main %}
-<div class="row m-4">
-    <div class="col-l-1 p-2 m-1">
+<div class="row m-0">
+    <div class="col-l-1 p-1 m-3 rounded">
         <p>*Campaign Name*</p>
-        <p>*New Implant*</p>
+        <p>*New Implant* <a href="/{{ cid }}/implant/create">aaa</a>/p>
         <p>*Implant Logs*</p>
-        <p>*UAC*</p>
         <p>*Campaign Settings*</p>
     </div>
-    <div class="col-l-11 p-2 m-1">
-<div class="row">
-
-</div>
+    <div class="col-l-11 p-1 m-3 rounded ">
+        <div class="col m-1 p-3 w-100">
+        {%  block main2 %}{% endblock %}
+        </div>
     </div>
 </div>
 {% endblock %}
