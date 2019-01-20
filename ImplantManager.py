@@ -152,6 +152,7 @@ def BaseImplantPage(cid):
 @app.route("/<cid>/<iid>")
 @login_required
 def ImplantInputPage(cid,iid):
+    g.setdefault('cid', cid)
     print(cid,iid)
     return render_template("implant_input.html")
 

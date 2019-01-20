@@ -7,15 +7,12 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon-32x32.gif') }}">
     <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
-  <link rel="stylesheet" href="{{ url_for('static', filename='login-style.css') }}">
-  <script src="{{ url_for('static', filename='filter.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login-style.css') }}">
+    <script src="{{ url_for('static', filename='filter.js') }}"></script>
     <script src="{{ url_for('static',filename='particles.min.js') }}"></script>
     <script src="{{ url_for('static',filename='app.js') }}" defer></script>
-  <!--<script src="{{ url_for('static', filename='vee.js') }}" defer></script>-->
-
 </head>
 <body>
-
     {%  block main %}{% endblock %}
 </body>
 </html>
