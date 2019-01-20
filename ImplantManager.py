@@ -148,7 +148,7 @@ def BaseImplantPage(cid):
         #   print(Implants, dir(Implants))
         print(url_for('ImplantInputPage',cid=cid,iid=Implants[0][1]))
         return redirect(url_for('ImplantInputPage',cid=cid,iid=Implants[0][1]))
-    return render_template("ImplantMain.html",cid=cid)
+    return render_template("ImplantMain.html",cid=cid, Msg="There are no implants associated with this campaign")
 @app.route("/<cid>/<iid>")
 @login_required
 def ImplantInputPage(cid,iid):

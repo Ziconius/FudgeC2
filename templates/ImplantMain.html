@@ -9,7 +9,8 @@
     </div>
     <div class="col-l-11 p-1 m-3 rounded ">
         <div class="col m-1 p-3 w-100">
-        {%  block main2 %}{% endblock %}
+            {% if Msg %}<div class="text-danger font-weight-bold">{{ Msg }}</div> {% endif %}
+            {%  block main2 %}{% endblock %}
         </div>
     </div>
 </div>
