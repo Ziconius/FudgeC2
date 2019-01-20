@@ -4,10 +4,13 @@
     <div class="col-l-4 ">
 
     <form id="Login" method="POST" action="create" name="CI">
-        <div class="form-group">Campaign Title
+        <div class="form-group">Implant Title
+            <input type="text" class="form-control" id="title" name="title" placeholder="Implant common name">
+        </div>
+        <div class="form-group">Implant URL
             <input type="text" class="form-control" id="url" name="url" placeholder="Callback URL">
         </div>
-        <div class="form-group">Campaign Description
+        <div class="form-group">Implant Description
             <input type="text" class="form-control" name="description" id="description" placeholder="Description">
         </div>
 
@@ -16,5 +19,6 @@
     </form>
 
     </div>
+    {% if error %}<div class="text-danger font-weight-bold">{{error}}</div>{% endif %}
 </div>
 {% endblock %}

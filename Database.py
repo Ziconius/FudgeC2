@@ -4,7 +4,7 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 from models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers
 
-import time
+import time, random
 class Database():
     def __init__(self):
         engine = create_engine("sqlite:///fudge_2.db")
@@ -117,7 +117,7 @@ class Database():
         campDict = {}
         for x in q:
             campDict[x[0]]=x[1]
-            print(x)
+            #print(x)
             campaignList.append(x[0])
         return campDict
 
@@ -125,6 +125,37 @@ class Database():
     # -- Implant Content --#
     def Add_Implant(self,cid, title, url, description="Implant: Blank description."):
         implant = Implants(cid=cid,title=title)
+        IK= random.randint(10000,99999)
+        NewImplant = Implants(cid=cid,title=title,description=description,callback_url=url,implant_key=IK,file_hash="0",filename="0")
+        self.Session.add(NewImplant)
+        try:
+            self.Session.commit()
+            q=self.Session.query(Implants).first()
+            print(q)
+        except Exception as e:
+            print("db.Add_Implant: ",e)
+
+
+
+        # uid = self.__get_userid__(email)
+        # if uid == False:
+        #     return False
+        # campaign = Campaigns(title=title, created=time.time(), description=description)
+        # # c_user = CampaignUsers(cid=,uid=,read=,write=)
+        # self.Session.add(campaign)
+        # try:
+        #     self.Session.commit()  # flush check if this will work...
+        #     # q=self.Session.query(Campaigns.cid).filter(Campaigns.title==title).one()
+        #     # print("1",q[0])
+        #     if self.Add_CampaignUser(title, email, True, True):
+        #         print("Success adding a new campaign user.")
+        #         return True
+        # except Exception as e:
+        #     print(e)
+        #     return False
+
+
+
     # -- LOGIN CONTENT --#
     def Get_UserObjectLogin(self, email, password):
         # Auths a user and returns user object:
@@ -133,15 +164,28 @@ class Database():
             #print("@@@",user.password)
             return user
         else:
-            print(type(user),user)
+            #print(type(user),user)
             return False
-
+    def Get_CampaignNameFromCID(self,cid):
+        # -- Clean up --#
+        name=self.Session.query(Campaigns.title).filter(Campaigns.cid==cid).first()
+        #print(type(name))
+        if name == None:
+            return "Unknown"
+        #print(name.title)
+        return name.title
     def Get_UserObject(self, email):
         # Auths a user and returns user object:
         user = self.Session.query(Users).filter(Users.user_email==email).first()
         #user = Users.query.filter_by(user_email==email).first()
-        print(user.password)
+        #print(user.password)
         return user
+    def Get_AllCampaignImplants(self, cid):
+        implant= self.Session.query(Implants.title, Implants.iid).filter(Implants.cid==cid).all()
+        if implant ==None:
+            print("Campaign has no implants.")
+        #print(implant.iid)
+        return implant
 '''
 
 

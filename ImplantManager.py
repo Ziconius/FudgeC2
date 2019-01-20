@@ -16,25 +16,40 @@ app.config.from_object(__name__)
 app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
 login = LoginManager(app)
 login.init_app(app)
-
+# -- Context Processors --#
 @app.context_processor
 def inject_dict_for_all_auth_templates():
-    # -- Confirm if this is secure --#
-    print(dir(current_user),current_user.is_authenticated)
+    # -- Returns the list of Campaigns the auth'd user has read access to --#
+    #print(dir(current_user),current_user.is_authenticated)
     if current_user.is_authenticated:
-        print(current_user)
-        # Return the list of the users avaliable campaigns for the navbar dropdown.
+        #print(current_user)
+        # Return the list of the users available campaigns for the navbar dropdown.
         return dict(campaignlist=db.Get_AllUserCampaigns(current_user.user_email))
     else:
         return dict()
     # return dict(mydict=code_to_generate_dict())
 
-## GARBAGE
+@app.context_processor
+def inject_dict_for_all_campaign_templates(cid=None):
+    #print(request.url)
+    if 'cid' in g:
+        #print("We gots' a CID BOIS!")
+        cid =g.get('cid')
+        cname=db.Get_CampaignNameFromCID(cid)
+    if cid != None:
+        return dict(campaign=cname)
+    else:
+        print("context processor")
+        return dict()
+
+
+# -- Managing the error and user object. --#
 @login.user_loader
 def load_user(id):
     return db.Get_UserObject(id)
 @app.before_request
 def before_request():
+    #print(request)
     return
 @app.after_request
 def add_header(r):
@@ -77,7 +92,7 @@ def login():
 @app.route("/logout")
 @login_required
 def logout():
-    print(current_user.uid, current_user.user_email)
+    #print(current_user.uid, current_user.user_email)
     if (current_user.is_authenticated):
         logout_user()
         return redirect(url_for("login"))
@@ -124,12 +139,20 @@ def BaseHomePage():
 @app.route("/<cid>/")
 @login_required
 def BaseImplantPage(cid):
+    g.setdefault('cid', cid)
     # -- This needs to return the implant_input.html template if any implants exist, if not reuturn ImplantMain
     # --    also need to work out the CID across the pages...
+    Implants = db.Get_AllCampaignImplants(cid)
+    #print(Implants[0][0],type(Implants),dir(Implants))
+    if len(Implants) >0:
+        #   print(Implants, dir(Implants))
+        print(url_for('ImplantInputPage',cid=cid,iid=Implants[0][1]))
+        return redirect(url_for('ImplantInputPage',cid=cid,iid=Implants[0][1]))
     return render_template("ImplantMain.html",cid=cid)
 @app.route("/<cid>/<iid>")
 @login_required
 def ImplantInputPage(cid,iid):
+    print(cid,iid)
     return render_template("implant_input.html")
 
 @login_required
@@ -161,6 +184,24 @@ def CreateNewItem():
 @app.route("/<cid>/implant/create", methods=['GET','POST'])
 @login_required
 def NewImplant(cid):
+    #current_app['cid']=cid
+    # -- set SID and user DB to convert --#
+    g.setdefault('cid',cid)
+    #g['cid']=cid
+    if request.method=="POST":
+        try:
+            if "CreateImplant" in request.form:
+
+                title = request.form['title']
+                url=request.form['url']
+                description= request.form['description']
+
+                print("NOW CREATING IMPLANT")
+                a = db.Add_Implant(cid,title,url,description)
+        except Exception as e:
+            print("NewImplant: ",e)
+            # -- Implicting returning page with Error --#
+            return render_template('CreateImplant.html', cid=cid, error="There was an error creating your implant.")
 
     print("Create Form: ",request.form)
     return render_template('CreateImplant.html', cid=cid)
