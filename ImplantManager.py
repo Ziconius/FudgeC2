@@ -134,7 +134,7 @@ def CreateNewItem():
 @app.route("/settings",methods=['GET','POST'])
 @login_required
 def GlobalSettingsPage():
-    return "404"
+    return  render_template("GlobalSettings.html")
 
 
 # -- CAMPAIGN SPECIFIC PAGES -- #
