@@ -4,5 +4,6 @@
 *.xml
 *.db
 .__pycharm__/*
-.__pycache__/*
+__pycache__/*
 .idea/*
+scratch*
