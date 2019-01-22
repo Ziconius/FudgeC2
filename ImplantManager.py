@@ -37,7 +37,7 @@ def inject_dict_for_all_campaign_templates(cid=None):
         cid =g.get('cid')
         cname=db.Get_CampaignNameFromCID(cid)
     if cid != None:
-        return dict(campaign=cname)
+        return dict(campaign=cname, cid=cid)
     else:
         print("context processor")
         return dict()
@@ -49,7 +49,6 @@ def load_user(id):
     return db.Get_UserObject(id)
 @app.before_request
 def before_request():
-    #print(request)
     return
 @app.after_request
 def add_header(r):
@@ -62,37 +61,20 @@ def page_not_found(e):
     return redirect(url_for(('login')), 401)
 
 # -- AUTHENTICATION --#
-def AUTO_LOGIN_REMOVE():
-    a = db.Get_UserObjectLogin("admin","letmein")
-    # a.authenticated=True
-    #print("###",type(a),a)
-    #print(a.is_authenticated())
-    login_user(a)
-    #print("::", a.is_authenticated())
 @app.route("/login", methods=['GET','POST'])
 def login():
-    #AUTO_LOGIN_REMOVE()
     if request.method=="POST":
-        print("POST /login")
         if 'email' in request.form and 'password' in request.form and request.form['email'] != None and request.form['password'] != None:
-            print("a",type(request.form['email']),type(request.form['password']))
-
             a = db.Get_UserObjectLogin(request.form['email'],request.form['password'])
-            print(type(a),a)
             if a == False:
-                return render_template("login.html", error="Incorrect Username/Password")
-            #a.authenticated=True
-            print(a.is_authenticated())
+                return render_template("LoginPage.html", error="Incorrect Username/Password")
             login_user(a)
-            print("::",a.is_authenticated())
             return redirect(url_for("BaseHomePage"))
-    print("GET /login")
-    return render_template("login.html")
+    return render_template("LoginPage.html")
 
 @app.route("/logout")
 @login_required
 def logout():
-    #print(current_user.uid, current_user.user_email)
     if (current_user.is_authenticated):
         logout_user()
         return redirect(url_for("login"))
@@ -127,15 +109,35 @@ def aaa(cmd=0):
 # -- END PURGE --#
 # -- END PURGE --#
 
-# -- NEW ENDPOINTS -- #
 
+# -- NEW ENDPOINTS -- #
 @app.route("/")
 @login_required
 def BaseHomePage():
     a = db.Get_AllUserCampaigns(current_user.user_email)
-    return render_template("welcome.html")
+    return render_template("Homepage.html")
+
+@app.route("/CreateCampaign", methods=['GET','POST'])
+@login_required
+def CreateNewItem():
+    if request.method=="POST":
+        if 'CreateCampaign' in request.form:
+            print("Building Campaign")
+            print(request.form)
+            #print(dir())
+            # WOrk out if Implant or Campaign
+            db.Create_Campaign(request.form['title'],current_user.user_email,request.form['description'])
+            return redirect(url_for('BaseHomePage'))
+    else:
+        return render_template('CreateCampaign.html')
+
+@app.route("/settings",methods=['GET','POST'])
+@login_required
+def GlobalSettingsPage():
+    return "404"
 
 
+# -- CAMPAIGN SPECIFIC PAGES -- #
 @app.route("/<cid>/")
 @login_required
 def BaseImplantPage(cid):
@@ -162,26 +164,6 @@ def BaseImplantSettings(cid):
     return "2"
 
 
-
-@app.route("/CreateCampaign", methods=['GET','POST'])
-@login_required
-def CreateNewItem():
-    if request.method=="POST":
-        if 'CreateCampaign' in request.form:
-            print("Building Campaign")
-            print(request.form)
-            #print(dir())
-            # WOrk out if Implant or Campaign
-            db.Create_Campaign(request.form['title'],current_user.user_email,request.form['description'])
-            return redirect(url_for('BaseHomePage'))
-        elif 'CreateImplant' in request.form:
-            cid = request.form['CreateImplant']
-            title = request.form['description']
-            url = request.form['url']
-
-    else:
-        return render_template('CreateCampaign.html')
-
 @app.route("/<cid>/implant/create", methods=['GET','POST'])
 @login_required
 def NewImplant(cid):
@@ -207,10 +189,27 @@ def NewImplant(cid):
     print("Create Form: ",request.form)
     return render_template('CreateImplant.html', cid=cid)
 
-@app.route("/Implant/<iid>/Generate", methods=["GET"])
+@app.route("/<cid>/implant/generate", methods=["GET", "POST"])
 @login_required
-def ImplantGenerate(iid):
+def ImplantGenerate():
+    # -- Get iid from the POST request
     return "405"
+
+@app.route("/<cid>/implant/cmd", methods=["GET","POST"])
+@login_required
+def ImplantCmdRegister(cid):
+    # -- GET FORM --#
+    # --    if ALL register on all implants wiht user write authority
+    # --    if <iid> check user write authority
+    # --     else RETURN 501 && log error.
+    print(request.form)
+    return "404"
+
+@app.route("/<cid>/implant/stagers", methods=["GET","POST"])
+@login_required
+def ImplantStager(cid):
+    g.setdefault('cid', cid)
+    return render_template("ImplantStagerPage.html")
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5001, threaded=True)

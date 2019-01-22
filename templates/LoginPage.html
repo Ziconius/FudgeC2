@@ -1,6 +1,5 @@
-{% extends "template.html" %}
+{% extends "HeaderTemplate.html" %}
 {% block main %}
-
 <body id="LoginForm">
 <div class="container">
 <div id="particles-js"></div>
@@ -8,7 +7,7 @@
 <div class="main-div">
     <div class="mt-1"><img src="/static/fudge.png" class="mb-4" height="200px" alt="Responsive image"></div>
     <div class="panel">
-   <h2>Fudge Login</h2>
+   <h2>Fudge</h2>
    <p>Please enter your credentials</p>
    </div>
     <form id="Login" method="POST" action="login">
@@ -23,9 +22,7 @@
     </form>
     <div class="text-muted mt-4 "><br><p>Version 0.1 (Orc Peon)</p></div>
     </div>
-
 </div></div>
-
 </body>
 
 {% endblock %}

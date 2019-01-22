@@ -158,13 +158,11 @@ class Database():
 
     # -- LOGIN CONTENT --#
     def Get_UserObjectLogin(self, email, password):
-        # Auths a user and returns user object:
+        # Auths a user and returns user object
         user = self.Session.query(Users).filter(Users.user_email==email, Users.password==password).first()
         if user != None:
-            #print("@@@",user.password)
             return user
         else:
-            #print(type(user),user)
             return False
     def Get_CampaignNameFromCID(self,cid):
         # -- Clean up --#

