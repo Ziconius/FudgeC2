@@ -51,6 +51,11 @@ class Implants(Base):
     filename=Column(String(255), nullable=True, unique=True)
     callback_url = Column(String(255), nullable=False, server_default=text("127.0.0.1"))
     description = Column(String(255))
+    beacon = Column(INTEGER(10))
+    initial_delay = Column(INTEGER(10))
+    comms_http = Column(INTEGER(1))
+    comms_dns = Column(INTEGER(1))
+    comms_binary = Column(INTEGER(1))
 
 
 class ImplantLogs(Base):

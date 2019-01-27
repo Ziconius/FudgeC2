@@ -123,17 +123,25 @@ class Database():
 
 
     # -- Implant Content --#
-    def Add_Implant(self,cid, title, url, description="Implant: Blank description."):
+    def Add_Implant(self,cid, title, url, beacon,initial_delay,comms_http,comms_dns,comms_binary, description="Implant: Blank description."):
         implant = Implants(cid=cid,title=title)
         IK= random.randint(10000,99999)
-        NewImplant = Implants(cid=cid,title=title,description=description,callback_url=url,implant_key=IK,file_hash="0",filename="0")
+        NewImplant = Implants(cid=cid,title=title,description=description,callback_url=url,implant_key=IK,file_hash="0",filename="0",
+                              beacon=beacon,
+                              initial_delay=initial_delay,
+                              comms_http=comms_http,
+                              comms_dns=comms_dns,
+                              comms_binary = comms_binary
+                              )
         self.Session.add(NewImplant)
         try:
             self.Session.commit()
             q=self.Session.query(Implants).first()
             print(q)
+            return True
         except Exception as e:
             print("db.Add_Implant: ",e)
+            return False
 
 
 
@@ -179,7 +187,7 @@ class Database():
         #print(user.password)
         return user
     def Get_AllCampaignImplants(self, cid):
-        implant= self.Session.query(Implants.title, Implants.iid).filter(Implants.cid==cid).all()
+        implant= self.Session.query(Implants.iid, Implants.title, Implants.description, Implants.callback_url).filter(Implants.cid==cid).all()
         if implant ==None:
             print("Campaign has no implants.")
         #print(implant.iid)

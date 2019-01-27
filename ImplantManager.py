@@ -175,21 +175,53 @@ def NewImplant(cid):
     if request.method=="POST":
         try:
             if "CreateImplant" in request.form:
-
+                print("Inside subscript:",request.form)
+                if request.form['title'] =="" or request.form['url'] =="" or request.form['description'] == "":
+                    raise ValueError('Mandatory values left blank')
                 title = request.form['title']
                 url=request.form['url']
                 description= request.form['description']
+                beacon=request.form['beacon_delay']
+                initial_delay=request.form['initial_delay']
 
+                # -- Comms check --#
+                if "comms_http" in request.form :
+                    if request.form['comms_http']=="on":
+                        comms_http=1
+                    else:
+                        raise ValueError('comms_http exists with non-specific value i.e. != "on" ')
+                else:
+                    comms_http=0
+                if "comms_dns" in request.form :
+                    if request.form['comms_dns']=="on":
+                        comms_dns=1
+                    else:
+                        raise ValueError('comms_dns exists with non-specific value i.e. != "on" ')
+                else:
+                    comms_dns=0
+                if "comms_binary" in request.form :
+                    if request.form['comms_binary']=="on":
+                        comms_binary=1
+                    else:
+                        raise ValueError('comms_binary exists with non-specific value i.e. != "on" ')
+                else:
+                    comms_binary=0
+                if comms_binary == 0 and comms_dns == 0 and comms_http ==0:
+                    raise ValueError('No communitcation channel selected. ')
                 print("NOW CREATING IMPLANT")
-                a = db.Add_Implant(cid,title,url,description)
+                print(request.method)
+                a = db.Add_Implant(cid, title ,url,beacon,initial_delay,comms_http,comms_dns,comms_binary,description)
+                if a== True:
+                    return render_template('CreateImplant.html', cid=cid,success="Implant created.")
         except Exception as e:
             print("NewImplant: ",e)
             # -- Implicting returning page with Error --#
-            return render_template('CreateImplant.html', cid=cid, error="There was an error creating your implant.")
+            return render_template('CreateImplant.html', cid=cid, error=e)
 
     print("Create Form: ",request.form)
     return render_template('CreateImplant.html', cid=cid)
 
+# -- This may no longer be required -- #
 @app.route("/<cid>/implant/generate", methods=["GET", "POST"])
 @login_required
 def ImplantGenerate():
@@ -210,7 +242,10 @@ def ImplantCmdRegister(cid):
 @login_required
 def ImplantStager(cid):
     g.setdefault('cid', cid)
-    return render_template("ImplantStagerPage.html")
+    # -- get request: return list of implants --
+    # -- Will update to a dropdown when exporting Word docs etc is possible -- #
+    ACI = db.Get_AllCampaignImplants(cid)
+    return render_template("ImplantStagerPage.html", implantList=ACI)
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5001, threaded=True)
