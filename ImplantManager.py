@@ -24,6 +24,7 @@ def inject_dict_for_all_auth_templates():
     if current_user.is_authenticated:
         #print(current_user)
         # Return the list of the users available campaigns for the navbar dropdown.
+        print(current_user.user_email)
         return dict(campaignlist=db.Get_AllUserCampaigns(current_user.user_email))
     else:
         return dict()
