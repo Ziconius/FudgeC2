@@ -12,14 +12,20 @@ CREATE TABLE IF NOT EXISTS `response_logs` (
 	`log_entry`	TEXT NOT NULL,
 	`iid`	INTEGER NOT NULL
 );
-CREATE TABLE IF NOT EXISTS `implants` (
+CREATE TABLE `implants` (
 	`iid`	INTEGER PRIMARY KEY AUTOINCREMENT,
-	`implant_key`	INTEGER NOT NULL,
 	`cid`	INTEGER NOT NULL,
+	`title`	TEXT,
+	`description`	TEXT,
+	`callback_url`	TEXT NOT NULL DEFAULT '127.0.0.1',
 	`file_hash`	TEXT NOT NULL,
 	`filename`	TEXT NOT NULL,
-	`callback_url`	TEXT NOT NULL DEFAULT '127.0.0.1',
-	`description`	TEXT
+	`implant_key`	INTEGER NOT NULL,
+	`default_beacon`	INTEGER NOT NULL DEFAULT 3600,
+	`initial_delay`	INTEGER NOT NULL DEFAULT 30,
+	`comms_http`	INTEGER NOT NULL DEFAULT 1,
+	`comms_dns`	INTEGER NOT NULL DEFAULT 1,
+	`comms_binary`	INTEGER NOT NULL DEFAULT 0
 );
 CREATE TABLE IF NOT EXISTS `implant_logs` (
 	`cid`	INTEGER NOT NULL,
