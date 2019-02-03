@@ -42,7 +42,7 @@ class Database():
         query = self.Session.query(Users.uid).filter(Users.user_email == email)
         # TODO: Improve and avoid race conditions.
         for x in query:
-            print(x)
+            #print(x)
             return x
         return False
         # if no email return false....
@@ -192,6 +192,44 @@ class Database():
             print("Campaign has no implants.")
         #print(implant.iid)
         return implant
+
+
+    def Register_ImplantCommand(self, email, iid, cmd):
+        # -- Check if user and iid are allow to work -- #
+        # -- Return Types:
+        #       disallowed use html style errors?
+        #       true false for anti enum?
+        #
+        uid = self.__get_userid__(email)
+        #print(uid[0])
+        # result = self.Session.query(CampaignUsers, Campaigns.title).filter(CampaignUsers.uid  == uid[0],Implants.iid == iid).group_by(Implants.iid).all()
+        result = self.Session.query(CampaignUsers, Implants).filter(CampaignUsers.uid == uid[0], Campaigns.cid == CampaignUsers.cid, Implants.cid == Campaigns.cid, Implants.iid ==iid).all()
+        #print("Write: ", line[0].write, " CB URL:", line[1].callback_url)
+        if len(result) == 0:
+            print("No Implant <--> User association")
+            return False
+        for line in result:
+            if line[0].write == 0:
+                return False
+            elif line[0].write ==1:
+                # uid
+                cid=line[0].cid
+                new_implant_log=ImplantLogs(cid=cid,uid=uid[0],time=time.time(),log_entry=cmd,iid=iid)
+                self.Session.add(new_implant_log)
+                try:
+                    self.Session.commit()
+                    q = self.Session.query(ImplantLogs).first()
+                    print(q)
+                    return True
+                except Exception as e:
+                    print("db.Register_ImplantCommand: ", e)
+                    return False
+
+                return True
+            else:
+                # -- Incase non 0/1 response --#
+                return False
+
 '''
 
 
@@ -209,7 +247,7 @@ class Database():
             return "Incorrect Username/Password."
 
 
-    
+
     def Get_Campaign_Info():
         return
     def Add_Campaign_User( campaign, email):
@@ -217,7 +255,7 @@ class Database():
         if not uid:
             print("No UID found.")
             return False
-        cid = __get_campaign_id(campaign)   
+        cid = __get_campaign_id(campaign)
         if not cid:
             print("No CID found.")
             return False

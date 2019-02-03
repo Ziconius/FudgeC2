@@ -149,15 +149,19 @@ def BaseImplantPage(cid):
     #print(Implants[0][0],type(Implants),dir(Implants))
     if len(Implants) >0:
         #   print(Implants, dir(Implants))
-        print(url_for('ImplantInputPage',cid=cid,iid=Implants[0][1]))
-        return redirect(url_for('ImplantInputPage',cid=cid,iid=Implants[0][1]))
+        print(Implants[0],Implants[0][0],Implants[0][1])
+        print(url_for('ImplantInputPage',cid=cid,iid=Implants[0][0]))
+        return redirect(url_for('ImplantInputPage',cid=cid,iid=Implants[0][0]))
     return render_template("ImplantMain.html",cid=cid, Msg="There are no implants associated with this campaign")
 @app.route("/<cid>/<iid>")
 @login_required
 def ImplantInputPage(cid,iid):
     g.setdefault('cid', cid)
     print(cid,iid)
-    return render_template("implant_input.html")
+    a=db.Get_AllCampaignImplants(cid)
+    print(type(a))
+
+    return render_template("implant_input.html", Implants=a)
 
 @login_required
 @app.route ("/<cid>/settings")
@@ -246,6 +250,18 @@ def ImplantStager(cid):
     # -- Will update to a dropdown when exporting Word docs etc is possible -- #
     ACI = db.Get_AllCampaignImplants(cid)
     return render_template("ImplantStagerPage.html", implantList=ACI)
+
+
+# -- Implant comms -- #
+@app.route("/cmd/<iid>", methods=["POST"])
+@login_required
+def ImplantCommandRegistration(iid):
+    if request.method == "POST":
+        if "cmd" in request.form:
+            print(request.form['cmd'])
+            # Allowed = db.Register_ImplantCommand(current_user.user_email, iid, cmd)
+            return jsonify({"1":2})
+    return "000"
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5001, threaded=True)
