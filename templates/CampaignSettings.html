@@ -1,0 +1,32 @@
+{% extends "ImplantMain.html" %}
+{% block main2 %}
+
+<div class="m-0 p-3">
+    <h4>Existing Implants & Stagers: {{ campaign }}</h4>
+
+    {% if users %}
+    <h5>User Access Rights</h5>
+    {% set count = namespace(a=0) %}
+    {% for user in users %}
+    {{ user.user }}
+    <!-- Update to check the current rights of a user!-->
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio{{a}}" value="option{{a}}">
+        <label class="form-check-label" for="inlineRadio{{a}}">None</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio{{a}}" value="option{{a}}">
+        <label class="form-check-label" for="inlineRadio{{a}}">Read</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio{{a}}" value="option{{a}}">
+        <label class="form-check-label" for="inlineRadio{{a}}">Write</label>
+    </div><br>
+    {% set count.a = count.a + 1 %}
+    {% endfor %}
+
+    {% endif %}
+
+</div>
+{% endblock %}
+

