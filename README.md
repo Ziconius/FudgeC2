@@ -18,12 +18,31 @@ A Powershell implant framework built on Python3/Flask- Designed for team collabo
 ###  ----------------------
 
 
+
 # Fudge Overview
+
+## Setup
+### Installation
+
+The simplest route to get a basic Fudge server up and running is:
+
+```
+git clone https://github.com/Ziconius/Fudge
+cd Fudge
+pip3 install -r requirements.txt
+sudo ptyhon3 Controller.py
+```
+
+Depending on your connections, you will likely need to configure a number of proxy and routing servers. The most common configuration and set up is to use Fudge with HTTPS using a reverse NGINX/Apache2 proxy.
+
+## Login
+After the inital installation you can log in with the default admin account using the credentiasl: `admin:letmein`. You will be prompted to the admin password as this point. 
+
 ## Users
 Fudge comes with a default username and password, which prompts the user to change the password on first login
 
 User configuration
-
+to set up a new user log in with an admin account and select the new user option from the Global settings menu.
 
 ## Campaigns
 #### What is a campaign?
@@ -33,7 +52,7 @@ Each campaign contains a unique name and, implants, and logs while a user can be
 
 
 
-##Implants
+## Implants
 #### What is an implant
 An implant is the end result of sucessful stager. Ewach implant will have it's own stager, callback URL and ID. 
 
@@ -48,4 +67,10 @@ Protocols: A user will also need to select the protocols which the implant uses,
 * DNS 
 * Binary protocol
 
-A user can enable and disable depending on their requirements
+A user can enable and disable protocols depending on the environment they believe they are working in.
+
+Once an implant has been generated the Stagers page will provide a number of basic techniques which can be used to compromise the target. Currently stager techniques are as follows:
+
+* IEX
+* Windows Words Macro (In development)
+
