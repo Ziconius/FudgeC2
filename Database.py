@@ -7,7 +7,7 @@ from models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, Campai
 import time, random
 class Database():
     def __init__(self):
-        engine = create_engine("sqlite:///fudge_2.db")
+        engine = create_engine("sqlite:///fudge_2.db?check_same_thread=False")
         self.selectors = {
             "uid": Users.uid,
             "email": Users.user_email
@@ -39,13 +39,14 @@ class Database():
 
     ## -- PRIVATE METHODS -- #
     def __get_userid__(self,email):
-        query = self.Session.query(Users.uid).filter(Users.user_email == email)
+        # -- Require further improvement i.e try:catch
+        query = self.Session.query(Users.uid).filter(Users.user_email == email).first()
+        if query[0] == None:
+            return False
+        else:
+            return query[0]
         # TODO: Improve and avoid race conditions.
-        for x in query:
-            #print(x)
-            return x
-        return False
-        # if no email return false....
+
     def __get_campaignid__(self,campaign):
         #TODO: Improve the Try/Catch
         q = self.Session.query(Campaigns.cid).filter(Campaigns.title==campaign).one()
@@ -160,7 +161,7 @@ class Database():
 
 
         # uid = self.__get_userid__(email)
-        # if uid == False:
+        # if uid == False:flask
         #     return False
         # campaign = Campaigns(title=title, created=time.time(), description=description)
         # # c_user = CampaignUsers(cid=,uid=,read=,write=)
@@ -207,12 +208,22 @@ class Database():
         #print(implant.iid)
         return implant
 
-    def Get_ImplantKey(self,IID):
+    def Get_ImplantFromKey(self,IID):
         a = self.Session.query(Implants).filter(Implants.implant_key==IID).first()
         if a != None:
             return a
         else:
             return False
+
+    def Update_ImplantLastCheckIn(self, ImplantKey):
+        #IID = self.Session.query(Implants).filter(Implants.implant_key==ImplantKey).first()
+        #print(IID, int(time.time()))
+        #IID.last_check_in==int(time.time())
+
+        a =self.Session.query(Implants).filter(Implants.implant_key==ImplantKey).update({"last_check_in": (int(time.time()))})
+        self.Session.commit()
+        #print(a.last_check_in)
+        #self.Session.commit()
 
 
     def Register_ImplantCommand(self, email, iid, cmd):
@@ -222,8 +233,8 @@ class Database():
         #       true false for anti enum?
         #
         uid = self.__get_userid__(email)
-        result = self.Session.query(CampaignUsers, Implants).filter(CampaignUsers.uid == uid[0], Campaigns.cid == CampaignUsers.cid, Implants.cid == Campaigns.cid, Implants.iid ==iid).all()
-
+        result = self.Session.query(CampaignUsers, Implants).filter(CampaignUsers.uid == uid, Campaigns.cid == CampaignUsers.cid, Implants.cid == Campaigns.cid, Implants.iid ==iid).all()
+        # print(result)
         if len(result) == 0:
             print("No Implant <--> User association")
             return False
@@ -233,7 +244,7 @@ class Database():
             elif line[0].write ==1:
                 # uid
                 cid=line[0].cid
-                new_implant_log=ImplantLogs(cid=cid,uid=uid[0],time=time.time(),log_entry=cmd,iid=iid)
+                new_implant_log=ImplantLogs(cid=cid,uid=uid,time=time.time(),log_entry=cmd,iid=iid)
                 self.Session.add(new_implant_log)
                 try:
                     self.Session.commit()
@@ -246,6 +257,36 @@ class Database():
             else:
                 # -- Incase non 0/1 response --#
                 return False
+
+    def Register_ImplantResponse(self,UIK,Response):
+        # Pull back the first record which matches the UIK, contain both the Campaign the IID is associated from the implant the UIk is associated with.
+        info=self.Session.query(Implants,Campaigns).filter(Campaigns.cid==Implants.cid).filter(Implants.implant_key==UIK).first()
+        iid = info[0].iid
+        cid = info[1].cid
+        # print("Record\ncid:    {}\niid:    {}\nentry:  {}\ntime:   {}".format(cid,iid,Response,int(time.time())))
+        RL=ResponseLogs(cid=cid, iid=iid, log_entry=Response,time=int(time.time()))
+        self.Session.add(RL)
+        try:
+            self.Session.commit()
+        except Exception as E:
+            print(E)
+
+
+
+    def Get_CampaignImplantResponses(self, cid):
+        a=self.Session.query(ResponseLogs).filter(ResponseLogs.cid == cid).all()
+        ReturnList=[]
+        for x in a:
+            a = x.__dict__
+            if '_sa_instance_state' in a:
+                del a['_sa_instance_state']
+            b = self.Session.query(Implants.title).filter(Implants.iid==a['iid']).first()
+            if b != None:
+                a['title']=b[0]
+            ReturnList.append(a)
+        return(ReturnList)
+
+        # -- This may be a single or list: Check and convert to list implictly?
 
 
     # -- Campaign Settings Content -- #
@@ -273,7 +314,24 @@ class Database():
     def Set_UserCampaignReadWrite(self,uid, readwrite):
         # -- UID + 0 None 1 read 2 write
         return
-'''
+
+    # -- Reusable Security Checks
+
+    def Verify_UserCanAccessCampaign(self,Users,CID):
+        # -- TODO: Reduce line count, and if,elif, and else statment to a cleaner alternative.
+        User = self.__get_userid__(Users)
+        print(User)
+        if User == None:
+            return False
+        R = self.Session.query(CampaignUsers).filter(CampaignUsers.cid==CID, CampaignUsers.uid==User).first()
+        if R == None:
+            return False
+        elif R.read==0:
+            return False
+        elif R.read==1:
+            return True
+
+'''         
 
 
     def User_Login(Username, Password):

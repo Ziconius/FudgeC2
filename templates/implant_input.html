@@ -31,21 +31,58 @@
     </form>
     </div>
 
-    <div class="col-lg-3" id="Response">Response:</div>
+    <div class="col-lg-6" id="Response"></div>
+    <div class="col-lg-2" id="ImplantStatus">
+        Implant Check in:
+        {% if Implants %}
+            {% for implant in Implants %}
+                <p>{{implant[1]}}:</p><br>
+            {% endfor %}
+        {% endif %}
+
+    </div>
 </div>
 <script>
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-
+<!--localStorage.setItem("ImplantRecord",[])-->
+var contained_list=[];
 async function get_command_response (){
+    console.log("~~"+contained_list)
     while(true){
     $.ajax({
-        url:"/aab",
+        url:"/aab/{{cid}}",
         type:"GET",
         success: function (response) {
+            // Get list of responses
             console.log("++"+response+"++")
-            document.getElementById('Response').innerHTML =(response);
+            for (element in response){
+                console.log("~~"+response[element].log_id)
+                <!-- Check for the log_id existing, if it doesn't add to list and write to top of page to remove weird loading page-->
+                if( contained_list.includes(response[element].log_id)){
+                    console.log('LOL');
+                    }
+                else{
+                    console.log(1);
+                 contained_list.push(response[element].log_id)
+                 var pageContainer = document.getElementById('Response')
+                 pageContainer = response[element].log_id+ pageContainer;
+
+                 var GG = response[element].log_id;
+                 var utcSeconds = response[element].time;
+                 var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
+                 d.setUTCSeconds(utcSeconds);
+                 GG = "<div class=''><p>IID: "+response[element].title+"<br>Time: "+d+"<br>Rsp: <code>"+response[element].log_entry+"</code></p></div><hr>"
+
+                 var WP = document.getElementById('Response').innerHTML
+
+                 document.getElementById('Response').innerHTML = GG+WP;
+                 }
+
+               }
+            console.log(contained_list)
+
 
             }
 
@@ -69,7 +106,7 @@ $(function() {
                 // if response
                 //alert('response received');
                 console.log("++"+response+"++")
-                document.getElementById('Response').innerHTML =(response['msg']);
+                //document.getElementById('Response').innerHTML =(response['msg']);
                 // ajax success callback
             },
             error: function (response) {
@@ -77,7 +114,7 @@ $(function() {
                 // ajax error callback
             },
         });
-        document.getElementById('comment').innerHTML=("");
+        //document.getElementById('comment').innerHTML=("");//
     });
 });
 </script>

@@ -56,6 +56,7 @@ class Implants(Base):
     comms_http = Column(INTEGER(1))
     comms_dns = Column(INTEGER(1))
     comms_binary = Column(INTEGER(1))
+    last_check_in = Column(INTEGER(13))
 
 
 class ImplantLogs(Base):

