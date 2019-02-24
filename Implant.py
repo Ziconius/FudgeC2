@@ -21,25 +21,29 @@ class ImplantSingleton:
             # print("--- Adding Command ---\nUser: ", User, "\nImplant:",Implant,"\nCommand:",Command)
 
             #IID=db.Get_ImplantFromKey(Implant)
-            if  Implant not in self.RegisteredCommands:
+            if Implant not in self.RegisteredCommands:
                 self.RegisteredCommands[Implant] = []
             self.RegisteredCommands[Implant].append(Command)
 
-        def IssueCommand(self,IID=0):
+        def IssueCommand(self,UIK=0):
             # print(IID)
-            if IID != 0:
-                # -- Issue command based on unique implant identifiers (UII)
-                # -- UII is embedded into the implant via Jinja on delivery.
-                ImplantObj=db.Get_ImplantFromKey(IID)
-                # print(type(ImplantObj.iid),ImplantObj.iid)
-                # print(self.RegisteredCommands)
-                if ImplantObj.iid in self.RegisteredCommands:
-                    if len(self.RegisteredCommands[ImplantObj.iid]) != 0:
-                        a = self.RegisteredCommands[ImplantObj.iid].pop()
-                        print(a)
-                        return a
+            if UIK != 0:
+                # -- Issue command based on unique implant identifiers (UIK)
+                # -- UIK is embedded into the implant via Jinja on delivery.
+                # print("Reg cmd: ",self.RegisteredCommands)
+                ImplantObj=db.Get_GeneratedImplantDataFromUIK(UIK)
+                #print(ImplantObj)
+                for x in ImplantObj:
+                    # print(type(x['iid']),x['iid'], x['unique_implant_id'])
+                    # print(self.RegisteredCommands)
 
-            # -- Create a suit null response.
+                    if x['unique_implant_id'] in self.RegisteredCommands:
+                        if len(self.RegisteredCommands[x['unique_implant_id']]) != 0:
+                            a = self.RegisteredCommands[x['unique_implant_id']].pop()
+                            # print(a)
+                            return a
+
+            # -- Create a suitable null response.
             # --    This may be a random value, depending on how the implant handles it.
                 return "=="
             else:

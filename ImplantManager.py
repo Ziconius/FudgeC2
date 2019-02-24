@@ -153,10 +153,11 @@ def BaseImplantPage(cid):
     #print(Implants[0][0],type(Implants),dir(Implants))
     if len(Implants) >0:
         #   print(Implants, dir(Implants))
-        print(Implants[0],Implants[0][0],Implants[0][1])
-        print(url_for('ImplantInputPage',cid=cid,iid=Implants[0][0]))
-        return redirect(url_for('ImplantInputPage',cid=cid,iid=Implants[0][0]))
-    return render_template("ImplantMain.html",cid=cid, Msg="There are no implants associated with this campaign")
+        print(Implants)
+        print(Implants[0],Implants[0]['iid'],Implants[0])
+        print(url_for('ImplantInputPage',cid=cid,iid=Implants[0]['iid']))
+        return redirect(url_for('ImplantInputPage',cid=cid,iid=Implants[0]['iid']))
+    return render_template("ImplantMain.html",cid=cid, Msg="No implants have called back in association with this campaign - create an implant base and use the stager page.")
 @app.route("/<cid>/<iid>")
 @login_required
 def ImplantInputPage(cid,iid):
@@ -261,7 +262,9 @@ def ImplantStager(cid):
     g.setdefault('cid', cid)
     # -- get request: return list of implants --
     # -- Will update to a dropdown when exporting Word docs etc is possible -- #
-    ACI = db.Get_AllCampaignImplants(cid)
+
+    ACI = db.Get_AllImplantBaseFromCid(cid)
+
     return render_template("ImplantStagerPage.html", implantList=ACI)
 
 

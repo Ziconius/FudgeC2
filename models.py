@@ -37,14 +37,14 @@ class ResponseLogs(Base):
     __tablename__='response_logs'
     log_id = Column(INTEGER(11), nullable=False, index=True, primary_key=True)
     cid = Column(INTEGER(11), nullable=False, index=True)
-    iid = Column(INTEGER(11), nullable=False, index=True)
+    uik = Column(INTEGER(11), nullable=False, index=True)
     log_entry = Column(String(255), nullable=False, unique=True)
     time = Column(INTEGER(11), nullable=False, index=True)
 
 class Implants(Base):
     __tablename__='implants'
     iid=Column(INTEGER(11), nullable=False, index=True, primary_key=True)
-    implant_key = Column(String(255), nullable=False, unique=True)
+    stager_key = Column(String(255), nullable=False, unique=True)
     title = Column(String(255),nullable=False)
     cid = Column(INTEGER(11), nullable=False, index=True )
     file_hash=Column(String(255), nullable=True)
@@ -56,15 +56,23 @@ class Implants(Base):
     comms_http = Column(INTEGER(1))
     comms_dns = Column(INTEGER(1))
     comms_binary = Column(INTEGER(1))
-    last_check_in = Column(INTEGER(13))
+    # last_check_in = Column(INTEGER(13))
+    # unique_implant_key = Column(INTEGER(16), unique=True)
 
+class GeneratedImplants(Base):
+    __tablename__='generated_implants'
+    unique_implant_id = Column(INTEGER(16), unique=True,nullable=False, primary_key=True)
+    last_check_in = Column(INTEGER(16))
+    current_beacon = Column(INTEGER(16))
+    iid = Column(INTEGER(11), ForeignKey("implants.iid"), nullable=False, index=True)
+    generated_title = Column(String(255),nullable=False)
 
 class ImplantLogs(Base):
     __tablename__='implant_logs'
     log_id = Column(INTEGER(11), nullable=False, index=True, primary_key=True)
     cid = Column(INTEGER(11), nullable=False, index=True)
     uid =Column(INTEGER(11), nullable=False, index=True)
-    iid =Column(INTEGER(11), nullable=False, index=True)
+    uik=Column(INTEGER(11), nullable=False, index=True)
     time =Column(INTEGER(11), nullable=False, index=True)
     log_entry =Column(String(255), nullable=False)
 

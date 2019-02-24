@@ -16,7 +16,7 @@
                   {% if Implants %}
                   <option name="a" id="b">ALL</option>
                   {% for imp in Implants %}
-                        <option name="{{ imp[0] }}">{{ imp[1] }}</option>
+                        <option name="{{ imp.unique_implant_id }}" id="{{ imp.unique_implant_id }}">{{ imp.generated_title }}</option>
                   {% endfor %}
                   {% endif %}
               </select>
@@ -24,7 +24,7 @@
 
             <div class="form-group" >
                 <label class="control-label">Implant Command:</label>
-                <input type="text" name="cmd" class="form-control" id="implantCmd" placeholder="cmd">
+                <input onfocus="this.placeholder=''" type="text" name="cmd" class="form-control" id="implantCmd" placeholder="cmd">
             </div>
         </fieldset>
             <button type="submit" class="btn btn-default" id="AnswerBtn">Submit</button>
@@ -36,7 +36,7 @@
         Implant Check in:
         {% if Implants %}
             {% for implant in Implants %}
-                <p>{{implant[1]}}:</p><br>
+                <p>{{ implant.generated_title}}: {{ implant.last_check_in }}</p><br>
             {% endfor %}
         {% endif %}
 
@@ -73,6 +73,7 @@ async function get_command_response (){
                  var utcSeconds = response[element].time;
                  var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
                  d.setUTCSeconds(utcSeconds);
+                 console.log(response[element])
                  GG = "<div class=''><p>IID: "+response[element].title+"<br>Time: "+d+"<br>Rsp: <code>"+response[element].log_entry+"</code></p></div><hr>"
 
                  var WP = document.getElementById('Response').innerHTML
@@ -108,11 +109,14 @@ $(function() {
                 console.log("++"+response+"++")
                 //document.getElementById('Response').innerHTML =(response['msg']);
                 // ajax success callback
+                console.log("@@@"+document.getElementById('implantCmd').innerHTML)
+                document.getElementById('implantCmd').value="";
             },
             error: function (response) {
                 alert('ajax failed');
                 // ajax error callback
             },
+
         });
         //document.getElementById('comment').innerHTML=("");//
     });

@@ -2,12 +2,13 @@
 from sqlalchemy import create_engine, func, extract
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
-from models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers
+from models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants
 
 import time, random
 class Database():
     def __init__(self):
         engine = create_engine("sqlite:///fudge_2.db?check_same_thread=False")
+        # -- TODO: RefactorGet_AllCampaignImplants
         self.selectors = {
             "uid": Users.uid,
             "email": Users.user_email
@@ -54,10 +55,39 @@ class Database():
             return False
         else:
             print(q[0])
+    def __splice_implants_and_generated_implants__(self, obj):
+        # Hand a list of genrerated imaplnts and implabt list pairs and splice them togerther returning in a [{},{}] format
+        # print(str(type(obj)))
+        CompletedList = []
+        if type(obj) == list:
+            for x in obj:
+                ResultofSplice={}
+                # print(type(x))
+                if str(type(x)) == "<class 'sqlalchemy.util._collections.result'>":
+                    ResultofSplice = {**x[0].__dict__, **x[1].__dict__}
+                    # ResultofSplice
+                    # ResultofSplice x[1].__dict__
+                    # print(ResultofSplice)
+                CompletedList.append(ResultofSplice)
+            # for element in CompletedList:
+            #     print("@@: ",element)
+            #     for key in element.keys():
+            #         print(key,": ",element[key])
+            # print("Notice: __splice__ Success", CompletedList)
+            return CompletedList
+        else:
+            print("bb")
+            print(type(obj))
+            ResultofSplice = {}
+            # print(type(x))
+            if str(type(obj)) == "<class 'sqlalchemy.util._collections.result'>":
+                ResultofSplice = {**obj[0].__dict__, **obj[1].__dict__}
+            CompletedList.append(ResultofSplice)
+        return CompletedList
 #:-:
     ## -- PUBLIC METHODS -- #
     def Add_User(self, Username, Password, Admin=False):
-        #TODO: This needs a more rebust response Try/Except.
+        # -- TODO: This needs a more rebust response Try/Except.
         query = self.Session.query(Users.password, Users.uid).filter(Users.user_email==Username).all()
         for x in query:
             # print(query[0][1])
@@ -125,23 +155,29 @@ class Database():
         # -- NOT COMPLETE: ENSURE 'ALL' entry returns a list of implants.
         # -- RETURN ( list:iid(int) )
         a=[]
+        # -- In progress
         if ImplantID == "ALL":
-            IID = self.Session.query(Implants).filter(Implants.cid == CID).all()
+            IID = self.Session.query(GeneratedImplants,Implants).filter(GeneratedImplants.iid==Implants.iid ,Implants.cid == CID).all()
+            IID=self.__splice_implants_and_generated_implants__(IID)
             for x in IID:
-                print(x.iid)
-                a.append(x.iid)
+                print(x['unique_implant_id'])
+                a.append(x['unique_implant_id'])
         else:
-            IID = self.Session.query(Implants).filter(Implants.title == ImplantID).all()
+            print("Getting implant record from title: ", ImplantID)
+            IID = self.Session.query(GeneratedImplants, Implants).filter(Implants.iid == GeneratedImplants.iid, GeneratedImplants.generated_title == ImplantID).all()
+            IID = self.__splice_implants_and_generated_implants__(IID)
+            # IID = self.Session.query(Implants).filter(Implants.title == ImplantID).all()
             for element in IID:
-                print(element.iid)
-                a.append(element.iid)
+                print(element['unique_implant_id'])
+                a.append(element['unique_implant_id'])
         return a
 
     # -- Implant Content --#
     def Add_Implant(self,cid, title, url, beacon,initial_delay,comms_http,comms_dns,comms_binary, description="Implant: Blank description."):
+        # -- TODO: Refactor
         implant = Implants(cid=cid,title=title)
-        IK= random.randint(10000,99999)
-        NewImplant = Implants(cid=cid,title=title,description=description,callback_url=url,implant_key=IK,file_hash="0",filename="0",
+        stager_key= random.randint(10000,99999)
+        NewImplant = Implants(cid=cid,title=title,description=description,callback_url=url,stager_key=stager_key,file_hash="0",filename="0",
                               beacon=beacon,
                               initial_delay=initial_delay,
                               comms_http=comms_http,
@@ -159,26 +195,6 @@ class Database():
             return False
 
 
-
-        # uid = self.__get_userid__(email)
-        # if uid == False:flask
-        #     return False
-        # campaign = Campaigns(title=title, created=time.time(), description=description)
-        # # c_user = CampaignUsers(cid=,uid=,read=,write=)
-        # self.Session.add(campaign)
-        # try:
-        #     self.Session.commit()  # flush check if this will work...
-        #     # q=self.Session.query(Campaigns.cid).filter(Campaigns.title==title).one()
-        #     # print("1",q[0])
-        #     if self.Add_CampaignUser(title, email, True, True):
-        #         print("Success adding a new campaign user.")
-        #         return True
-        # except Exception as e:
-        #     print(e)
-        #     return False
-
-
-
     # -- LOGIN CONTENT --#
     def Get_UserObjectLogin(self, email, password):
         # Auths a user and returns user object
@@ -187,14 +203,14 @@ class Database():
             return user
         else:
             return False
+
     def Get_CampaignNameFromCID(self,cid):
         # -- Clean up --#
         name=self.Session.query(Campaigns.title).filter(Campaigns.cid==cid).first()
-        #print(type(name))
         if name == None:
             return "Unknown"
-        #print(name.title)
         return name.title
+
     def Get_UserObject(self, email):
         # Auths a user and returns user object:
         user = self.Session.query(Users).filter(Users.user_email==email).first()
@@ -202,38 +218,89 @@ class Database():
         #print(user.password)
         return user
     def Get_AllCampaignImplants(self, cid):
-        implant= self.Session.query(Implants.iid, Implants.title, Implants.description, Implants.callback_url, Implants.implant_key).filter(Implants.cid==cid).all()
+         # THIS IS THE OLD IMPLANT!
+        # implant= self.Session.query(Implants.iid, Implants.title, Implants.description, Implants.callback_url, Implants.stager_key).filter(Implants.cid==cid).all()
+        a = []
+        implant = self.Session.query(GeneratedImplants, Implants).filter(GeneratedImplants.iid==Implants.iid, Implants.cid == cid).all()
         if implant ==None:
             print("Campaign has no implants.")
-        #print(implant.iid)
-        return implant
+        results = self.__splice_implants_and_generated_implants__(implant)
+        return results
 
-    def Get_ImplantFromKey(self,IID):
-        a = self.Session.query(Implants).filter(Implants.implant_key==IID).first()
+    def Get_AllImplantBaseFromCid(self,cid):
+        # -- THIS NEED TO BE REBUILT
+        a = self.Session.query(Implants).filter(Implants.cid == cid).all()
+        ret_list = []
+        for x in a:
+            b= x.__dict__
+            ret_list.append(b)
+        # print(ret_list)
         if a != None:
             return a
         else:
             return False
 
-    def Update_ImplantLastCheckIn(self, ImplantKey):
-        #IID = self.Session.query(Implants).filter(Implants.implant_key==ImplantKey).first()
-        #print(IID, int(time.time()))
-        #IID.last_check_in==int(time.time())
+    def Get_GeneratedImplantDataFromUIK(self,UIK):
+        # -- TODO: reason for this method
+        # print("______UIK: ",UIK)
+        a = self.Session.query(GeneratedImplants, Implants).filter(Implants.iid==GeneratedImplants.iid, GeneratedImplants.unique_implant_id == UIK).all()
+        a = self.__splice_implants_and_generated_implants__(a)
+        if a != None:
+            return a
+        else:
+            return False
 
-        a =self.Session.query(Implants).filter(Implants.implant_key==ImplantKey).update({"last_check_in": (int(time.time()))})
+    def Convert_UniqueImplantKey(self, IID):
+        print("TODO")
+    def Register_NewImplantFromStagerKey(self, StagerKey):
+        # -- We are registering a NEW implant and generating a unique_stager_key (or UIK)
+        # -- Moving forward all reference to ImplantKey/UII should be changed to StagerID
+
+        I = self.Session.query(Implants).filter(Implants.stager_key==StagerKey).first()
+        UIK = random.randint(000000,999999)
+        new_title = str(I.title) +"_"+ str(UIK)
+        GI=GeneratedImplants(unique_implant_id = UIK,last_check_in = 0,current_beacon = I.beacon,iid = I.iid, generated_title = new_title)
+        self.Session.add(GI)
+        try:
+            self.Session.commit()
+            q = self.Session.query(GeneratedImplants).first()
+            print(q)
+
+        except Exception as e:
+            print("db.Add_Implant: ", e)
+            return False
+
+        GetImplant = self.Session.query(GeneratedImplants, Implants).filter(Implants.iid == GeneratedImplants.iid, GeneratedImplants.unique_implant_id == UIK).first()
+        GetImplant = self.__splice_implants_and_generated_implants__(GetImplant)
+        # GetImplant=self.Session.query(Implants,GeneratedImplants).filter(GeneratedImplants.iid == Implants.iid).filter(Implants.stager_key == StagerKey).first()
+        print("Post splicechecl: ",GetImplant)
+        # -- Return Raw objects, and caller to manage them,
+        return GetImplant
+
+
+
+    def Update_ImplantLastCheckIn(self, GeneratedImplantKey):
+        # -- TODO: Create error handling around invalid GeneratedImplantKey
+        a =self.Session.query(GeneratedImplants).filter(GeneratedImplants.unique_implant_id==GeneratedImplantKey).update({"last_check_in": (int(time.time()))})
         self.Session.commit()
-        #print(a.last_check_in)
-        #self.Session.commit()
 
 
-    def Register_ImplantCommand(self, email, iid, cmd):
-        # -- Check if user and iid are allow to work -- #
-        # -- Return Types:
-        #       disallowed use html style errors?
-        #       true false for anti enum?
-        #
-        uid = self.__get_userid__(email)
-        result = self.Session.query(CampaignUsers, Implants).filter(CampaignUsers.uid == uid, Campaigns.cid == CampaignUsers.cid, Implants.cid == Campaigns.cid, Implants.iid ==iid).all()
+    def Register_ImplantCommand(self, username, uik, command):
+        # -- Requirements: username unique_implant_key, command
+        # -- Checks: User can register commands against a generated implant
+
+        uid = self.__get_userid__(username)
+
+        result = self.Session.query(CampaignUsers,
+                                    Implants,
+                                    GeneratedImplants
+                                    ).filter(
+                            CampaignUsers.uid == uid,
+                            Campaigns.cid == CampaignUsers.cid,
+                            Implants.cid == Campaigns.cid,
+                            Implants.iid ==GeneratedImplants.iid,
+                            GeneratedImplants.unique_implant_id == uik).all()
+
         # print(result)
         if len(result) == 0:
             print("No Implant <--> User association")
@@ -244,7 +311,7 @@ class Database():
             elif line[0].write ==1:
                 # uid
                 cid=line[0].cid
-                new_implant_log=ImplantLogs(cid=cid,uid=uid,time=time.time(),log_entry=cmd,iid=iid)
+                new_implant_log=ImplantLogs(cid=cid,uid=uid,time=time.time(),log_entry=command,uik=uik)
                 self.Session.add(new_implant_log)
                 try:
                     self.Session.commit()
@@ -259,14 +326,18 @@ class Database():
                 return False
 
     def Register_ImplantResponse(self,UIK,Response):
+        # -- TODO: REBUILD
         # Pull back the first record which matches the UIK, contain both the Campaign the IID is associated from the implant the UIk is associated with.
-        info=self.Session.query(Implants,Campaigns).filter(Campaigns.cid==Implants.cid).filter(Implants.implant_key==UIK).first()
+        info=self.Session.query(Implants,Campaigns,GeneratedImplants).filter(Campaigns.cid==Implants.cid
+                                                           ).filter(Implants.iid==GeneratedImplants.iid).filter(GeneratedImplants.unique_implant_id==UIK).first()
         iid = info[0].iid
         cid = info[1].cid
+        uik = info[2].unique_implant_id
         # print("Record\ncid:    {}\niid:    {}\nentry:  {}\ntime:   {}".format(cid,iid,Response,int(time.time())))
-        RL=ResponseLogs(cid=cid, iid=iid, log_entry=Response,time=int(time.time()))
+        RL=ResponseLogs(cid=cid, uik=uik, log_entry=Response,time=int(time.time()))
         self.Session.add(RL)
         try:
+            print("Commiting values")
             self.Session.commit()
         except Exception as E:
             print(E)
@@ -274,13 +345,15 @@ class Database():
 
 
     def Get_CampaignImplantResponses(self, cid):
+        # -- TODO: Refactor
         a=self.Session.query(ResponseLogs).filter(ResponseLogs.cid == cid).all()
         ReturnList=[]
         for x in a:
             a = x.__dict__
             if '_sa_instance_state' in a:
                 del a['_sa_instance_state']
-            b = self.Session.query(Implants.title).filter(Implants.iid==a['iid']).first()
+            b = self.Session.query(GeneratedImplants.generated_title).filter(GeneratedImplants.unique_implant_id==a['uik']).first()
+            print("@@@@",b)
             if b != None:
                 a['title']=b[0]
             ReturnList.append(a)
