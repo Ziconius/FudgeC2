@@ -4,7 +4,9 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 from models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants
 
-import time, random
+import bcrypt
+import time
+import random
 class Database():
     def __init__(self):
         engine = create_engine("sqlite:///fudge_2.db?check_same_thread=False")
@@ -84,8 +86,19 @@ class Database():
                 ResultofSplice = {**obj[0].__dict__, **obj[1].__dict__}
             CompletedList.append(ResultofSplice)
         return CompletedList
-#:-:
-    ## -- PUBLIC METHODS -- #
+
+    def __hash_cleartext_password__(self,password):
+        # Hashed a clear text password ready for insertion into the database
+        password_bytes = password.encode()
+        hashedpassword = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+        if bcrypt.checkpw(password_bytes, hashedpassword):
+            return hashedpassword
+        else:
+            return False
+
+    # --
+    # -- PUBLIC METHODS -- #
+    # --
     def Add_User(self, Username, Password, Admin=False):
         # -- TODO: This needs a more rebust response Try/Except.
         query = self.Session.query(Users.password, Users.uid).filter(Users.user_email==Username).all()
@@ -97,6 +110,22 @@ class Database():
         self.Session.add(users)
         self.Session.commit()
         return True
+    def User_HasCompletedFirstLogon(self,email):
+        # -- Return (true/false)
+        HasLoggedOn = self.Session.query(Users).filter(Users.first_logon == 0,Users.user_email == email).all()
+        if HasLoggedOn:
+            print(HasLoggedOn)
+            return True
+        else:
+            print("Else: ",HasLoggedOn)
+            return False
+    def User_ChangePasswordOnFirstLogon(self,email, cleartext):
+        hashedpassword = self.__hash_cleartext_password__(cleartext)
+        Result = self.Session.query(Users).filter(Users.user_email==email).update({"password":(hashedpassword)})
+        self.Session.commit()
+
+
+
     def Create_Campaign(self, title, email, description="Default"):
         # check user:
         uid=self.__get_userid__(email)
@@ -198,9 +227,15 @@ class Database():
     # -- LOGIN CONTENT --#
     def Get_UserObjectLogin(self, email, password):
         # Auths a user and returns user object
-        user = self.Session.query(Users).filter(Users.user_email==email, Users.password==password).first()
+        user = self.Session.query(Users).filter(Users.user_email==email).first()
+        print(password)
+        pwbytes = password.encode()
         if user != None:
-            return user
+            if bcrypt.checkpw(pwbytes, user.password):
+                print("Match!")
+                return user
+            else:
+                return False
         else:
             return False
 

@@ -69,8 +69,11 @@ def login():
             a = db.Get_UserObjectLogin(request.form['email'],request.form['password'])
             if a == False:
                 return render_template("LoginPage.html", error="Incorrect Username/Password")
-            login_user(a)
-            return redirect(url_for("BaseHomePage"))
+            if db.User_ChangePasswordOnFirstLogon(request.form['email'],request.form['password']):
+                login_user(a)
+                return redirect(url_for("BaseHomePage"))
+            else:
+                return redirect(url_for("PasswordReset"))
     return render_template("LoginPage.html")
 
 @app.route("/logout")
@@ -81,6 +84,11 @@ def logout():
         return redirect(url_for("login"))
     else:
         return redirect(url_for("login"))
+
+@app.route("/passwordreset")
+def PasswordReset():
+    print("Resetting")
+    return render_template("PasswordResetPage.html")
 
 # -- PURGE --#
 # -- PURGE --#

@@ -17,6 +17,7 @@ class Users(Base):
     last_login = Column(String(255), nullable=False)
     authenticated = Column(String(), server_default=text("False"))
     admin = Column(String(255), nullable=False)
+    first_logon = Column(INTEGER(1), nullable=False, default=0)
     def is_active(self):
         """True, as all users are active."""
         return True
