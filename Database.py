@@ -4,12 +4,13 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 from models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants
 
+import uuid
 import bcrypt
 import time
 import random
 class Database():
     def __init__(self):
-        engine = create_engine("sqlite:///fudge_2.db?check_same_thread=False")
+        engine = create_engine("sqlite:///fudge.db?check_same_thread=False")
         # -- TODO: RefactorGet_AllCampaignImplants
         self.selectors = {
             "uid": Users.uid,
@@ -49,7 +50,10 @@ class Database():
         else:
             return query[0]
         # TODO: Improve and avoid race conditions.
-
+    def __update_last_logged_in__(self,email):
+        Result = self.Session.query(Users).filter(Users.user_email == email).update({"last_login": (time.time())})
+        self.Session.commit()
+        return True
     def __get_campaignid__(self,campaign):
         #TODO: Improve the Try/Catch
         q = self.Session.query(Campaigns.cid).filter(Campaigns.title==campaign).one()
@@ -119,12 +123,28 @@ class Database():
         else:
             print("Else: ",HasLoggedOn)
             return False
-    def User_ChangePasswordOnFirstLogon(self,email, cleartext):
-        hashedpassword = self.__hash_cleartext_password__(cleartext)
-        Result = self.Session.query(Users).filter(Users.user_email==email).update({"password":(hashedpassword)})
+    def User_ChangePasswordOnFirstLogon(self,guid, current_password,new_password):
+        UserObj = self.Session.query(Users).filter(Users.first_logon_guid==guid).first()
+        if UserObj == None:
+            return False
+        else:
+            if bcrypt.checkpw(current_password.encode(), UserObj.password):
+                print("Correct PW")
+                hashedpassword = self.__hash_cleartext_password__(new_password)
+                Result = self.Session.query(Users).filter(Users.first_logon_guid==guid).update({"password":(hashedpassword),"first_logon":1})
+                self.Session.commit()
+                UpdatedUserObj = self.Session.query(Users).filter(Users.password==hashedpassword).first()
+                print(dir(UpdatedUserObj))
+                return UpdatedUserObj
+            else:
+                return False
+
+    def Get_UserFirstLogonGuid(self, email):
+        pre_guid =str(uuid.uuid4())
+        print(pre_guid)
+        Result = self.Session.query(Users).filter(Users.user_email == email).update({"first_logon_guid": (pre_guid)})
         self.Session.commit()
-
-
+        return pre_guid
 
     def Create_Campaign(self, title, email, description="Default"):
         # check user:
@@ -202,11 +222,12 @@ class Database():
         return a
 
     # -- Implant Content --#
-    def Add_Implant(self,cid, title, url, beacon,initial_delay,comms_http,comms_dns,comms_binary, description="Implant: Blank description."):
+    def Add_Implant(self,cid, title, url,port, beacon,initial_delay,comms_http,comms_dns,comms_binary, description="Implant: Blank description."):
         # -- TODO: Refactor
         implant = Implants(cid=cid,title=title)
         stager_key= random.randint(10000,99999)
         NewImplant = Implants(cid=cid,title=title,description=description,callback_url=url,stager_key=stager_key,file_hash="0",filename="0",
+                              port=port,
                               beacon=beacon,
                               initial_delay=initial_delay,
                               comms_http=comms_http,
@@ -228,11 +249,12 @@ class Database():
     def Get_UserObjectLogin(self, email, password):
         # Auths a user and returns user object
         user = self.Session.query(Users).filter(Users.user_email==email).first()
-        print(password)
-        pwbytes = password.encode()
         if user != None:
-            if bcrypt.checkpw(pwbytes, user.password):
+            #print(password.encode(), user.password.encode())
+            a = user.password
+            if bcrypt.checkpw(password.encode(), a):
                 print("Match!")
+                self.__update_last_logged_in__(email)
                 return user
             else:
                 return False
@@ -287,6 +309,8 @@ class Database():
 
     def Convert_UniqueImplantKey(self, IID):
         print("TODO")
+        # -- Check for reference and remove after.
+
     def Register_NewImplantFromStagerKey(self, StagerKey):
         # -- We are registering a NEW implant and generating a unique_stager_key (or UIK)
         # -- Moving forward all reference to ImplantKey/UII should be changed to StagerID
@@ -388,7 +412,6 @@ class Database():
             if '_sa_instance_state' in a:
                 del a['_sa_instance_state']
             b = self.Session.query(GeneratedImplants.generated_title).filter(GeneratedImplants.unique_implant_id==a['uik']).first()
-            print("@@@@",b)
             if b != None:
                 a['title']=b[0]
             ReturnList.append(a)
@@ -438,60 +461,3 @@ class Database():
             return False
         elif R.read==1:
             return True
-
-'''         
-
-
-    def User_Login(Username, Password):
-        # db.select([census]).where(db.and_(census.columns.state == 'California', census.columns.sex != 'M'))
-        query = sqlalchemy.select([Users]).where(sqlalchemy.and_(Users.columns.user_email == Username, Users.columns.password == Password))
-        #query = sqlalchemy.select([Users])
-        Result = connection.execute(query)
-        ResultSet=Result.fetchone()
-        #print(len(ResultSet))
-
-        if ResultSet != None:
-            return "Sucessful Login: This is an admin account."
-        else:
-            return "Incorrect Username/Password."
-
-
-
-    def Get_Campaign_Info():
-        return
-    def Add_Campaign_User( campaign, email):
-        uid = __get_user_id__(email)
-        if not uid:
-            print("No UID found.")
-            return False
-        cid = __get_campaign_id(campaign)
-        if not cid:
-            print("No CID found.")
-            return False
-        query = sqlalchemy.insert(CampaignUsers).values(cid=CID, uid=uid, read=1, write=1)
-        connection.execute(query)
-        return True
-    def Update_Campaign_User():
-        return
-    def Remove_Campaign_User():
-        return
-    def Create_Implant():
-        return
-    def Log_Implant():
-        return
-    def Log_Response():
-        return
-print(Add_User("admin_3","letmein", True))
-
-User_Login("admin","letmein")
-
-#a= input("Username: ")
-#b= input("Password: ")
-
-#print(User_Login(a,b))
-#Create_Campaign("Boots Ltd.","admin")
-__get_user_id__("admin")
-#metadata.drop_all(engine)
-'''
-#db = Database()
-#db.test("admin")

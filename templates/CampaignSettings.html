@@ -2,7 +2,8 @@
 {% block main2 %}
 
 <div class="m-0 p-3">
-    <h4>Existing Implants & Stagers: {{ campaign }}</h4>
+    <h4>Settings</h4>
+    <h5>Existing Implants & Stagers: {{ campaign }}</h5>
 
     {% if users %}
     <h5>User Access Rights</h5>
@@ -24,7 +25,10 @@
     </div><br>
     {% set count.a = count.a + 1 %}
     {% endfor %}
-
+    {% else %}
+        <hr>
+            <p>Notice::No extra users.</p>
+        <hr>
     {% endif %}
 
 </div>

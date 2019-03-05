@@ -34,14 +34,16 @@
     <div class="col-lg-6" id="Response"></div>
     <div class="col-lg-2" id="ImplantStatus">
         Implant Check in:
+        <div class="" id="ImplantStatusValues">
         {% if Implants %}
             {% for implant in Implants %}
                 <p>{{ implant.generated_title}}: {{ implant.last_check_in }}</p><br>
             {% endfor %}
         {% endif %}
-
+        </div>
     </div>
 </div>
+<script src="{{ url_for('static', filename='ImplantController.js') }}"></script>
 <script>
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -68,25 +70,18 @@ async function get_command_response (){
                  contained_list.push(response[element].log_id)
                  var pageContainer = document.getElementById('Response')
                  pageContainer = response[element].log_id+ pageContainer;
-
                  var GG = response[element].log_id;
                  var utcSeconds = response[element].time;
                  var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
                  d.setUTCSeconds(utcSeconds);
                  console.log(response[element])
                  GG = "<div class=''><p>IID: "+response[element].title+"<br>Time: "+d+"<br>Rsp: <code>"+response[element].log_entry+"</code></p></div><hr>"
-
                  var WP = document.getElementById('Response').innerHTML
-
                  document.getElementById('Response').innerHTML = GG+WP;
                  }
-
                }
             console.log(contained_list)
-
-
             }
-
     })
     await sleep(10000);
     }
@@ -121,6 +116,7 @@ $(function() {
         //document.getElementById('comment').innerHTML=("");//
     });
 });
+Get_ImplantCallback ({{cid}})
 </script>
 {% endblock %}
 

@@ -18,6 +18,7 @@ class Users(Base):
     authenticated = Column(String(), server_default=text("False"))
     admin = Column(String(255), nullable=False)
     first_logon = Column(INTEGER(1), nullable=False, default=0)
+    first_logon_guid = Column(String(32), nullable=False, default=0, unique=True)
     def is_active(self):
         """True, as all users are active."""
         return True
@@ -51,6 +52,7 @@ class Implants(Base):
     file_hash=Column(String(255), nullable=True)
     filename=Column(String(255), nullable=True, unique=True)
     callback_url = Column(String(255), nullable=False, server_default=text("127.0.0.1"))
+    port = Column(INTEGER(5), nullable=False, server_default=text("0"))
     description = Column(String(255))
     beacon = Column(INTEGER(10))
     initial_delay = Column(INTEGER(10))

@@ -4,6 +4,7 @@ import base64
 from Implant import ImplantSingleton
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user
 from Database import Database
+import time
 #from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField
 # This is the web app to control implants and campaigns
 
@@ -69,11 +70,15 @@ def login():
             a = db.Get_UserObjectLogin(request.form['email'],request.form['password'])
             if a == False:
                 return render_template("LoginPage.html", error="Incorrect Username/Password")
-            if db.User_ChangePasswordOnFirstLogon(request.form['email'],request.form['password']):
+            if a.first_logon == 1:
                 login_user(a)
                 return redirect(url_for("BaseHomePage"))
             else:
-                return redirect(url_for("PasswordReset"))
+                GUID = db.Get_UserFirstLogonGuid(request.form['email'])
+
+                return render_template("PasswordResetPage.html",guid=GUID)
+                # return redirect(url_for("PasswordReset",guid=GUID))
+
     return render_template("LoginPage.html")
 
 @app.route("/logout")
@@ -85,10 +90,22 @@ def logout():
     else:
         return redirect(url_for("login"))
 
-@app.route("/passwordreset")
+@app.route("/passwordreset", methods = ['GET','POST'])
 def PasswordReset():
-    print("Resetting")
-    return render_template("PasswordResetPage.html")
+    if request.method =="POST":
+        a = request
+        print(request.form)
+        pw_1=request.form['password_one']
+        pw_2=request.form['password_two']
+        pw_c=request.form['current_password']
+        guid=request.form['id']
+        if pw_1 == pw_2:
+            UserObj = db.User_ChangePasswordOnFirstLogon(guid, pw_c,pw_1)
+            if UserObj:
+                login_user(UserObj)
+                return redirect(url_for('BaseHomePage'))
+    # print("Resetting")
+    return redirect(url_for('login'))
 
 # -- PURGE --#
 # -- PURGE --#
@@ -184,11 +201,12 @@ def BaseImplantSettings(cid):
     # -- Implant List
     g.setdefault('cid', cid)
     Users = db.Get_SettingsUsers(cid, current_user.user_email)
-
     if request.method == "POST":
-        return
+        print("POST - User settings changing")
+        #-- make changes.
+        return render_template("CampaignSettings.html", users=Users)
     else:
-        return render_template("CampaignSettings.html", users = Users)
+        return render_template("CampaignSettings.html", users=Users)
 
 
 @app.route("/<cid>/implant/create", methods=['GET','POST'])
@@ -206,10 +224,12 @@ def NewImplant(cid):
                     raise ValueError('Mandatory values left blank')
                 title = request.form['title']
                 url=request.form['url']
+                port = request.form['port']
                 description= request.form['description']
                 beacon=request.form['beacon_delay']
                 initial_delay=request.form['initial_delay']
-
+                if type(port) != int:
+                    raise ValueError('Port is required as integer')
                 # -- Comms check --#
                 if "comms_http" in request.form :
                     if request.form['comms_http']=="on":
@@ -236,7 +256,7 @@ def NewImplant(cid):
                     raise ValueError('No communitcation channel selected. ')
                 print("NOW CREATING IMPLANT")
                 print(request.method)
-                a = db.Add_Implant(cid, title ,url,beacon,initial_delay,comms_http,comms_dns,comms_binary,description)
+                a = db.Add_Implant(cid, title ,url,port,beacon,initial_delay,comms_http,comms_dns,comms_binary,description)
                 if a== True:
                     return render_template('CreateImplant.html', cid=cid,success="Implant created.")
         except Exception as e:
@@ -275,8 +295,37 @@ def ImplantStager(cid):
 
     return render_template("ImplantStagerPage.html", implantList=ACI)
 
+@app.route("/<cid>/implant/status", methods=['GET','POST'])
+@login_required
+def GetImplantStatus(cid):
+    a = db.Get_AllCampaignImplants("1")
+    data = {}
+    count = 1
+    for x in a:
+        b = x['beacon']
+        a = time.time() - x['last_check_in']
+        c = {"status": None, "title": x['generated_title'], "last_checked_in": x['last_check_in']}
+        if a < b:
+            c['status'] = "good"
+        elif a < b * 2:
+            c['status'] = "normal"
+        else:
+            c['status'] = "poor"
+        data[count] = c
+        count = count + 1
+    return jsonify(data)
 
-# -- Implant comms -- #
+@app.route("/<cid>/Graphs", methods=['GET','POST'])
+@login_required
+def CampaignGraph(cid):
+    g.setdefault('cid', cid)
+    # -- If we receive a POST request then we will populate the page, this will be called AFTER the page has loaded.
+    if request.method=="POST":
+        blah = {'a':"1",'b':"v"}
+        return jsonify(blah)
+    return render_template("CampaignGraph.html")
+
+# -- Implant command execution -- #
 @app.route("/cmd/<cid>", methods=["POST"])
 @login_required
 def ImplantCommandRegistration(cid):

