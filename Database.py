@@ -146,6 +146,7 @@ class Database():
         self.Session.commit()
         return pre_guid
 
+
     def Create_Campaign(self, title, email, description="Default"):
         # check user:
         uid=self.__get_userid__(email)

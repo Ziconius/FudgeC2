@@ -38,4 +38,4 @@ class PSObfucate():
 
 if __name__ == "__main__":
     pso=PSObfucate()
-    pso.variableObs("HyperLinkHackz")
+    pso.variableObs("NetshPersistenceToken")

@@ -3,6 +3,27 @@
 <div class="row justify-content-lg-center m-4">
     <div class="col-lg-10 p-3 m-3 rounded">
         Global Settings - Coming soon.
+        Add user:
+
+    <form action="/settings" method="POST" role="form" class="form-horizontal" id="AnswerForm">
+            <div class="form-group" >
+                <label class="control-label">Add New User</label>
+                <input onfocus="this.placeholder=''" type="text" name="UserName" class="form-control" id="implantCmd" placeholder="cmd">
+            </div>
+            <div>
+                <input TICK BOX>
+            </div>
+            <button type="submit" class="btn btn-default" id="AddUserBtn">Submit</button>
+    </form>
+
+
+
+        Disable User:
+        --Drop down --
+
+        # -- Danger Area --#
+        Delete User
+
     </div>
 </div>
 {% endblock %}

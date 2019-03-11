@@ -4,13 +4,14 @@ import base64
 from Implant import ImplantSingleton
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user
 from Database import Database
+from UserManagement import UserManagementController
 import time
 #from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField
 # This is the web app to control implants and campaigns
 
 db = Database()
 Imp=ImplantSingleton.instance
-
+UsrMgmt = UserManagementController()
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -161,13 +162,24 @@ def CreateNewItem():
     else:
         return render_template('CreateCampaign.html')
 
+
+
+
+# -- Non-Campaign Specific Pages -- #
+# --------------------------------- #
+
 @app.route("/settings",methods=['GET','POST'])
 @login_required
 def GlobalSettingsPage():
+    if request.method == "POST":
+        UsrMgmt.AddUser(request.form,current_user.user_email)
+        print("Check form type and call respecitive function")
     return  render_template("GlobalSettings.html")
 
 
 # -- CAMPAIGN SPECIFIC PAGES -- #
+# ----------------------------- #
+
 @app.route("/<cid>/")
 @login_required
 def BaseImplantPage(cid):
@@ -304,7 +316,7 @@ def GetImplantStatus(cid):
     for x in a:
         b = x['beacon']
         a = time.time() - x['last_check_in']
-        c = {"status": None, "title": x['generated_title'], "last_checked_in": x['last_check_in']}
+        c = {"status": None, "title": x['generated_title'],"last_checked_in": x['last_check_in']}
         if a < b:
             c['status'] = "good"
         elif a < b * 2:
