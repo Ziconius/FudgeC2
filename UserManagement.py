@@ -44,15 +44,25 @@ class UserManagementController():
 
         return Result_Dict
 
-    def AddUserToCampaign(self, Submitter, User, Campaign, Rights=0):
-        print("Here")
-        print(Submitter)
-        S = self.db.Get_UserObject(Submitter)
-        if S.admin:
-            U = self.db.Get_UserObject(User)
-            if U:
-                C = self.db.Get_CampaignInfo(Campaign,Submitter)
-                if C:
-                    self.db.User_SetCampaignAccessRights(U.uid, C.cid,Rights)
-        else:
-            return False
+    def AddUserToCampaign(self, Submitter, Users, Campaign, Rights=0):
+        # -- Refactor with Try/Catch validating the Rights values.
+        # Remove Right kawgs.
+        # Improve variable names
+        # --
+
+        # print("Here")
+        # print(Submitter)
+        if Users:
+            for User in Users:
+                # print("::",User,":",Users[User])
+                S = self.db.Get_UserObject(Submitter)
+                if S.admin:
+                    U = self.db.Get_UserObject(User)
+                    if U:
+                        C = self.db.Get_CampaignInfo(Campaign,Submitter)
+                        if C:
+                            self.db.User_SetCampaignAccessRights(U.uid, C.cid,Users[User])
+
+                else:
+                    return False
+            return True

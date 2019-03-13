@@ -91,6 +91,6 @@ class CampaignUsers(Base):
     auto_id = Column(INTEGER(11), nullable=False, index=True, primary_key=True)
     cid = Column(INTEGER(11),ForeignKey("campaigns.cid"), nullable=False, index=True )
     uid = Column(INTEGER(11), nullable=False, index=True)
-    read =Column(TINYINT(1),nullable=False, server_default=text("'0'"))
-    write =Column(TINYINT(1),nullable=False, server_default=text("'0'"))
+    permissions =Column(TINYINT(1),nullable=False, server_default=text("'0'"))
+    #write =Column(TINYINT(1),nullable=False, server_default=text("'0'"))
 

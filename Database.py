@@ -35,7 +35,8 @@ class Database():
         # rows = self.Session.query(Users).filter(extract('day', Account.created_at) == int(now.day),extract('month', Account.created_at) == now.month).all()
         return query
     def JoinTest(self,user):
-        q=self.Session.query(Campaigns.title,Users.user_email,CampaignUsers.write).filter(Users.user_email==user,CampaignUsers.uid==Users.uid).group_by(Campaigns.title).all()
+        # --
+        q=self.Session.query(Campaigns.title,Users.user_email,CampaignUsers.permissions).filter(Users.user_email==user,CampaignUsers.uid==Users.uid).group_by(Campaigns.title).all()
         #q = self.Session.query(Campaigns,CampaignUsers).join(CampaignUsers)
         for x in q:
             print(x)
@@ -169,12 +170,12 @@ class Database():
         # Make campaign (check no dup name)
         # Add user to campaign users
         # commit or rollback.
-    def Add_CampaignUser(self,CampaignTitle,Email,Read=True,Write=False):
+    def Add_CampaignUser(self,CampaignTitle,Email,Permission=1):
         # a
         cid = self.Session.query(Campaigns.cid).filter(Campaigns.title==CampaignTitle).one()[0]
         uid = self.Session.query(Users.uid).filter(Users.user_email==Email).one()[0]
         print(cid,uid)
-        query=CampaignUsers(cid=cid,uid=uid,read=Read,write=Write)
+        query=CampaignUsers(cid=cid,uid=uid,permission=Permission)
         try:
             self.Session.add(query)
             self.Session.commit()
@@ -366,9 +367,7 @@ class Database():
             print("No Implant <--> User association")
             return False
         for line in result:
-            if line[0].write == 0:
-                return False
-            elif line[0].write ==1:
+            if line[0].permissions == 2:
                 # uid
                 cid=line[0].cid
                 new_implant_log=ImplantLogs(cid=cid,uid=uid,time=time.time(),log_entry=command,uik=uik)
@@ -432,12 +431,9 @@ class Database():
             entry = self.Session.query(CampaignUsers).filter(CampaignUsers.cid ==cid, CampaignUsers.uid== x[1]).first()
             print("::")
             if entry != None:
-                tmp['read'] =entry.read
-                tmp['write'] = entry.write
-                # print(entry.read,entry.write)
+                tmp['permissions'] = entry.permissions
             else:
-                tmp['read'] = 0
-                tmp['write'] = 0
+                tmp['permissions'] = 0
             final.append(tmp)
 
         x = [ i for i in final if i['user'] != user]
@@ -451,9 +447,7 @@ class Database():
         a = self.Session.query(CampaignUsers).filter(CampaignUsers.uid == user, CampaignUsers.cid == cid).first()
         if a != None:
             print(a.cid)
-        # Result = self.Session.query(CampaignUsers).filter(Users.user_email == email).update({"last_login": (time.time())})
-        # self.Session.commit()
-        # return True
+
 
         return
 
@@ -468,7 +462,7 @@ class Database():
         R = self.Session.query(CampaignUsers).filter(CampaignUsers.cid==CID, CampaignUsers.uid==User).first()
         if R == None:
             return False
-        elif R.read==0:
+        elif R.permissions==0:
             return False
-        elif R.read==1:
+        elif R.permissions >=1:
             return True

@@ -222,7 +222,7 @@ def BaseImplantSettings(cid):
             "Request: ",request.form,
             "CID: ",cid
         )
-        #UsrMgmt.AddUserToCampaign(current_user.user_email, request.form, cid)
+        UsrMgmt.AddUserToCampaign(current_user.user_email, request.form, cid)
         #-- make changes.
         return redirect(url_for('BaseImplantSettings', cid=cid))
     else:

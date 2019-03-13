@@ -10,22 +10,25 @@
     {% set count = namespace(a=0) %}
     <form action="/{{cid}}/settings" method="POST" role="form" id="AnswerForm">
     {% for user in users %}
+    <div class="form-group">
     {{ user.user }}
     <!-- Update to check the current rights of a user!-->
     <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio{{a}}" value="0">
-        <label class="form-check-label" for="inlineRadio{{a}}">None</label>
+        <input class="form-check-input" type="radio" name="{{ user.user }}" id="inlineRadio{{count.a}}" value="0">
+        <label class="form-check-label" for="inlineRadio{{count.a}}">None</label>
     </div>
     <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio{{a}}" value="1">
-        <label class="form-check-label" for="inlineRadio{{a}}">Read</label>
+        <input class="form-check-input" type="radio" name="{{ user.user }}" id="inlineRadio{{count.a}}" value="1">
+        <label class="form-check-label" for="inlineRadio{{count.a}}">Read</label>
     </div>
     <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio{{a}}" value="2">
-        <label class="form-check-label" for="inlineRadio{{a}}">Read/Write</label>
-    </div><br>
+        <input class="form-check-input" type="radio" name="{{ user.user }}" id="inlineRadio{{count.a}}" value="2">
+        <label class="form-check-label" for="inlineRadio{{count.a}}">Read/Write</label>
+    </div>
+    <br>
 
     {% set count.a = count.a + 1 %}
+    </div>
     {% endfor %}
     <button type="submit" class="btn btn-default" id="AddUserBtn">Submit</button>
     </form>
