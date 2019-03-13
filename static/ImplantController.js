@@ -16,7 +16,15 @@ async function Get_ImplantCallback (cid){
                     var utcSeconds = response[element].last_checked_in;
                     var d = new Date(0);
                     d.setUTCSeconds(utcSeconds);
-                    GG = "<div class=''><p>title: "+response[element].title+"<br>Time: "+d+"<br>status: <code>"+response[element].status+"</code></p></div><hr>"
+                    var CodeColour = "text-primary"
+                    if (response[element].status=='poor'){
+                        var CodeColour="text-danger"
+                    } else if (response[element].status=='normal') {
+                        var CodeColour="text-warning"
+                    } else if (response[element].status=='good') {
+                        var CodeColour="text-success"
+                    }
+                    GG = "<div class=''><p>Title: "+response[element].title+"<br>Time: "+d+"<br>Status: <code class='"+CodeColour+"'>"+response[element].status+"</code></p></div><hr>"
                     document.getElementById('ImplantStatusValues').innerHTML = document.getElementById('ImplantStatusValues').innerHTML + GG;
                 }
             }

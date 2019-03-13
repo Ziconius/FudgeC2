@@ -110,7 +110,7 @@ class Database():
             # print(query[0][1])
             return False
         print("::")
-        users = Users(user_email=Username,password=Password,admin=Admin,last_login=time.time())
+        users = Users(user_email=Username,password=self.__hash_cleartext_password__(Password),admin=Admin,last_login=time.time())
         self.Session.add(users)
         self.Session.commit()
         return True
@@ -443,8 +443,18 @@ class Database():
         x = [ i for i in final if i['user'] != user]
         return x
 
-    def Set_UserCampaignReadWrite(self,uid, readwrite):
-        # -- UID + 0 None 1 read 2 write
+    def User_SetCampaignAccessRights(self,user,cid, rights):
+        # -- Int::User
+
+        # -- Int: cid
+        # -- Int::Right 0/1/2 (None/Read/Read+Write)
+        a = self.Session.query(CampaignUsers).filter(CampaignUsers.uid == user, CampaignUsers.cid == cid).first()
+        if a != None:
+            print(a.cid)
+        # Result = self.Session.query(CampaignUsers).filter(Users.user_email == email).update({"last_login": (time.time())})
+        # self.Session.commit()
+        # return True
+
         return
 
     # -- Reusable Security Checks
@@ -452,7 +462,7 @@ class Database():
     def Verify_UserCanAccessCampaign(self,Users,CID):
         # -- TODO: Reduce line count, and if,elif, and else statment to a cleaner alternative.
         User = self.__get_userid__(Users)
-        print(User)
+        # print(User)
         if User == None:
             return False
         R = self.Session.query(CampaignUsers).filter(CampaignUsers.cid==CID, CampaignUsers.uid==User).first()

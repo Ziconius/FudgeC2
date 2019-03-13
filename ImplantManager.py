@@ -119,7 +119,7 @@ def management():
 @app.route("/aab/<cid>", methods =['GET','POST'])
 @login_required
 def cmdreturn(cid):
-    print(request, cid)
+    # print(request, cid)
     if db.Verify_UserCanAccessCampaign(current_user.user_email,cid):
         # print(type())
         return jsonify(Imp.Get_CommandResult(cid))
@@ -172,8 +172,10 @@ def CreateNewItem():
 @login_required
 def GlobalSettingsPage():
     if request.method == "POST":
-        UsrMgmt.AddUser(request.form,current_user.user_email)
+        # -- Add user returns a dict with action/result/reason keys.
+        Result = UsrMgmt.AddUser(request.form,current_user.user_email)
         print("Check form type and call respecitive function")
+        return jsonify(Result)
     return  render_template("GlobalSettings.html")
 
 
@@ -206,7 +208,7 @@ def ImplantInputPage(cid,iid):
     return render_template("implant_input.html", Implants=a)
 
 @login_required
-@app.route ("/<cid>/settings")
+@app.route ("/<cid>/settings", methods=['GET','POST'])
 def BaseImplantSettings(cid):
     # -- Gather Data for settings:
     # -- Users + read/write/none
@@ -215,8 +217,14 @@ def BaseImplantSettings(cid):
     Users = db.Get_SettingsUsers(cid, current_user.user_email)
     if request.method == "POST":
         print("POST - User settings changing")
+        print(
+            "User:",current_user.user_email,
+            "Request: ",request.form,
+            "CID: ",cid
+        )
+        #UsrMgmt.AddUserToCampaign(current_user.user_email, request.form, cid)
         #-- make changes.
-        return render_template("CampaignSettings.html", users=Users)
+        return redirect(url_for('BaseImplantSettings', cid=cid))
     else:
         return render_template("CampaignSettings.html", users=Users)
 
