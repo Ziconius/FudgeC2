@@ -46,23 +46,28 @@ class UserManagementController():
 
     def AddUserToCampaign(self, Submitter, Users, Campaign, Rights=0):
         # -- Refactor with Try/Catch validating the Rights values.
+        '''
+        :param Submitter: string
+        :param Users: Request.form (dict)
+        :param Campaign: int
+        :param Rights: int
+        :return: bool
+        '''
         # Remove Right kawgs.
         # Improve variable names
         # --
-
-        # print("Here")
-        # print(Submitter)
+        if len(Users) < 1:
+            print("too few")
+            return False
         if Users:
             for User in Users:
-                # print("::",User,":",Users[User])
                 S = self.db.Get_UserObject(Submitter)
                 if S.admin:
                     U = self.db.Get_UserObject(User)
                     if U:
-                        C = self.db.Get_CampaignInfo(Campaign,Submitter)
+                        C = self.db.Verify_UserCanAccessCampaign(S.user_email,Campaign)
                         if C:
-                            self.db.User_SetCampaignAccessRights(U.uid, C.cid,Users[User])
-
+                            self.db.User_SetCampaignAccessRights(U.uid, Campaign,Users[User])
                 else:
                     return False
             return True

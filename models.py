@@ -18,7 +18,7 @@ class Users(Base):
     authenticated = Column(String(), server_default=text("False"))
     admin = Column(String(255), nullable=False)
     first_logon = Column(INTEGER(1), nullable=False, default=0)
-    first_logon_guid = Column(String(32), nullable=False, default=0, unique=True)
+    first_logon_guid = Column(String(32), nullable=False, default=0)
     def is_active(self):
         """True, as all users are active."""
         return True
@@ -94,3 +94,8 @@ class CampaignUsers(Base):
     permissions =Column(TINYINT(1),nullable=False, server_default=text("'0'"))
     #write =Column(TINYINT(1),nullable=False, server_default=text("'0'"))
 
+class AppLogs(Base):
+    __tablename__='app_logs'
+    log_id = Column(INTEGER(16), primary_key=True, index=True, nullable=False)
+    type = Column(String(255), nullable=False)
+    data = Column(String(255),nullable=False)

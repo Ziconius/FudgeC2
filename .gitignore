@@ -3,8 +3,11 @@
 # No xml in use - this is likely pycharm stuff.
 *.xml
 *.db
+*.pyc
 .__pycharm__/*
 __pycache__/*
+modules/__pycache__/*
 .idea/*
 scratch*
 *-journal
+log.txt

@@ -2,12 +2,14 @@
 from sqlalchemy import create_engine, func, extract
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
-from models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants
+from models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs
 
 import uuid
 import bcrypt
 import time
 import random
+from Logging import Logging
+L=Logging()
 class Database():
     def __init__(self):
         engine = create_engine("sqlite:///fudge.db?check_same_thread=False")
@@ -185,6 +187,7 @@ class Database():
             return False
 
     def Get_CampaignInfo(self,campaign,email):
+        # -- Not used?
         q = self.Session.query(Campaigns).filter(Campaigns.title==campaign,Users.user_email==email).all()
         for x in q:
             print("User:",email,x.title,x.description,x.created)
@@ -224,7 +227,7 @@ class Database():
         return a
 
     # -- Implant Content --#
-    def Add_Implant(self,cid, title, url,port, beacon,initial_delay,comms_http,comms_dns,comms_binary, description="Implant: Blank description."):
+    def Add_Implant(self,cid, title, url,port, beacon,initial_delay,comms_http=0,comms_dns=0,comms_binary=0, description="Implant: Blank description."):
         # -- TODO: Refactor
         implant = Implants(cid=cid,title=title)
         stager_key= random.randint(10000,99999)
@@ -244,18 +247,19 @@ class Database():
             return True
         except Exception as e:
             print("db.Add_Implant: ",e)
-            return False
+            return e
 
 
     # -- LOGIN CONTENT --#
+    @L.log("User logged in.")
     def Get_UserObjectLogin(self, email, password):
         # Auths a user and returns user object
+        print(email,password)
         user = self.Session.query(Users).filter(Users.user_email==email).first()
         if user != None:
             #print(password.encode(), user.password.encode())
             a = user.password
             if bcrypt.checkpw(password.encode(), a):
-                print("Match!")
                 self.__update_last_logged_in__(email)
                 return user
             else:
@@ -429,7 +433,7 @@ class Database():
         for x in User:
             tmp={"user":x[0],"uid":x[1]}
             entry = self.Session.query(CampaignUsers).filter(CampaignUsers.cid ==cid, CampaignUsers.uid== x[1]).first()
-            print("::")
+            # print("::")
             if entry != None:
                 tmp['permissions'] = entry.permissions
             else:
@@ -440,15 +444,26 @@ class Database():
         return x
 
     def User_SetCampaignAccessRights(self,user,cid, rights):
-        # -- Int::User
-
-        # -- Int: cid
-        # -- Int::Right 0/1/2 (None/Read/Read+Write)
+        '''
+        :param user: Int
+        :param cid: Int
+        :param rights: Int [0/1/2]
+        :return: bool
+        '''
+        print(user,cid, rights)
         a = self.Session.query(CampaignUsers).filter(CampaignUsers.uid == user, CampaignUsers.cid == cid).first()
-        if a != None:
-            print(a.cid)
-
-
+        if a == None:
+            PermissionUpdate = CampaignUsers(cid=cid,uid=user,permissions=rights)
+            self.Session.add(PermissionUpdate)
+            try:
+                self.Session.commit()
+                return True
+            except Exception as E:
+                print(E)
+                return False
+        else:
+            Result = self.Session.query(CampaignUsers).filter(CampaignUsers.cid==cid, CampaignUsers.uid==user).update({'cid':cid,'uid':user,'permissions':rights})
+            self.Session.commit()
         return
 
     # -- Reusable Security Checks
@@ -460,9 +475,28 @@ class Database():
         if User == None:
             return False
         R = self.Session.query(CampaignUsers).filter(CampaignUsers.cid==CID, CampaignUsers.uid==User).first()
-        if R == None:
-            return False
-        elif R.permissions==0:
+        if R == None or R.permissions <=0:
             return False
         elif R.permissions >=1:
             return True
+
+    def Verify_UserCanWriteCampaign(self, username,cid):
+        uid = self.__get_userid__(username)
+        if uid == None:
+            return False
+        R = self.Session.query(CampaignUsers).filter(CampaignUsers.cid == cid, CampaignUsers.uid == uid).first()
+        if R == None or R.permissions <2:
+            print("or statement"    )
+            return False
+        elif R.permissions >= 2:
+            return True
+
+    # -- App Logging Classes -- #
+    # ------------------------- #
+    def Log_ApplicationLogging(self, values):
+        campaign = AppLogs(type=values['type'], data=values['data'])
+        self.Session.add(campaign)
+        try:
+            self.Session.commit()  # flush check if this will work...
+        except:
+            return False
