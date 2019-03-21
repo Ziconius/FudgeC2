@@ -78,6 +78,7 @@ class ImplantLogs(Base):
     uik=Column(INTEGER(11), nullable=False, index=True)
     time =Column(INTEGER(11), nullable=False, index=True)
     log_entry =Column(String(255), nullable=False)
+    read_by_implant = Column(INTEGER(16),nullable=False, server_default=text("0"))
 
 class Campaigns(Base):
     __tablename__='campaigns'

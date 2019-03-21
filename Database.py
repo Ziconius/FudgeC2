@@ -48,7 +48,7 @@ class Database():
     def __get_userid__(self,email):
         # -- Require further improvement i.e try:catch
         query = self.Session.query(Users.uid).filter(Users.user_email == email).first()
-        if query[0] == None:
+        if query == None:
             return False
         else:
             return query[0]
@@ -205,26 +205,11 @@ class Database():
             #print(x)
             campaignList.append(x[0])
         return campDict
-    def Get_ImplantIDFromTitle(self, CID,ImplantID, Email):
-        # -- NOT COMPLETE: ENSURE 'ALL' entry returns a list of implants.
-        # -- RETURN ( list:iid(int) )
-        a=[]
-        # -- In progress
-        if ImplantID == "ALL":
-            IID = self.Session.query(GeneratedImplants,Implants).filter(GeneratedImplants.iid==Implants.iid ,Implants.cid == CID).all()
-            IID=self.__splice_implants_and_generated_implants__(IID)
-            for x in IID:
-                print(x['unique_implant_id'])
-                a.append(x['unique_implant_id'])
-        else:
-            print("Getting implant record from title: ", ImplantID)
-            IID = self.Session.query(GeneratedImplants, Implants).filter(Implants.iid == GeneratedImplants.iid, GeneratedImplants.generated_title == ImplantID).all()
-            IID = self.__splice_implants_and_generated_implants__(IID)
-            # IID = self.Session.query(Implants).filter(Implants.title == ImplantID).all()
-            for element in IID:
-                print(element['unique_implant_id'])
-                a.append(element['unique_implant_id'])
-        return a
+    def Get_AllImplantIDFromTitle(self, Implant_title):
+        # -- Return list containing generated implant dictionaries.
+        IID = self.Session.query(GeneratedImplants, Implants).filter(Implants.iid == GeneratedImplants.iid, GeneratedImplants.generated_title == Implant_title).all()
+        IID = self.__splice_implants_and_generated_implants__(IID)
+        return IID
 
     # -- Implant Content --#
     def Add_Implant(self,cid, title, url,port, beacon,initial_delay,comms_http=0,comms_dns=0,comms_binary=0, description="Implant: Blank description."):
@@ -303,9 +288,17 @@ class Database():
         else:
             return False
 
+    def Get_AllGeneratedImplantsFromCID(self, CID):
+        raw_implants= self.Session.query(GeneratedImplants, Implants).filter(GeneratedImplants.iid == Implants.iid, Implants.cid == CID).all()
+        generated_implants = self.__splice_implants_and_generated_implants__(raw_implants)
+        if generated_implants != None:
+            return generated_implants
+        else:
+            return False
+
     def Get_GeneratedImplantDataFromUIK(self,UIK):
-        # -- TODO: reason for this method
-        # print("______UIK: ",UIK)
+        # -- Pulls all configuration data for a generated implant based on UIK.
+        # --    Used when implants checkin.
         a = self.Session.query(GeneratedImplants, Implants).filter(Implants.iid==GeneratedImplants.iid, GeneratedImplants.unique_implant_id == UIK).all()
         a = self.__splice_implants_and_generated_implants__(a)
         if a != None:
@@ -343,7 +336,8 @@ class Database():
         return GetImplant
 
 
-
+    # -- Active Implant Queries -- #
+    # ---------------------------- #
     def Update_ImplantLastCheckIn(self, GeneratedImplantKey):
         # -- TODO: Create error handling around invalid GeneratedImplantKey
         a =self.Session.query(GeneratedImplants).filter(GeneratedImplants.unique_implant_id==GeneratedImplantKey).update({"last_check_in": (int(time.time()))})
@@ -366,7 +360,6 @@ class Database():
                             Implants.iid ==GeneratedImplants.iid,
                             GeneratedImplants.unique_implant_id == uik).all()
 
-        # print(result)
         if len(result) == 0:
             print("No Implant <--> User association")
             return False
@@ -374,7 +367,7 @@ class Database():
             if line[0].permissions == 2:
                 # uid
                 cid=line[0].cid
-                new_implant_log=ImplantLogs(cid=cid,uid=uid,time=time.time(),log_entry=command,uik=uik)
+                new_implant_log=ImplantLogs(cid=cid,uid=uid,time=time.time(),log_entry=command,uik=uik,read_by_implant=0)
                 self.Session.add(new_implant_log)
                 try:
                     self.Session.commit()
@@ -387,6 +380,34 @@ class Database():
             else:
                 # -- Incase non 0/1 response --#
                 return False
+    def Get_RegisteredImplantCommandsFromUIK(self, UIK):
+        # -- Return List
+        Logs = self.Session.query(ImplantLogs).filter(ImplantLogs.uik == UIK).all()
+        if Logs != None:
+            return Logs
+        else:
+            return []
+
+    def Get_RegisteredImplantCommandsFromCID(self, CID):
+        Logs = self.Session.query(ImplantLogs).filter(ImplantLogs.cid == CID).all()
+        if len(Logs) > 0:
+            return Logs
+        else:
+            return []
+
+    def Register_ImplantCommandPickup(self,uik, cmd, reg_time):
+        # a = self.Session.query(GeneratedImplants).filter(
+        #     GeneratedImplants.unique_implant_id == GeneratedImplantKey).update({"last_check_in": (int(time.time()))})
+        ImplantPickup = self.Session.query(ImplantLogs).filter(
+            ImplantLogs.uik == uik,
+            ImplantLogs.log_entry == cmd,
+            ImplantLogs.time == reg_time).update({'read_by_implant':(int(time.time()))})
+        try:
+            self.Session.commit()
+            return True
+        except Exception as E:
+            print(E)
+            return False
 
     def Register_ImplantResponse(self,UIK,Response):
         # -- TODO: REBUILD
@@ -425,6 +446,7 @@ class Database():
 
 
     # -- Campaign Settings Content -- #
+    # ------------------------------- #
     def Get_SettingsUsers(self, cid, user):
         # TODO: Create a list of user dicts with name, uid, and read/write to be returned to a table with radio tabs.
         # TODO: Clean up
@@ -466,12 +488,10 @@ class Database():
             self.Session.commit()
         return
 
-    # -- Reusable Security Checks
-
+    # -- Access Control Checks
     def Verify_UserCanAccessCampaign(self,Users,CID):
         # -- TODO: Reduce line count, and if,elif, and else statment to a cleaner alternative.
         User = self.__get_userid__(Users)
-        # print(User)
         if User == None:
             return False
         R = self.Session.query(CampaignUsers).filter(CampaignUsers.cid==CID, CampaignUsers.uid==User).first()
@@ -481,12 +501,12 @@ class Database():
             return True
 
     def Verify_UserCanWriteCampaign(self, username,cid):
+        # Return bool
         uid = self.__get_userid__(username)
         if uid == None:
             return False
         R = self.Session.query(CampaignUsers).filter(CampaignUsers.cid == cid, CampaignUsers.uid == uid).first()
-        if R == None or R.permissions <2:
-            print("or statement"    )
+        if R == None or R.permissions < 2:
             return False
         elif R.permissions >= 2:
             return True

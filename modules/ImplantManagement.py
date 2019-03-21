@@ -1,16 +1,27 @@
 from Database import Database
+from Implant import ImplantSingleton
 class ImplantManagement():
     db = Database()
+    Imp = ImplantSingleton.instance
 
     def ImplantCommandRegistration(self, cid , username, form):
         # -- This should be refactored at a later date to support read/write changes to
         # --    granular controls on templates, and later specific implants
-        User = self.db.Verify_UserCanWriteCampaign(cid, username)
-        if User == True:
-            print("We can register commands")
+        User = self.db.Verify_UserCanWriteCampaign(username,cid)
+        if User == False:
+            return False
 
-
-        return
+        # -- Get All implants or implants by name then send to 'implant.py'
+        # -- email, unique implant key, cmd
+        if "cmd" in form and "ImplantSelect" in form:
+            if form['ImplantSelect'] == "ALL":
+                ListOfImplants = self.db.Get_AllGeneratedImplantsFromCID(cid)
+            else:
+                ListOfImplants= self.db.Get_AllImplantIDFromTitle(form['ImplantSelect'])
+            for implant in ListOfImplants:
+                self.Imp.AddCommand(username,implant['unique_implant_id'], form['cmd'])
+            return True
+        return False
 
     def CreateNewImplant(self,cid,form, user):
         # -- This is creating a new Implant Template
@@ -57,3 +68,17 @@ class ImplantManagement():
             print("NewImplant: ",e)
             # -- Implicting returning page with Error --#
             return e
+
+    def Get_RegisteredImplantCommands(self, username, cid=0):
+        #Return list of dictionaries, not SQLAlchemy Objects.
+        if self.db.Verify_UserCanAccessCampaign(username, cid):
+            Commands = self.db.Get_RegisteredImplantCommandsFromCID(cid)
+            toDict = []
+            for x in Commands:
+                a = x.__dict__
+                if '_sa_instance_state' in a:
+                    del a['_sa_instance_state']
+                toDict.append(a)
+            return toDict
+        else:
+            return False

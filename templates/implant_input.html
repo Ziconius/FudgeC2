@@ -29,6 +29,10 @@
         </fieldset>
             <button type="submit" class="btn btn-default" id="AnswerBtn">Submit</button>
     </form>
+        <div><hr><p>Queued Commands</p></div>
+        <div id="awaiting">
+
+        </div>
     </div>
 
     <div class="col-lg-6" id="Response"></div>
@@ -48,39 +52,36 @@
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-<!--localStorage.setItem("ImplantRecord",[])-->
 var contained_list=[];
 async function get_command_response (){
-    console.log("~~"+contained_list)
     while(true){
     $.ajax({
-        url:"/aab/{{cid}}",
+        url:"/{{ cid }}/cmd_response",
         type:"GET",
         success: function (response) {
             // Get list of responses
-            console.log("++"+response+"++")
+            var pageContainer = document.getElementById('Response');
             for (element in response){
-                console.log("~~"+response[element].log_id)
-                <!-- Check for the log_id existing, if it doesn't add to list and write to top of page to remove weird loading page-->
-                if( contained_list.includes(response[element].log_id)){
-                    console.log('LOL');
-                    }
-                else{
-                    console.log(1);
-                 contained_list.push(response[element].log_id)
-                 var pageContainer = document.getElementById('Response')
-                 pageContainer = response[element].log_id+ pageContainer;
-                 var GG = response[element].log_id;
-                 var utcSeconds = response[element].time;
-                 var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
-                 d.setUTCSeconds(utcSeconds);
-                 console.log(response[element])
-                 GG = "<div class=''><p>IID: "+response[element].title+"<br>Time: "+d+"<br>Rsp: <code>"+response[element].log_entry+"</code></p></div><hr>"
-                 var WP = document.getElementById('Response').innerHTML
-                 document.getElementById('Response').innerHTML = GG+WP;
+                // Check for the log_id existing, if it doesn't add to list and write to top of page to remove weird loading page
+                if ( contained_list.includes(response[element].log_id) ) {
+                    console.log('Entry found');
+                } else {
+
+                    contained_list.push(response[element].log_id);
+                    // pageContainer = response[element].log_id+ pageContainer;
+                    // alert(pageContainer)
+                    GG = response[element].log_id;
+                    var utcSeconds = response[element].time;
+                    var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
+                    d.setUTCSeconds(utcSeconds);
+                    // console.log(response[element]);
+                    GG = "<div><p>IID: "+response[element].title+"<br>Time: "+d+"<br>Rsp: <code>"+response[element].log_entry+"</code></p></div><hr>";
+                    WP = document.getElementById('Response').innerHTML;
+                    // alert(WP);
+                    document.getElementById('Response').innerHTML = GG + WP;
                  }
                }
-            console.log(contained_list)
+            //console.log(contained_list)
             }
     })
     await sleep(10000);
@@ -117,6 +118,7 @@ $(function() {
     });
 });
 Get_ImplantCallback ({{cid}})
+Get_Awaiting_Cmds ({{cid}})
 </script>
 {% endblock %}
 

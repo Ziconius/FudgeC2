@@ -8,10 +8,8 @@ A Powershell implant framework built on Python3/Flask- Designed for team collabo
 #### Implant Manager
 
 * Add password change
-* Add Create user function
 * Add icons to supplement text
 * Order implant check-ins buy quality
-* Set implant check-in colour to green/amber/red
 
 
 ##### Implant
@@ -22,6 +20,8 @@ A Powershell implant framework built on Python3/Flask- Designed for team collabo
 ##### Controller
 * Check for `fudge.db` in the working dir, if not configure new setup.
 * Code refactor Controller to boot server & listener 
+* Restructure 
+
 ###  ----------------------
 
 

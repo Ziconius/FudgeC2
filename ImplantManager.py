@@ -24,21 +24,15 @@ login.init_app(app)
 @app.context_processor
 def inject_dict_for_all_auth_templates():
     # -- Returns the list of Campaigns the auth'd user has read access to --#
-    #print(dir(current_user),current_user.is_authenticated)
     if current_user.is_authenticated:
-        #print(current_user)
         # Return the list of the users available campaigns for the navbar dropdown.
-        print(current_user.user_email)
         return dict(campaignlist=db.Get_AllUserCampaigns(current_user.user_email))
     else:
         return dict()
-    # return dict(mydict=code_to_generate_dict())
 
 @app.context_processor
 def inject_dict_for_all_campaign_templates(cid=None):
-    #print(request.url)
     if 'cid' in g:
-        #print("We gots' a CID BOIS!")
         cid =g.get('cid')
         cname=db.Get_CampaignNameFromCID(cid)
     if cid != None:
@@ -82,10 +76,7 @@ def login():
                 return redirect(url_for("BaseHomePage"))
             else:
                 GUID = db.Get_UserFirstLogonGuid(request.form['email'])
-
                 return render_template("PasswordResetPage.html",guid=GUID)
-                # return redirect(url_for("PasswordReset",guid=GUID))
-
     return render_template("LoginPage.html")
 
 @app.route("/auth/logout")
@@ -99,6 +90,7 @@ def logout():
 
 @app.route("/auth/passwordreset", methods = ['GET','POST'])
 def PasswordReset():
+    # -- TODO: Move to the UserManagement Class.
     if request.method =="POST":
         a = request
         print(request.form)
@@ -111,40 +103,27 @@ def PasswordReset():
             if UserObj:
                 login_user(UserObj)
                 return redirect(url_for('BaseHomePage'))
-    # print("Resetting")
     return redirect(url_for('login'))
 
-# -- PURGE --#
-# -- PURGE --#
 
-@app.route("/abc", methods =['GET','POST'])
-@login_required
-def management():
-    return render_template('main.html')
-
-@app.route("/aab/<cid>", methods =['GET','POST'])
+# -- JSON Response for command responses and waiting commands -- #
+@app.route("/<cid>/cmd_response", methods =['GET','POST'])
 @login_required
 def cmdreturn(cid):
-    # print(request, cid)
+    # -- Javascript appears to not be printing out all entries
     if db.Verify_UserCanAccessCampaign(current_user.user_email,cid):
-        # print(type())
         return jsonify(Imp.Get_CommandResult(cid))
     else:
         return str(0)
-#Endpoint query
 
-@app.route("/aaa/<cmd>", methods =['GET','POST'])
-@app.route("/aaa", methods =['GET','POST'])
+@app.route("/<cid>/waiting_commands", methods=['GET','POST'])
 @login_required
-def aaa(cmd=0):
-    if request.method=="GET":
-        Imp.AddCommand(cmd)
-        return "a"
-    else:
-        Imp.AddCommand(request.form['ta'])
-        return "OK."
-# -- END PURGE --#
-# -- END PURGE --#
+def waitingcommands(cid):
+    # -- Get JSON blob which contains all implant commands and then registration state
+    Commands = ImpMgmt.Get_RegisteredImplantCommands(current_user.user_email, cid)
+    return jsonify(Commands)
+
+
 
 
 # -- NEW ENDPOINTS -- #
@@ -309,11 +288,16 @@ def CampaignGraph(cid):
 @login_required
 def ImplantCommandRegistration(cid):
     if request.method == "POST":
-        print("CID: ",cid,"\nFRM: ",request.form)
+        print("\nCID: ",cid,"\nFRM: ",request.form)
+        # -- This is the new format using ImpMgmt to handle validation of user and command.
         ImpMgmt.ImplantCommandRegistration(cid, current_user.user_email, request.form)
+        # -- Currently no return value is required. This should be defined.
+
+        # -- Temp blocker while using developing ImpMgmt.ImpCmdReg()
         a = 0
         if a == 0:
             return jsonify({"1":0})
+        # -- End of dev blocker
 
         if "cmd" in request.form and "ImplantSelect" in request.form:
             # This check if specific implant or ALL implants.

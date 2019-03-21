@@ -32,3 +32,27 @@ async function Get_ImplantCallback (cid){
     await sleep(15000);
     }
 };
+
+
+async function Get_Awaiting_Cmds (cid){
+    while(true){
+        $.ajax({
+            url:`/${cid}/waiting_commands`,
+            type:"GET",
+            success: function (response) {
+                document.getElementById('awaiting').innerHTML = ""
+                //    document.getElementById('awaiting').innerHTML = response
+                for (element in response){
+                    //contained_list.push(response[element].title)
+                    //var pageContainer = document.getElementById('awaiting')
+                    if (response[element].read_by_implant == 0){
+                        console.log(response[element].time)
+                        line="<p>Implant ID: "+response[element].uik+"</br>Command: "+response[element].log_entry+"</p>"
+                        document.getElementById('awaiting').innerHTML =  document.getElementById('awaiting').innerHTML + line
+                    } else { console.log(response[element].time)}
+                }
+            }
+        })
+    await sleep(15000);
+    }
+};
