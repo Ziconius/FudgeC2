@@ -14,7 +14,9 @@ def Start_Listener( threadName, delay):
     App.run(debug=True, use_reloader=False, host='0.0.0.0', port=5000, threaded=True)
 
 def Start_Controller(x,y):
-   Manager.run(debug=True, use_reloader=False, host='0.0.0.0', port=5001, threaded=True)
+   # Using ssl_context as a temp measure, this should be changed in a production environment to support SSL via
+   #  WSGI and nginx.
+   Manager.run(debug=True, use_reloader=False, host='0.0.0.0', port=5001, threaded=True, ssl_context='adhoc')
    return
 
 

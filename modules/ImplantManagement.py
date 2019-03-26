@@ -48,8 +48,11 @@ class ImplantManagement():
                 comms_http = 0
                 comms_dns = 0
                 comms_binary = 0
-                if type(port) != int:
-                    raise ValueError('Port is required as integer')
+                try:
+                    port = int(port)
+                except:
+                    if type(port) != int:
+                        raise ValueError('Port is required as integer')
                 # -- Comms check --#
                 if "comms_http" in form :
                     comms_http = 1

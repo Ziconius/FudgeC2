@@ -20,7 +20,9 @@ A Powershell implant framework built on Python3/Flask- Designed for team collabo
 ##### Controller
 * Check for `fudge.db` in the working dir, if not configure new setup.
 * Code refactor Controller to boot server & listener 
-* Restructure 
+* Code to be moved into folders and more managers to be constructed
+* Restructure how listeners are configured and launched. This peice of work will likely take several weeks of reengineering.
+  
 
 ###  ----------------------
 

@@ -66,29 +66,16 @@ class Database():
             print(q[0])
     def __splice_implants_and_generated_implants__(self, obj):
         # Hand a list of genrerated imaplnts and implabt list pairs and splice them togerther returning in a [{},{}] format
-        # print(str(type(obj)))
         CompletedList = []
         if type(obj) == list:
             for x in obj:
                 ResultofSplice={}
-                # print(type(x))
                 if str(type(x)) == "<class 'sqlalchemy.util._collections.result'>":
                     ResultofSplice = {**x[0].__dict__, **x[1].__dict__}
-                    # ResultofSplice
-                    # ResultofSplice x[1].__dict__
-                    # print(ResultofSplice)
                 CompletedList.append(ResultofSplice)
-            # for element in CompletedList:
-            #     print("@@: ",element)
-            #     for key in element.keys():
-            #         print(key,": ",element[key])
-            # print("Notice: __splice__ Success", CompletedList)
             return CompletedList
         else:
-            print("bb")
-            print(type(obj))
             ResultofSplice = {}
-            # print(type(x))
             if str(type(obj)) == "<class 'sqlalchemy.util._collections.result'>":
                 ResultofSplice = {**obj[0].__dict__, **obj[1].__dict__}
             CompletedList.append(ResultofSplice)
@@ -110,9 +97,7 @@ class Database():
         # -- TODO: This needs a more rebust response Try/Except.
         query = self.Session.query(Users.password, Users.uid).filter(Users.user_email==Username).all()
         for x in query:
-            # print(query[0][1])
             return False
-        print("::")
         users = Users(user_email=Username,password=self.__hash_cleartext_password__(Password),admin=Admin,last_login=time.time())
         self.Session.add(users)
         self.Session.commit()
@@ -144,7 +129,6 @@ class Database():
 
     def Get_UserFirstLogonGuid(self, email):
         pre_guid =str(uuid.uuid4())
-        print(pre_guid)
         Result = self.Session.query(Users).filter(Users.user_email == email).update({"first_logon_guid": (pre_guid)})
         self.Session.commit()
         return pre_guid
@@ -162,7 +146,7 @@ class Database():
             self.Session.commit() # flush check if this will work...
             #q=self.Session.query(Campaigns.cid).filter(Campaigns.title==title).one()
             #print("1",q[0])
-            if self.Add_CampaignUser(title,email,True,True):
+            if self.Add_CampaignUser(title,email,2):
                 print("Success adding a new campaign user.")
                 return True
         except Exception as e:
@@ -177,7 +161,7 @@ class Database():
         cid = self.Session.query(Campaigns.cid).filter(Campaigns.title==CampaignTitle).one()[0]
         uid = self.Session.query(Users.uid).filter(Users.user_email==Email).one()[0]
         print(cid,uid)
-        query=CampaignUsers(cid=cid,uid=uid,permission=Permission)
+        query=CampaignUsers(cid=cid,uid=uid,permissions=Permission)
         try:
             self.Session.add(query)
             self.Session.commit()
