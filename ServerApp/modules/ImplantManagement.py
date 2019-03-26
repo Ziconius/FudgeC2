@@ -1,5 +1,5 @@
-from Database import Database
-from Implant import ImplantSingleton
+from Data.Database import Database
+from Implant.Implant import ImplantSingleton
 class ImplantManagement():
     db = Database()
     Imp = ImplantSingleton.instance

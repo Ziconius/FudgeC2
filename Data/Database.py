@@ -2,17 +2,18 @@
 from sqlalchemy import create_engine, func, extract
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
-from models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs
+
+from Data.models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs
 
 import uuid
 import bcrypt
 import time
 import random
-from Logging import Logging
+from Data.Logging import Logging
 L=Logging()
 class Database():
     def __init__(self):
-        engine = create_engine("sqlite:///fudge.db?check_same_thread=False")
+        engine = create_engine("sqlite:///Storage/fudge.db?check_same_thread=False")
         # -- TODO: RefactorGet_AllCampaignImplants
         self.selectors = {
             "uid": Users.uid,

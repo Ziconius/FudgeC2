@@ -1,5 +1,3 @@
-# from Database import Database
-# db = Database()
 class Logging():
     # -- Basic text file logging via decorator.
     # -- This should be updated to support logging to sqlite.

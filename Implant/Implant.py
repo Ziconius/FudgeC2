@@ -1,4 +1,4 @@
-from Database import Database
+from Data.Database import Database
 class ImplantSingleton:
     class __OnlyOne:
         UID = None

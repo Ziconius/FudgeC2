@@ -1,4 +1,4 @@
-from Database import Database
+from Data.Database import Database
 import random
 import string
 class UserManagementController():

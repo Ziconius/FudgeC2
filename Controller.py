@@ -2,9 +2,9 @@
 
 import _thread
 import time
-import Implant
-from Listener import app
-import ImplantManager
+from Implant import Implant
+from Listeners import Listener
+from ServerApp import ImplantManager
 
 
 
@@ -21,7 +21,7 @@ def Start_Controller(x,y):
 
 
 # Create two threads as follows:
-App = app #Listener
+App = Listener.app #Listener
 Manager= ImplantManager.app
 # Singleton in used to allow the app and the listeners to converse with implant object easily.
 Imp = Implant.ImplantSingleton.instance

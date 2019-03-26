@@ -1,8 +1,8 @@
 from flask import Flask, render_template, flash, request, jsonify, g, current_app,url_for, redirect, make_response, send_file, send_from_directory
 import base64
 #from Controller import OnlyOne
-from Implant import ImplantSingleton
-from Database import Database
+from Implant.Implant import ImplantSingleton
+from Data.Database import Database
 Imp=ImplantSingleton.instance
 def ImplantManager(a):
     if "X-Implant" in a:

@@ -1,11 +1,11 @@
 from flask import Flask, render_template, flash, request, jsonify, g, current_app,url_for, redirect, make_response, session
 from flask_sqlalchemy import SQLAlchemy
 import base64
-from Implant import ImplantSingleton
+from Implant.Implant import ImplantSingleton
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user
-from Database import Database
-from UserManagement import UserManagementController
-from modules import ImplantManagement
+from Data.Database import Database
+from ServerApp.modules.UserManagement import UserManagementController
+from ServerApp.modules import ImplantManagement
 import time
 #from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField
 # This is the web app to control implants and campaigns
@@ -76,8 +76,8 @@ def login():
                 return redirect(url_for("BaseHomePage"))
             else:
                 GUID = db.Get_UserFirstLogonGuid(request.form['email'])
-                return render_template("PasswordResetPage.html",guid=GUID)
-    return render_template("LoginPage.html")
+                return render_template("auth/PasswordResetPage.html",guid=GUID)
+    return render_template("auth/LoginPage.html")
 
 @app.route("/auth/logout")
 @login_required
@@ -161,7 +161,7 @@ def GlobalSettingsPage():
         Result = UsrMgmt.AddUser(request.form,current_user.user_email)
         print("Check form type and call respecitive function")
         return jsonify(Result)
-    return  render_template("GlobalSettings.html")
+    return  render_template("settings/GlobalSettings.html")
 
 
 # -- CAMPAIGN SPECIFIC PAGES -- #
@@ -209,7 +209,7 @@ def BaseImplantSettings(cid):
         UsrMgmt.AddUserToCampaign(current_user.user_email, request.form, cid)
         return redirect(url_for('BaseImplantSettings', cid=cid))
     else:
-        return render_template("CampaignSettings.html", users=Users)
+        return render_template("settings/CampaignSettings.html", users=Users)
 
 
 @app.route("/<cid>/implant/create", methods=['GET','POST'])
