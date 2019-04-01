@@ -300,11 +300,8 @@ def ImplantCommandRegistration(cid):
         # -- End of dev blocker
 
         if "cmd" in request.form and "ImplantSelect" in request.form:
-            # This check if specific implant or ALL implants.
             ListOfImplantsToExecute = db.Get_ImplantIDFromTitle(cid,request.form['ImplantSelect'], current_user.user_email)
             for Implants in ListOfImplantsToExecute:
-                print("ALL:",Implants)
-                # print(request.form['cmd'])
                 Imp.AddCommand(current_user.user_email, Implants ,request.form['cmd'])
 
             # This needs to be

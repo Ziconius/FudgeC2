@@ -1,14 +1,14 @@
 class Logging():
     # -- Basic text file logging via decorator.
     # -- This should be updated to support logging to sqlite.
-
+    logfile = "Storage/log.txt"
 
 
     def log(self, tag_name):
         def tags_decorator(func):
             def func_wrapper(*args, **kwargs):
                 result = func(*args, **kwargs)
-                with open("log.txt",'a+') as logfile:
+                with open(self.logfile,'a+') as logfile:
                     logfile.write("{}{}\n".format(tag_name,result ))
                 return result
             return func_wrapper
@@ -23,7 +23,7 @@ class Logging():
         def tags_decorator(func):
             def func_wrapper(*args, **kwargs):
                 result = func(*args, **kwargs)
-                with open("log.txt",'a+') as logfile:
+                with open(self.logfile,'a+') as logfile:
                     logfile.write("{}{}\n".format(tag_name,result ))
                 return result
             return func_wrapper

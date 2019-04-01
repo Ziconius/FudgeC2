@@ -4,7 +4,7 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
 from Data.models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs
-
+from Storage.settings import Settings
 import uuid
 import bcrypt
 import time
@@ -13,11 +13,11 @@ from Data.Logging import Logging
 L=Logging()
 class Database():
     def __init__(self):
-        engine = create_engine("sqlite:///Storage/fudge.db?check_same_thread=False")
+        engine = create_engine("sqlite:///Storage/"+Settings.database_name+"?check_same_thread=False")
         # -- TODO: RefactorGet_AllCampaignImplants
         self.selectors = {
             "uid": Users.uid,
-            "email": Users.user_email
+            "email": Users.user_email   
         }
         self.Session = scoped_session(sessionmaker(bind=engine, autocommit=False))
         """:type: sqlalchemy.orm.Session""" # PyCharm type fix. Not required for execution.
