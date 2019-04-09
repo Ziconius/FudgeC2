@@ -59,6 +59,7 @@ class Implants(Base):
     comms_http = Column(INTEGER(1))
     comms_dns = Column(INTEGER(1))
     comms_binary = Column(INTEGER(1))
+    obfuscation_level = Column(INTEGER(1), nullable=False)
     # last_check_in = Column(INTEGER(13))
     # unique_implant_key = Column(INTEGER(16), unique=True)
 

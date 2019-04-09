@@ -1,34 +1,9 @@
-# Fudge
-A Powershell implant framework built on Python3/Flask- Designed for team collaboration and improved reporting.
 
-
-
-
-### -- Upcoming Content --
-#### Implant Manager
-
-* Add password change
-* Add icons to supplement text
-* Order implant check-ins buy quality
-
-
-##### Implant
-* Create further staging options (docx, pfd, etc)
-* Settings for Fudge boot
-
-
-##### Controller
-* Check for `fudge.db` in the working dir, if not configure new setup.
-* Code refactor Controller to boot server & listener 
-* Code to be moved into folders and more managers to be constructed
-* Restructure how listeners are configured and launched. This peice of work will likely take several weeks of reengineering.
-  
-
-###  ----------------------
 
 
 
 # Fudge Overview
+A Powershell implant framework built on Python3/Flask- Designed for team collaboration and client interaction and campaign timelining.
 
 ## Setup
 ### Installation
@@ -133,3 +108,29 @@ Once an implant has been generated the Stagers page will provide a number of bas
 * IEX
 * Windows Words Macro (In development)
 
+### Active Development
+Below is an high-level overview of the on-going development to increase functionality, and reliablility of Fudge.
+#### Implant Manager Web App
+* Add help page with implant special tags using `::cmd::` format.
+* Order implant check-ins buy quality
+* Review how implant responses are displayed within the main campaign page to improve readability
+* Create log page with detailed logging of for each implant, including time, command, implant, pickup, and pickup time.
+* Fill chronological graph page with real data.
+* Create admin-only campaign extract function, encrypting with AES256. This require viewer tool.
+
+
+##### Implant
+
+* Add further work on implant obfuscation levels/configuration.
+* Add implant special tags formatted: `::cmd::`
+* Create further staging options (docx, pfd, etc)
+
+
+
+##### Controller
+* Check for `fudge.db` in the working dir, if not configure new setup.
+* Code refactor Controller to boot server & listener 
+* Restructure how listeners are configured and launched. This piece of work will likely take several weeks of re-engineering.
+  
+
+###  ----------------------

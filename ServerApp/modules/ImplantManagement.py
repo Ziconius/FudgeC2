@@ -4,6 +4,20 @@ class ImplantManagement():
     db = Database()
     Imp = ImplantSingleton.instance
 
+    def _form_validated__obfucation_level_(self, form):
+        for x in form:
+            if "obfus" in x:
+                a  = x.split("-")
+                print(a[1])
+                # -- returning first value, we should only receive a single entry.
+                try:
+                    return int(a[1])
+                except:
+                    return None
+        return None
+
+
+
     def ImplantCommandRegistration(self, cid , username, form):
         # -- This should be refactored at a later date to support read/write changes to
         # --    granular controls on templates, and later specific implants
@@ -37,6 +51,10 @@ class ImplantManagement():
             print("SS")
             if "CreateImplant" in form:
                 print("Inside subscript:",form)
+                obfuscation_level = self._form_validated__obfucation_level_(form)
+                if obfuscation_level == None:
+                    print(obfuscation_level)
+                    raise ValueError('Missing, or invalid obfuscation levels')
                 if form['title'] =="" or form['url'] =="" or form['description'] == "":
                     raise ValueError('Mandatory values left blank')
                 title = form['title']
@@ -45,6 +63,7 @@ class ImplantManagement():
                 description= form['description']
                 beacon=form['beacon_delay']
                 initial_delay=form['initial_delay']
+                obfuscation_level = form['obfuscation_level']
                 comms_http = 0
                 comms_dns = 0
                 comms_binary = 0
@@ -62,7 +81,7 @@ class ImplantManagement():
                     comms_binary = 1
                 if comms_binary == 0 and comms_dns == 0 and comms_http ==0:
                     raise ValueError('No communitcation channel selected. ')
-                a = self.db.Add_Implant(cid, title ,url,port,beacon,initial_delay,comms_http,comms_dns,comms_binary,description)
+                a = self.db.Add_Implant(cid, title ,url,port,beacon,initial_delay,comms_http,comms_dns,comms_binary,description,obfuscation_level)
                 if a == True:
                     return True
                 else:

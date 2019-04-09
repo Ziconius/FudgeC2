@@ -1,4 +1,5 @@
 from Data.Database import Database
+from Implant.ImplantGeneratorDecorators import ImplantGenerator
 class ImplantSingleton:
     class __OnlyOne:
         UID = None
@@ -48,6 +49,13 @@ class ImplantSingleton:
             # -- This trust any calls have already been authenticated/
             # --    May need to move authentication to this level.
             return db.Get_CampaignImplantResponses(cid)
+
+        def GeneratePayload(self, NewSplicedImplantData):
+            # This will generate a fully random payload.
+            # TODO: Add a payload obfuscation level - this will be dealt within then render implant function.
+            aaa = ImplantGenerator()
+            aaa.render_implant_(NewSplicedImplantData)
+            return NewSplicedImplantData
 
     instance = None
     def __init__(self):

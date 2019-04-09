@@ -17,7 +17,7 @@ class Database():
         # -- TODO: RefactorGet_AllCampaignImplants
         self.selectors = {
             "uid": Users.uid,
-            "email": Users.user_email   
+            "email": Users.user_email
         }
         self.Session = scoped_session(sessionmaker(bind=engine, autocommit=False))
         """:type: sqlalchemy.orm.Session""" # PyCharm type fix. Not required for execution.
@@ -197,7 +197,7 @@ class Database():
         return IID
 
     # -- Implant Content --#
-    def Add_Implant(self,cid, title, url,port, beacon,initial_delay,comms_http=0,comms_dns=0,comms_binary=0, description="Implant: Blank description."):
+    def Add_Implant(self,cid, title, url,port, beacon,initial_delay,comms_http=0,comms_dns=0,comms_binary=0, description="Implant: Blank description.", obfucation_level=0):
         # -- TODO: Refactor
         implant = Implants(cid=cid,title=title)
         stager_key= random.randint(10000,99999)
@@ -207,7 +207,8 @@ class Database():
                               initial_delay=initial_delay,
                               comms_http=comms_http,
                               comms_dns=comms_dns,
-                              comms_binary = comms_binary
+                              comms_binary = comms_binary,
+                              obfucation_level = obfucation_level
                               )
         self.Session.add(NewImplant)
         try:

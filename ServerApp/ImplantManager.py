@@ -307,6 +307,10 @@ def ImplantCommandRegistration(cid):
             # This needs to be
             return jsonify({"1":2})
     return "000"
+@app.route("/help",methods = ["GET"])
+@login_required
+def HelpPage():
+    return render_template("HelpPage.html")
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5001, threaded=True)
