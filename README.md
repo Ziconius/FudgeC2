@@ -1,7 +1,3 @@
-
-
-
-
 # Fudge Overview
 A Powershell implant framework built on Python3/Flask- Designed for team collaboration and client interaction and campaign timelining.
 
@@ -75,8 +71,10 @@ _Currently the only supported stager is utilises IEX and IWR to load the implant
 
 Active implants are the result of new stagers connecting. When a stager connects backt ot the C2 server a new implant is generated, and delivered to the target host. Each new stager check in create a new active implant entry.
 
-### _Example_
-If we have a implant template called "Moozle Implant" which we delivery to a HR department in  via word macro, and get 5 sucessful stager executions we will see 5 active implants. These will be listed on the main implant page with 6 charcter unique blog. This would look like:
+##### _Example_
+As part of a campaign an user creates an implant template called "Moozle Implant" which is delivery to a HR department in via word macro. This then results in five successful execution of the macro stager; as a result the user will see five active implants.
+ 
+ These will be listed on the campaigns main implant page, with a six character unique blob. The unique implants will be listed something similar to below:
 
 ```
 Moozle Implant_123459
@@ -86,7 +84,7 @@ Moozle Implant_613516
 Moozle Implant_810021
 ```
 
-Each of these implants can be individually interacted with or the "ALL" keyword can be used to register a command against all active implants.
+Each of these implants can be individually interacted with, or using the "ALL" keyword to register a command against all active implants.
 
 
 

@@ -107,6 +107,8 @@ def PasswordReset():
 
 
 # -- JSON Response for command responses and waiting commands -- #
+# -------------------------------------------------------------- #
+
 @app.route("/<cid>/cmd_response", methods =['GET','POST'])
 @login_required
 def cmdreturn(cid):
@@ -124,9 +126,9 @@ def waitingcommands(cid):
     return jsonify(Commands)
 
 
+# -- Main endpoints -- #
+# -------------------- #
 
-
-# -- NEW ENDPOINTS -- #
 @app.route("/")
 @login_required
 def BaseHomePage():
@@ -146,8 +148,6 @@ def CreateNewItem():
             return redirect(url_for('BaseHomePage'))
     else:
         return render_template('CreateCampaign.html')
-
-
 
 
 # -- Non-Campaign Specific Pages -- #
@@ -174,28 +174,10 @@ def BaseImplantPage(cid):
     # -- This needs to return the implant_input.html template if any implants exist, if not reuturn ImplantMain
     # --    also need to work out the CID across the pages...
     Implants = db.Get_AllCampaignImplants(cid)
-    #print(Implants[0][0],type(Implants),dir(Implants))
     if len(Implants) >0:
-        #   print(Implants, dir(Implants))
-        # print(Implants)
-        # print(Implants[0],Implants[0]['iid'],Implants[0])
-
-        # print(url_for('ImplantInputPage',cid=cid,iid=Implants[0]['iid']))
         return render_template("implant_input.html", Implants=Implants)
-        # return redirect(url_for('ImplantInputPage',cid=cid,iid=Implants[0]['iid']))
     return render_template("ImplantMain.html",cid=cid, Msg="No implants have called back in association with this campaign - create an implant base and use the stager page.")
 
-# -- This should be removed, we no longer consider /<iid> to be a valid endpoint
-# @app.route("/<cid>/<iid>")
-# @login_required
-# def ImplantInputPage(cid,iid):
-#     exit()
-#     g.setdefault('cid', cid)
-#     print(cid,iid)
-#     a=db.Get_AllCampaignImplants(cid)
-#     print(type(a))
-#
-#     return render_template("implant_input.html", Implants=a)
 
 @login_required
 @app.route ("/<cid>/settings", methods=['GET','POST'])

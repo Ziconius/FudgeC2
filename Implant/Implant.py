@@ -2,19 +2,15 @@ from Data.Database import Database
 from Implant.ImplantGeneratorDecorators import ImplantGenerator
 class ImplantSingleton:
     class __OnlyOne:
-        UID = None
-        # -- REMOVE QUEUEDCOMMANDS
-        QueuedCommands = []
-
-        RegisteredCommands = {}
-
-        CommandOutput = []
-        # worth adding to the logging based on the commands issued here.
-        # -- ON BOOT READ LOG FILE AND PULL UNPULLED COMMANDS
+        # -- The Implant class is sole class responible for controlling data to and from implants.
+        # --    it manages  these interaction across all types of implants and communication protocols.
 
         def AddCommand(self, User, UniqueImplantKey,Command):
             # -- Add record to issue command table with username - time - command - UID
             # -- Implement the logging calls to ensure entries got to DB. and get recorded on pick up
+            # Writes command to the database.
+            #   checks for authorisation to write commands.
+            #   The AddCommand should only be called form 'ImplantManagement'
             db.Register_ImplantCommand(User, UniqueImplantKey, Command)
 
         def IssueCommand(self,UIK=0):
@@ -51,11 +47,9 @@ class ImplantSingleton:
             return db.Get_CampaignImplantResponses(cid)
 
         def GeneratePayload(self, NewSplicedImplantData):
-            # This will generate a fully random payload.
             # TODO: Add a payload obfuscation level - this will be dealt within then render implant function.
             aaa = ImplantGenerator()
-            aaa.render_implant_(NewSplicedImplantData)
-            return NewSplicedImplantData
+            return aaa.render_implant_(NewSplicedImplantData)
 
     instance = None
     def __init__(self):

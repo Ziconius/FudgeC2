@@ -1,6 +1,8 @@
 from Data.Database import Database
 from Implant.Implant import ImplantSingleton
 class ImplantManagement():
+    # -- The implant management class is responsible for performing pre-checks and validation before sending data
+    # --    to the Implant class
     db = Database()
     Imp = ImplantSingleton.instance
 
@@ -15,7 +17,6 @@ class ImplantManagement():
                 except:
                     return None
         return None
-
 
 
     def ImplantCommandRegistration(self, cid , username, form):
@@ -92,7 +93,7 @@ class ImplantManagement():
             return e
 
     def Get_RegisteredImplantCommands(self, username, cid=0):
-        #Return list of dictionaries, not SQLAlchemy Objects.
+        # -- Return list of dictionaries, not SQLAlchemy Objects.
         if self.db.Verify_UserCanAccessCampaign(username, cid):
             Commands = self.db.Get_RegisteredImplantCommandsFromCID(cid)
             toDict = []

