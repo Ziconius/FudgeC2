@@ -3,7 +3,7 @@
 </p>
 
 # Fudge 
-Fudge is a campaign orientated Powershell implant framework built on Python3/Flask- Designed for team collaboration and client interaction and campaign timelining.
+Fudge is a campaign orientated Powershell implant framework built on Python3/Flask  - Designed for team collaboration and client interaction and campaign timelining.
 
 ## Setup
 ### Installation
@@ -119,8 +119,9 @@ A user can enable and disable protocols depending on the environment they believ
 
 
 ## Active Development
-Below is an high-level overview of the on-going development to increase functionality, and reliability of Fudge. This is broken down into release cycles, focused on core functionality.
+Below is an high-level overview of the on-going development to increase functionality, and reliability of Fudge. This is broken down into release cycles, which are focused around core functionality changes.
 
+---
 Release 0.2 _(Human Grunt)_
 #### Implant Manager Web App
 - [ ] Add help page with implant special tags using `::cmd::` format.
@@ -148,3 +149,10 @@ Release 0.2 _(Human Grunt)_
 - [ ] Code refactor Controller to boot server & listener 
 - [ ] Restructure how listeners are configured and launched. This piece of work will likely take several weeks of re-engineering.
  
+ ---
+ Release 0.3 _(Dwarf Blacksmith)_
+##### Implant Manager Web App
+
+##### Implant
+
+##### Controller
