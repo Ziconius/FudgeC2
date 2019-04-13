@@ -109,26 +109,29 @@ Once an implant has been generated the Stagers page will provide a number of bas
 ### Active Development
 Below is an high-level overview of the on-going development to increase functionality, and reliablility of Fudge.
 #### Implant Manager Web App
-* Add help page with implant special tags using `::cmd::` format.
-* Order implant check-ins buy quality
-* Review how implant responses are displayed within the main campaign page to improve readability
-* Create log page with detailed logging of for each implant, including time, command, implant, pickup, and pickup time.
-* Fill chronological graph page with real data.
-* Create admin-only campaign extract function, encrypting with AES256. This require viewer tool.
+[ ] Add help page with implant special tags using `::cmd::` format.
+[ ] Order implant check-ins buy quality
+[ ] Review how implant responses are displayed within the main campaign page to improve readability
+[ ] Create log page with detailed logging of for each implant, including time, command, implant, pickup, and pickup time.
+[ ] Fill chronological graph page with real data.
+[ ] Create admin-only campaign extract function, encrypting with AES256. This require viewer tool.
+[ ] Provide feedback to read-only campaign users with feedback if they are not authorised to execute commands.
+[ ] Add filter for implants on implant page to reduce noise.
 
 
 ##### Implant
 
-* Add further work on implant obfuscation levels/configuration.
-* Add implant special tags formatted: `::cmd::`
-* Create further staging options (docx, pfd, etc)
+[ ] Add further work on implant obfuscation levels/configuration.
+[ ] Add implant special tags formatted: `::cmd::`
+[ ] Create further staging options (docx, pfd, etc)
+[ ] Improve format of returning data.
 
 
 
 ##### Controller
-* Check for `fudge.db` in the working dir, if not configure new setup.
-* Code refactor Controller to boot server & listener 
-* Restructure how listeners are configured and launched. This piece of work will likely take several weeks of re-engineering.
+[ ] Check for `fudge.db` in the working dir, if not configure new setup. 
+[ ] Code refactor Controller to boot server & listener 
+[ ] Restructure how listeners are configured and launched. This piece of work will likely take several weeks of re-engineering.
   
 
 ###  ----------------------
