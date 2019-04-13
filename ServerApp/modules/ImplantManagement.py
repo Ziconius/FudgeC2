@@ -10,7 +10,7 @@ class ImplantManagement():
         for x in form:
             if "obfus" in x:
                 a  = x.split("-")
-                print(a[1])
+                print("ll", a[1])
                 # -- returning first value, we should only receive a single entry.
                 try:
                     return int(a[1])
@@ -49,12 +49,10 @@ class ImplantManagement():
         # -- From here we know the user is able to write to the Campaign and an admin.
 
         try:
-            print("SS")
             if "CreateImplant" in form:
-                print("Inside subscript:",form)
                 obfuscation_level = self._form_validated__obfucation_level_(form)
                 if obfuscation_level == None:
-                    print(obfuscation_level)
+                    print("OL", obfuscation_level)
                     raise ValueError('Missing, or invalid obfuscation levels')
                 if form['title'] =="" or form['url'] =="" or form['description'] == "":
                     raise ValueError('Mandatory values left blank')
@@ -64,7 +62,6 @@ class ImplantManagement():
                 description= form['description']
                 beacon=form['beacon_delay']
                 initial_delay=form['initial_delay']
-                obfuscation_level = form['obfuscation_level']
                 comms_http = 0
                 comms_dns = 0
                 comms_binary = 0
@@ -84,9 +81,9 @@ class ImplantManagement():
                     raise ValueError('No communitcation channel selected. ')
                 a = self.db.Add_Implant(cid, title ,url,port,beacon,initial_delay,comms_http,comms_dns,comms_binary,description,obfuscation_level)
                 if a == True:
-                    return True
+                    return "Implant created."
                 else:
-                    raise ValueError(str(a))
+                    raise ValueError("Error creating entry. Ensure filename is unique")
         except Exception as e:
             print("NewImplant: ",e)
             # -- Implicting returning page with Error --#

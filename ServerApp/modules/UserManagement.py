@@ -21,6 +21,11 @@ class UserManagementController():
             "action":"Add New User",
             "result":None,
             "reason":None }
+        # TODO: Review if minimum lenght usernames should be permitted.
+        if len(formdata['UserName']) < 3:
+            Result_Dict['result'] = False
+            Result_Dict['reason'] = "Username too short"
+            return Result_Dict
         U = self.db.Get_UserObject(submitting_user)
         print(U.admin)
         if U.admin:
@@ -35,7 +40,7 @@ class UserManagementController():
                 print("::",pw)
                 self.db.Add_User(formdata['UserName'],pw,admin)
                 Result_Dict['result']=True
-                Result_Dict['reason']=str(formdata['UserName']+" now created. Password is: "+pw)
+                Result_Dict['reason']=str(formdata['UserName']+" now created. Password is: "+pw+" <br> Take note of this, it will not be visable again.")
             else:
                 Result_Dict['result'] = False
                 Result_Dict['reason'] = "User already exists."

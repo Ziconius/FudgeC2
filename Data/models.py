@@ -1,9 +1,9 @@
 # coding: utf-8
-from sqlalchemy import Column, Date, DateTime, Float, ForeignKey, Index, String, Table, Text, text
-from sqlalchemy.dialects.mysql import BIGINT, INTEGER, MEDIUMTEXT, TINYINT, VARCHAR
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Date, DateTime, Float, ForeignKey, Index, String, Table, Text, text, create_engine
+from sqlalchemy.dialects.mysql import BIGINT, INTEGER #, MEDIUMTEXT, TINYINT, VARCHAR
+# from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
-
+from Storage.settings import Settings
 Base = declarative_base()
 metadata = Base.metadata
 
@@ -11,14 +11,14 @@ metadata = Base.metadata
 
 class Users(Base):
     __tablename__='users'
-    uid =           Column(BIGINT(20), unique=True,primary_key=True)
-    user_email =    Column(String(255), nullable=False)
+    uid = Column(INTEGER,primary_key=True)
+    user_email = Column(String(255), nullable=False)
     password = Column(String(255), nullable=False)
     last_login = Column(String(255), nullable=False)
-    authenticated = Column(String(), server_default=text("False"))
+    authenticated = Column(String, server_default=text("False"))
     admin = Column(String(255), nullable=False)
     first_logon = Column(INTEGER(1), nullable=False, default=0)
-    first_logon_guid = Column(String(32), nullable=False, default=0)
+    first_logon_guid = Column(String(32), nullable=False, default="0")
     def is_active(self):
         """True, as all users are active."""
         return True
@@ -50,9 +50,9 @@ class Implants(Base):
     title = Column(String(255),nullable=False)
     cid = Column(INTEGER(11), nullable=False, index=True )
     file_hash=Column(String(255), nullable=True)
-    filename=Column(String(255), nullable=True, unique=True)
-    callback_url = Column(String(255), nullable=False, server_default=text("127.0.0.1"))
-    port = Column(INTEGER(5), nullable=False, server_default=text("0"))
+    filename=Column(String(255), nullable=True)
+    callback_url = Column(String(255), nullable=False)
+    port = Column(INTEGER(5), nullable=False, default=0)
     description = Column(String(255))
     beacon = Column(INTEGER(10))
     initial_delay = Column(INTEGER(10))
@@ -60,8 +60,6 @@ class Implants(Base):
     comms_dns = Column(INTEGER(1))
     comms_binary = Column(INTEGER(1))
     obfuscation_level = Column(INTEGER(1), nullable=False)
-    # last_check_in = Column(INTEGER(13))
-    # unique_implant_key = Column(INTEGER(16), unique=True)
 
 class GeneratedImplants(Base):
     __tablename__='generated_implants'
@@ -93,11 +91,14 @@ class CampaignUsers(Base):
     auto_id = Column(INTEGER(11), nullable=False, index=True, primary_key=True)
     cid = Column(INTEGER(11),ForeignKey("campaigns.cid"), nullable=False, index=True )
     uid = Column(INTEGER(11), nullable=False, index=True)
-    permissions =Column(TINYINT(1),nullable=False, server_default=text("'0'"))
-    #write =Column(TINYINT(1),nullable=False, server_default=text("'0'"))
+    permissions =Column(INTEGER(1),nullable=False, default=0)
 
 class AppLogs(Base):
     __tablename__='app_logs'
     log_id = Column(INTEGER(16), primary_key=True, index=True, nullable=False)
     type = Column(String(255), nullable=False)
     data = Column(String(255),nullable=False)
+
+# -- Generate an empty database if non-existent.
+engine = create_engine("sqlite:///Storage/{}?check_same_thread=False".format(Settings.database_name), echo=False)
+Base.metadata.create_all(engine)

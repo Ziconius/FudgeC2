@@ -3,7 +3,7 @@ from sqlalchemy import create_engine, func, extract
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
-from Data.models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs
+from Data.models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs, declarative_base
 from Storage.settings import Settings
 import uuid
 import bcrypt
@@ -13,7 +13,7 @@ from Data.Logging import Logging
 L=Logging()
 class Database():
     def __init__(self):
-        engine = create_engine("sqlite:///Storage/"+Settings.database_name+"?check_same_thread=False")
+        engine = create_engine("sqlite:///Storage/{}?check_same_thread=False".format(Settings.database_name))
         # -- TODO: RefactorGet_AllCampaignImplants
         self.selectors = {
             "uid": Users.uid,
@@ -21,6 +21,9 @@ class Database():
         }
         self.Session = scoped_session(sessionmaker(bind=engine, autocommit=False))
         """:type: sqlalchemy.orm.Session""" # PyCharm type fix. Not required for execution.
+
+        self.__does_admin_exist()
+
     def __enter__(self):
         return self
 
@@ -90,6 +93,13 @@ class Database():
             return hashedpassword
         else:
             return False
+
+    def __does_admin_exist(self):
+        # -- Checking for admin existance, for first-time launches.
+        if  not self.__get_userid__("admin"):
+            print("Creating first-time admin account.")
+            if not self.Add_User("admin", "letmein", True):
+                raise ValueError("Error creating admin account in empty database.")
 
     # --
     # -- PUBLIC METHODS -- #
@@ -197,8 +207,9 @@ class Database():
         return IID
 
     # -- Implant Content --#
-    def Add_Implant(self,cid, title, url,port, beacon,initial_delay,comms_http=0,comms_dns=0,comms_binary=0, description="Implant: Blank description.", obfucation_level=0):
+    def Add_Implant(self, cid, title, url, port, beacon, initial_delay, comms_http=0, comms_dns=0, comms_binary=0, description="Implant: Blank description.", obfuscation_level=0):
         # -- TODO: Refactor
+        print("In Add_Implant_Function")
         implant = Implants(cid=cid,title=title)
         stager_key= random.randint(10000,99999)
         NewImplant = Implants(cid=cid,title=title,description=description,callback_url=url,stager_key=stager_key,file_hash="0",filename="0",
@@ -208,7 +219,7 @@ class Database():
                               comms_http=comms_http,
                               comms_dns=comms_dns,
                               comms_binary = comms_binary,
-                              obfucation_level = obfucation_level
+                              obfuscation_level = obfuscation_level
                               )
         self.Session.add(NewImplant)
         try:

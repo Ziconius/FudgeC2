@@ -34,13 +34,13 @@ Manager = ImplantManager.app
 # Singleton in used to allow the app and the listeners to converse with implant object easily.
 Imp = Implant.ImplantSingleton.instance
 
+# -- Build Database if none exists
+
 try:
     _thread.start_new_thread(start_listener, ())
     _thread.start_new_thread(start_controller, ())
 except Exception as E:
     print("Error: unable to start thread")
-time.sleep(1)  # <- ??
-# Legacy testing code - Remove shortly.
 while 1:
     # Hold the application threads open
     time.sleep(10)
