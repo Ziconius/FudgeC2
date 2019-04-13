@@ -1,4 +1,5 @@
-# Fudge Overview
+[logo]: https://github.com/Ziconius/Fudge/blob/master/ServerApp/static/fudge.png "Logo Title Text 2"
+# Fudge 
 Fudge is a campaign orientated Powershell implant framework built on Python3/Flask- Designed for team collaboration and client interaction and campaign timelining.
 
 ## Setup
@@ -39,7 +40,7 @@ An admin can create a new user from within the Global Settings options. They wil
 
 ## Campaigns
 #### What is a campaign?
-A campaign is a method of organising a red team, which allows access control to be applies at a per user/per implant basis
+A campaign is a method of organising a red team, which allows access control to be applied on aper user basis
 
 Each campaign contains a unique name and, implants, and logs while a user can be a member of multiple campaigns
 
@@ -115,7 +116,9 @@ A user can enable and disable protocols depending on the environment they believ
 
 
 ## Active Development
-Below is an high-level overview of the on-going development to increase functionality, and reliability of Fudge.
+Below is an high-level overview of the on-going development to increase functionality, and reliability of Fudge. This is broken down into release cycles, focused on core functionality.
+
+Release 0.2 _(Human Grunt)_
 #### Implant Manager Web App
 - [ ] Add help page with implant special tags using `::cmd::` format.
 - [ ] Order implant check-ins buy quality
