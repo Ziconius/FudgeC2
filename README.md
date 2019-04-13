@@ -1,4 +1,5 @@
-[logo]: https://github.com/Ziconius/Fudge/blob/master/ServerApp/static/fudge.png "Logo Title Text 2"
+![logo](https://github.com/Ziconius/Fudge/blob/master/ServerApp/static/fudge.png)
+
 # Fudge 
 Fudge is a campaign orientated Powershell implant framework built on Python3/Flask- Designed for team collaboration and client interaction and campaign timelining.
 
