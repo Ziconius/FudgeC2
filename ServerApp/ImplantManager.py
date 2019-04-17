@@ -70,7 +70,7 @@ def login():
             a = db.Get_UserObjectLogin(request.form['email'],request.form['password'])
             print(a, dir(a))
             if a == False:
-                return render_template("LoginPage.html", error="Incorrect Username/Password")
+                return render_template("auth/LoginPage.html", error="Incorrect Username/Password")
             if a.first_logon == 1:
                 login_user(a)
                 return redirect(url_for("BaseHomePage"))
@@ -241,6 +241,7 @@ def GetImplantStatus(cid):
     a = db.Get_AllCampaignImplants("1")
     data = {}
     count = 1
+    # TODO: Revise this section entirely.
     for x in a:
         b = x['beacon']
         a = time.time() - x['last_check_in']
@@ -272,22 +273,11 @@ def ImplantCommandRegistration(cid):
     if request.method == "POST":
         print("\nCID: ",cid,"\nFRM: ",request.form)
         # -- This is the new format using ImpMgmt to handle validation of user and command.
-        ImpMgmt.ImplantCommandRegistration(cid, current_user.user_email, request.form)
+        registration_response = ImpMgmt.ImplantCommandRegistration(cid, current_user.user_email, request.form)
         # -- Currently no return value is required. This should be defined.
+        print(registration_response)
+        return jsonify(registration_response)
 
-        # -- Temp blocker while using developing ImpMgmt.ImpCmdReg()
-        a = 0
-        if a == 0:
-            return jsonify({"1":0})
-        # -- End of dev blocker
-
-        if "cmd" in request.form and "ImplantSelect" in request.form:
-            ListOfImplantsToExecute = db.Get_ImplantIDFromTitle(cid,request.form['ImplantSelect'], current_user.user_email)
-            for Implants in ListOfImplantsToExecute:
-                Imp.AddCommand(current_user.user_email, Implants ,request.form['cmd'])
-
-            # This needs to be
-            return jsonify({"1":2})
     return "000"
 @app.route("/help",methods = ["GET"])
 @login_required

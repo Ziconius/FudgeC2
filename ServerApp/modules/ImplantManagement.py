@@ -6,7 +6,7 @@ class ImplantManagement():
     db = Database()
     Imp = ImplantSingleton.instance
 
-    def _form_validated__obfucation_level_(self, form):
+    def _form_validated_obfucation_level_(self, form):
         for x in form:
             if "obfus" in x:
                 a  = x.split("-")
@@ -18,23 +18,44 @@ class ImplantManagement():
                     return None
         return None
 
+    def _validate_command(self, command):
+        # -- TODO: Check if type needs to be enforced.
+        special_cmd = ["sys_info"]
+        if command[0:2] == "::":
+            preprocessed_command = command[2:].lower().strip()
+            if preprocessed_command in special_cmd:
+                postprocessed_command = ":: "+preprocessed_command
+                return postprocessed_command, True
+            return command, {"cmd_reg":{"result":False, "reason":"Unknown inbuilt command, i.e. '::'"}}
+        return command, True
+
 
     def ImplantCommandRegistration(self, cid , username, form):
         # -- This should be refactored at a later date to support read/write changes to
         # --    granular controls on templates, and later specific implants
+        print("CID: ",cid,"\nUSR: ",username,"\nCMD: ",form)
         User = self.db.Verify_UserCanWriteCampaign(username,cid)
         if User == False:
-            return False
+            return {"cmd_reg":{"result":False,"reason":"You are not authorised to register commands in this campaign."}}
 
         # -- Get All implants or implants by name then send to 'implant.py'
         # -- email, unique implant key, cmd
         if "cmd" in form and "ImplantSelect" in form:
+            # -- before checking the database assess the cmd that was input.
+            processed_command, validated_command = self._validate_command(form['cmd'])
+            if validated_command != True:
+                return validated_command
+            # -- If validated_command is True then continue as it IS a valid command.
             if form['ImplantSelect'] == "ALL":
                 ListOfImplants = self.db.Get_AllGeneratedImplantsFromCID(cid)
             else:
                 ListOfImplants= self.db.Get_AllImplantIDFromTitle(form['ImplantSelect'])
+            # -- Access if this can fail. If empty return error.
+            if len(ListOfImplants) == 0:
+                return {"cmd_reg":{"result":False,"reason":"No implants listed."}}
             for implant in ListOfImplants:
-                self.Imp.AddCommand(username,implant['unique_implant_id'], form['cmd'])
+                # -- Create return from the Implant.AddCommand() method.
+                self.Imp.AddCommand(username,implant['unique_implant_id'], validated_command)
             return True
         return False
 
@@ -50,7 +71,7 @@ class ImplantManagement():
 
         try:
             if "CreateImplant" in form:
-                obfuscation_level = self._form_validated__obfucation_level_(form)
+                obfuscation_level = self._form_validated_obfucation_level_(form)
                 if obfuscation_level == None:
                     print("OL", obfuscation_level)
                     raise ValueError('Missing, or invalid obfuscation levels')

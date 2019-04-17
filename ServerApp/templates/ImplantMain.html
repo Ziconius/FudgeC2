@@ -1,17 +1,21 @@
 {% extends "BaseNavbar.html" %}
 {% block main %}
-<div class="row m-0">
-    <div class="col-lg-1 p-3 m-3 rounded">
-        <div class="font-weight-bold"><p> <a href="/{{ cid }}">{{ campaign }}</a></p></div>
-        <p><a href="/{{ cid }}/implant/create">Create Implant</a></p>
-        <p><a href="/{{ cid }}/logs">Implant Logs</a></p>
-        <p><a href="/{{ cid }}/settings">Campaign Settings</a></p>
-        <p><a href="/{{ cid }}/implant/stagers">Stagers</a></p>
-        <p><a href="/{{ cid }}/Graphs">Graphs</a></p>
+<div class="row m-0 p-0">
+    <div class="col-lg-2 m-0 p-2">
+        <div class="p-3 m-0 rounded iplm">
+            <div class="font-weight-bold"><p> <a href="/{{ cid }}">{{ campaign }}</a></p></div>
+            <p><a href="/{{ cid }}/implant/create">Create Implant</a></p>
+            <p><a href="/{{ cid }}/logs">Implant Logs</a></p>
+            <p><a href="/{{ cid }}/settings">Campaign Settings</a></p>
+            <p><a href="/{{ cid }}/implant/stagers">Stagers</a></p>
+            <p><a href="/{{ cid }}/Graphs">Graphs</a></p>
+        </div>
     </div>
-    <div class="col-lg-10 p-3 m-3 rounded ">
-        {% if Msg %}<div class="text-danger font-weight-bold">{{ Msg }}</div> {% endif %}
-        {%  block main2 %}{% endblock %}
+    <div class="col-lg-10 m-0 pl-0 p-2 ">
+        <div class="p-3 m-0 rounded iplm">
+            {% if Msg %}<div class="text-danger font-weight-bold">{{ Msg }}</div> {% endif %}
+            {%  block main2 %}{% endblock %}
+        </div>
     </div>
 </div>
 {% endblock %}

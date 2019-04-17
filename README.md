@@ -128,10 +128,9 @@ Release 0.2 _(Human Grunt)_
 - [ ] Order implant check-ins buy quality
 - [ ] Review how implant responses are displayed within the main campaign page to improve readability
 - [ ] Create log page with detailed logging of for each implant, including time, command, implant, pickup, and pickup time.
-- [ ] Fill chronological graph page with real data.
-- [ ] Create admin-only campaign extract function, encrypting with AES256. This require viewer tool.
 - [ ] Provide feedback to read-only campaign users with feedback if they are not authorised to execute commands.
 - [ ] Add filter for implants on implant page to reduce noise.
+- [ ] Improve Campaign Settings radio buttons to include current settings
 
 
 ##### Implant
@@ -146,13 +145,24 @@ Release 0.2 _(Human Grunt)_
 
 ##### Controller
 - [x] Check for `fudge.db` in the working dir, if not configure new setup. 
+   - [ ] Check for bugs in admin password setting.
 - [ ] Code refactor Controller to boot server & listener 
-- [ ] Restructure how listeners are configured and launched. This piece of work will likely take several weeks of re-engineering.
+
  
  ---
- Release 0.3 _(Dwarf Blacksmith)_
+ Release 0.3 _(Dwarven Blacksmith)_
 ##### Implant Manager Web App
+- [ ] Fill chronological graph page with real data.
+- [ ] Create admin-only campaign extract function, encrypting with AES256. This require viewer tool.
+- [ ] Reduce data sent to implant page, increase responsiveness.
 
 ##### Implant
-
+ - [ ] Add persistence mechanism
+ - [ ] Add .docx macro
+ - [ ] Improve obfuscation
+ 
 ##### Controller
+- [ ] Restructure how listeners are configured and launched. This piece of work will likely take several weeks of re-engineering.
+
+##### Campaign Viewer
+- [ ] Author separate viewer mechanisms for the client/blue team

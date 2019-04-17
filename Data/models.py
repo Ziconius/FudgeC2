@@ -40,7 +40,7 @@ class ResponseLogs(Base):
     log_id = Column(INTEGER(11), nullable=False, index=True, primary_key=True)
     cid = Column(INTEGER(11), nullable=False, index=True)
     uik = Column(INTEGER(11), nullable=False, index=True)
-    log_entry = Column(String(255), nullable=False, unique=True)
+    log_entry = Column(String(255), nullable=False)
     time = Column(INTEGER(11), nullable=False, index=True)
 
 class Implants(Base):
