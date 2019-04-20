@@ -55,10 +55,10 @@ def add_header(r):
     return r
 @app.errorhandler(404)
 def page_not_found(e):
-    return redirect(url_for('BaseHomePage'),404) # This should be a proper 404?
+    return redirect(url_for('BaseHomePage'),302) # This should be a proper 404?
 @app.errorhandler(401)
 def page_not_found(e):
-    return redirect(url_for(('login')), 401)
+    return redirect(url_for(('login')), 302)
 
 # -- Authentication endpoints -- #
 # ------------------------------ #

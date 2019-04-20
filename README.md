@@ -155,6 +155,7 @@ Release 0.2 _(Human Grunt)_
 - [ ] Fill chronological graph page with real data.
 - [ ] Create admin-only campaign extract function, encrypting with AES256. This require viewer tool.
 - [ ] Reduce data sent to implant page, increase responsiveness.
+- [ ] Password reset
 
 ##### Implant
  - [ ] Add persistence mechanism
