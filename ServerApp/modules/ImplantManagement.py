@@ -1,5 +1,6 @@
 from Data.Database import Database
 from Implant.Implant import ImplantSingleton
+import time
 class ImplantManagement():
     # -- The implant management class is responsible for performing pre-checks and validation before sending data
     # --    to the Implant class
@@ -18,6 +19,7 @@ class ImplantManagement():
                     return None
         return None
 
+
     def _validate_command(self, command):
         # -- TODO: Check if type needs to be enforced.
         special_cmd = ["sys_info"]
@@ -33,7 +35,7 @@ class ImplantManagement():
     def ImplantCommandRegistration(self, cid , username, form):
         # -- This should be refactored at a later date to support read/write changes to
         # --    granular controls on templates, and later specific implants
-        print("CID: ",cid,"\nUSR: ",username,"\nCMD: ",form)
+        #print("CID: ",cid,"\nUSR: ",username,"\nCMD: ",form)
         User = self.db.Verify_UserCanWriteCampaign(username,cid)
         if User == False:
             return {"cmd_reg":{"result":False,"reason":"You are not authorised to register commands in this campaign."}}
@@ -45,7 +47,8 @@ class ImplantManagement():
             processed_command, validated_command = self._validate_command(form['cmd'])
             if validated_command != True:
                 return validated_command
-            # -- If validated_command is True then continue as it IS a valid command.
+
+            # -- If validated_command is True then continue as it IS a valid command. N.b it may not be a legitimate command, but it is considered valid here.
             if form['ImplantSelect'] == "ALL":
                 ListOfImplants = self.db.Get_AllGeneratedImplantsFromCID(cid)
             else:
@@ -55,7 +58,7 @@ class ImplantManagement():
                 return {"cmd_reg":{"result":False,"reason":"No implants listed."}}
             for implant in ListOfImplants:
                 # -- Create return from the Implant.AddCommand() method.
-                self.Imp.AddCommand(username,implant['unique_implant_id'], validated_command)
+                self.Imp.AddCommand(username,implant['unique_implant_id'], processed_command)
             return True
         return False
 
@@ -123,3 +126,116 @@ class ImplantManagement():
             return toDict
         else:
             return False
+
+    def Get_ChronologicallyOrderedCampaignLogsJSON(self,username,cid):
+        unorder_logs = self.Get_CampaignLogsJson(username,cid)
+
+        final_list = []
+        def ReorderList(List, Item, key='time'):
+            if len(List) == 0:
+                List.append(Item)
+            print(Item)
+            for x in List:
+                if x[key] < Item[key]:
+                    print(00)
+            return List
+
+
+        for key in unorder_logs.keys():
+            if key == "metadata":
+                break
+            for i in unorder_logs[key]:
+                # print(i)
+                if key == "commands":
+                    print(unorder_logs[key][i]['time'])
+                    final_list = ReorderList(final_list, unorder_logs[key][i])
+
+                    # // Pickup time
+                    final_list = ReorderList(final_list, unorder_logs[key][i], 'read_by_implant')
+                    # do pick up
+
+                else:
+                    pass
+                    print(0)
+
+        ordered_logs = {}
+        return ordered_logs
+
+    def Get_CampaignLogsJson(self, username, cid):
+        a = '''
+        Get all data on a campaign
+         - Registered commands
+         - implants
+          - response implant_logs
+           - implant_response
+
+        timeline pathways:
+         - New active implant registrations (AllGeneratedImplants)
+         - Command registrations (RegistererdImplantsCommands)
+         - command pickup (RegistererdImplantsCommands)
+         - Implant response (Campaign Implant Response
+        '''
+
+        User = self.db.Verify_UserCanReadCampaign(username, cid)
+        if User == False:
+            return {"cmd_reg": {"result": False, "reason": "You are not authorised to register commands in this campaign."}}
+
+        EarliestInteraction = 0
+        LastestInteraction = 0
+        def TimeCompare(UnixTime, EarliestInteraction, LastestInteraction):
+
+            if UnixTime < EarliestInteraction or EarliestInteraction == 0:
+                EarliestInteraction = UnixTime
+            if UnixTime > LastestInteraction:
+                LastestInteraction = UnixTime
+            return EarliestInteraction, LastestInteraction
+
+        normalised_data = {"implants": {},
+                           "commands": {},
+                           "response": {},
+                           "metadata": {},
+                           }
+
+        aa = self.db.Get_AllGeneratedImplantsFromCID(cid)
+        bb = self.db.Get_RegisteredImplantCommandsFromCID(cid)
+        cc = self.db.Get_CampaignImplantResponses(cid)
+
+        counter = 0
+        # -- Normalise generated implants
+        for x in aa:
+            b = x
+            if '_sa_instance_state' in b:
+                del b['_sa_instance_state']
+            normalised_data["implants"][counter]= b
+            counter +=1
+        # -- Normalise RegisteredImplants
+        counter = 0
+        for gg in bb:
+            jj = gg.__dict__
+            if '_sa_instance_state' in jj:
+                del jj['_sa_instance_state']
+            normalised_data['commands'][counter]=jj
+            counter +=1
+        # -- Get command response
+        counter = 0
+        for x in cc:
+            normalised_data['response'][counter]=x
+            counter+=1
+
+        for keys in normalised_data.keys():
+            for x in normalised_data[keys]:
+                if 'time' in normalised_data[keys][x]:
+                    # print("::",keys)
+                    EarliestInteraction, LastestInteraction = TimeCompare(normalised_data[keys][x]['time'],EarliestInteraction, LastestInteraction)
+                if 'read_by_implant' in normalised_data[keys][x]:
+                    EarliestInteraction, LastestInteraction = TimeCompare(normalised_data[keys][x]['read_by_implant'],EarliestInteraction, LastestInteraction)
+                elif 'blah' in normalised_data[keys][x]:
+                    print("No.")
+
+        from datetime import datetime
+
+        # print(datetime.fromtimestamp(EarliestInteraction))
+        # print(datetime.fromtimestamp(LastestInteraction))
+        normalised_data['metadata']['earliest_interaction'] = EarliestInteraction
+        normalised_data['metadata']['last_interaction'] = LastestInteraction
+        return normalised_data

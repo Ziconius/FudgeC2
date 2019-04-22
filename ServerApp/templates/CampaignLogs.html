@@ -1,0 +1,47 @@
+{% extends "ImplantMain.html" %}
+{% block main2 %}
+<div class="row">
+    <div class="col-md-3">
+        <div>imp crte</div>
+        <div id="imp_crte"></div>
+    </div>
+    <div class="col-md-3">
+        <div>cmd reg</div>
+        <div id="cmd_reg"></div>
+    </div>
+    <div class="col-md-3">
+        <div>cmd pickup</div>
+        <div id="cmd_pickup"></div>
+    </div>
+    <div class="col-md-3">
+        <div>cmd resp</div>
+        <div id="cmd_resp"></div>
+    </div>
+</div>
+<script>
+function render_campaign_data(){
+    $.ajax({
+        url:"/{{ cid }}/logs",
+        type:"POST",
+        success: function (response) {
+
+            for (subitem in response['implants']){
+                //document.getElementById('cmd_reg');
+                a = response['implants'][subitem]
+                console.log(a)
+            }
+            for (sb_1 in response['commands']){
+                console.log(sb_1);
+                //b = response['commands'][sb_1]['time'];
+                GG = document.getElementById('cmd_reg');
+                WP = "<p>Name:"+response['commands'][sb_1]['uik']+"<br>Cmd: "+response['commands'][sb_1]['log_entry']+"<br>Time: "+response['commands'][sb_1]['time']+"</p><hr>";
+                //console.log(b)
+                document.getElementById('cmd_reg').innerHTML = document.getElementById('cmd_reg').innerHTML + WP;
+            }
+        }
+    })
+}
+render_campaign_data()
+</script>
+{% endblock %}
+

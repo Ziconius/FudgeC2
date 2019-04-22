@@ -369,7 +369,7 @@ class Database():
                 try:
                     self.Session.commit()
                     q = self.Session.query(ImplantLogs).first()
-                    print(q)
+                    #print(q)
                     return True
                 except Exception as e:
                     print("db.Register_ImplantCommand: ", e)
@@ -507,6 +507,16 @@ class Database():
             return False
         elif R.permissions >= 2:
             return True
+    def Verify_UserCanReadCampaign(self, username, cid):
+        uid = self.__get_userid__(username)
+        if uid == None:
+            return False
+        R = self.Session.query(CampaignUsers).filter(CampaignUsers.cid == cid, CampaignUsers.uid == uid).first()
+        if R == None or R.permissions < 1:
+            return False
+        elif R.permissions >= 1:
+            return True
+
 
     # -- App Logging Classes -- #
     # ------------------------- #

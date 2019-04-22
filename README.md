@@ -124,7 +124,7 @@ Below is an high-level overview of the on-going development to increase function
 ---
 Release 0.2 _(Human Grunt)_
 #### Implant Manager Web App
-- [ ] Add help page with implant special tags using `::cmd::` format.
+- [x] Add help page with implant special tags using `::cmd::` format.
 - [ ] Order implant check-ins buy quality
 - [ ] Review how implant responses are displayed within the main campaign page to improve readability
 - [ ] Create log page with detailed logging of for each implant, including time, command, implant, pickup, and pickup time.

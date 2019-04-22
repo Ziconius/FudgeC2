@@ -266,6 +266,16 @@ def CampaignGraph(cid):
         return jsonify(blah)
     return render_template("CampaignGraph.html")
 
+@app.route("/<cid>/logs", methods=["GET","POST"])
+@login_required
+def CampaignLogs(cid):
+    g.setdefault('cid',cid)
+    if request.method == "POST":
+        # -- Replace with pre-organised campaign logs - simplifies JS component.
+
+        return jsonify(ImpMgmt.Get_ChronologicallyOrderedCampaignLogsJSON(current_user.user_email,cid))
+    return render_template("CampaignLogs.html")
+
 # -- Implant command execution -- #
 @app.route("/<cid>/implant/register_cmd", methods=["POST"])
 @login_required
