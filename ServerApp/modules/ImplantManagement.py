@@ -59,8 +59,8 @@ class ImplantManagement():
             for implant in ListOfImplants:
                 # -- Create return from the Implant.AddCommand() method.
                 self.Imp.AddCommand(username,implant['unique_implant_id'], processed_command)
-            return True
-        return False
+            return {"cmd_reg":{"result":True,"reason":"Command registered"}}
+        return {"cmd_reg":{"result":False,"reason":"Incorrect implant given, or non-existant active implant."}}
 
     def CreateNewImplant(self,cid,form, user):
         # -- This is creating a new Implant Template
@@ -127,39 +127,70 @@ class ImplantManagement():
         else:
             return False
 
+    def ReorderList(self, List, Item, event=None, key='time'):
+        # print(":: ",Item)
+        if len(List) == 0:
+            Item['lo-time'] = Item[key]
+            if key == 'time':
+                Item['time-type'] = 'time'
+            else:
+                Item['time-type'] = 'read_by_implant'
+            Item['event'] = event
+            List.append(Item)
+            # print(List)
+            return List
+        # print(Item)
+        for index, value in enumerate(List):
+            # print("@@",index, value)
+            # print(value['lo-time'], Item[key])
+            # print(value['lo-time'] - Item[key])
+            if value['lo-time'] < Item[key]:
+                # print(key, Item)
+                Item['event'] = event
+                Item['lo-time'] = Item[key]
+                if key == 'time':
+                    Item['time-type'] = 'time'
+                else:
+                    Item['time-type'] = 'read_by_implant'
+                print(key, "::", Item['time-type'], Item['lo-time'], Item)
+                List.insert(index - 1, Item)
+                break
+        return List
     def Get_ChronologicallyOrderedCampaignLogsJSON(self,username,cid):
+        # -- TODO: BUG. This doesn't properly return the list, all cmd_reg elements replaced by
+        # --     cmd_pickup. Likely an issue with the way the list is being structured.
         unorder_logs = self.Get_CampaignLogsJson(username,cid)
 
         final_list = []
-        def ReorderList(List, Item, key='time'):
-            if len(List) == 0:
-                List.append(Item)
-            print(Item)
-            for x in List:
-                if x[key] < Item[key]:
-                    print(00)
-            return List
-
 
         for key in unorder_logs.keys():
             if key == "metadata":
                 break
             for i in unorder_logs[key]:
-                # print(i)
+                #print(unorder_logs[key][i])
                 if key == "commands":
-                    print(unorder_logs[key][i]['time'])
-                    final_list = ReorderList(final_list, unorder_logs[key][i])
-
-                    # // Pickup time
-                    final_list = ReorderList(final_list, unorder_logs[key][i], 'read_by_implant')
+                    #print(unorder_logs[key][i]['time'])
+                    a = unorder_logs[key][i]
+                    final_list = self.ReorderList(final_list, a, "cmd_reg")
+                    for x in final_list:
+                        print("''''",x['event'])
+                    a = None
+                    a = unorder_logs[key][i]
+                    print("%%",a)
+                    if unorder_logs[key][i]['read_by_implant'] != 0:
+                        print("Implant read")
+                        final_list = self.ReorderList(final_list, a,"imp_read", 'read_by_implant')
+                    for x in final_list:
+                        print("''''",x['event'])
                     # do pick up
-
-                else:
+                elif key == "implants":
+                    final_list = self.ReorderList(final_list, unorder_logs[key][i], "new_imp")
                     pass
-                    print(0)
+                elif  key == "response":
+                    final_list = self.ReorderList(final_list, unorder_logs[key][i], "response")
 
         ordered_logs = {}
-        return ordered_logs
+        return final_list
 
     def Get_CampaignLogsJson(self, username, cid):
         a = '''

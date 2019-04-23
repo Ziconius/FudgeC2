@@ -64,7 +64,7 @@ async function get_command_response (){
             for (element in response){
                 // Check for the log_id existing, if it doesn't add to list and write to top of page to remove weird loading page
                 if ( contained_list.includes(response[element].log_id) ) {
-                    console.log('Entry found');
+                    //console.log('Entry found');
                 } else {
 
                     contained_list.push(response[element].log_id);
@@ -107,6 +107,8 @@ $(function() {
                 // ajax success callback
                 console.log("@@@"+document.getElementById('implantCmd').innerHTML)
                 document.getElementById('implantCmd').value="";
+                console.log("###"+response['cmd_reg']['result'])
+                if (response['cmd_reg']['result']===false){alert(response['cmd_reg']['reason'])}
             },
             error: function (response) {
                 alert('ajax failed');

@@ -46,10 +46,12 @@ async function Get_Awaiting_Cmds (cid){
                     //contained_list.push(response[element].title)
                     //var pageContainer = document.getElementById('awaiting')
                     if (response[element].read_by_implant == 0){
-                        console.log(response[element].time)
+                        //console.log(response[element].time)
                         line="<p>Implant ID: "+response[element].uik+"</br>Command: "+response[element].log_entry+"</p>"
                         document.getElementById('awaiting').innerHTML =  document.getElementById('awaiting').innerHTML + line
-                    } else { console.log(response[element].time)}
+                    } else {
+                        //console.log(response[element].time)
+                    }
                 }
             }
         })

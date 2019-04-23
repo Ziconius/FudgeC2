@@ -14,16 +14,16 @@
     {{ user.user }}
     <!-- Update to check the current rights of a user!-->
     <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="{{ user.user }}" id="inlineRadio{{count.a}}" value="0">
-        <label class="form-check-label" for="inlineRadio{{count.a}}">None</label>
+        <input {% if users[count.a].permissions==0 %}{{ "checked" }}{% endif %} class="form-check-input" type="radio" name="{{ user.user }}" id="inlineRadio{{count.a}}" value="0">
+        <label class="form-check-label">None</label>
     </div>
     <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="{{ user.user }}" id="inlineRadio{{count.a}}" value="1">
-        <label class="form-check-label" for="inlineRadio{{count.a}}">Read</label>
+        <input {% if users[count.a].permissions==1 %}{{ "checked" }}{% endif %} class="form-check-input" type="radio" name="{{ user.user }}" id="inlineRadio{{count.a}}" value="1">
+        <label class="form-check-label">Read</label>
     </div>
     <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="{{ user.user }}" id="inlineRadio{{count.a}}" value="2">
-        <label class="form-check-label" for="inlineRadio{{count.a}}">Read/Write</label>
+        <input {% if users[count.a].permissions==2 %}{{ "checked" }}{% endif %} class="form-check-input" type="radio" name="{{ user.user }}" id="inlineRadio{{count.a}}" value="2">
+        <label class="form-check-label">Read/Write</label>
     </div>
     <br>
 

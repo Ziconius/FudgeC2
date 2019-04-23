@@ -128,15 +128,15 @@ Release 0.2 _(Human Grunt)_
 - [ ] Order implant check-ins buy quality
 - [ ] Review how implant responses are displayed within the main campaign page to improve readability
 - [ ] Create log page with detailed logging of for each implant, including time, command, implant, pickup, and pickup time.
-- [ ] Provide feedback to read-only campaign users with feedback if they are not authorised to execute commands.
+- [x] Provide feedback to read-only campaign users with feedback if they are not authorised to execute commands. Basic implementation only.
 - [ ] Add filter for implants on implant page to reduce noise.
-- [ ] Improve Campaign Settings radio buttons to include current settings
+- [x] Improve Campaign Settings radio buttons to display the current configuration.
 
 
 ##### Implant
 
 - [ ] Add further work on implant obfuscation levels/configuration.
-- [ ] Add implant special tags formatted: `::cmd::`
+- [x] Add implant special tags formatted: `::cmd::`
 - [ ] Create further staging options (docx, pfd, etc)
 - [ ] Improve format of returning data.
 - [ ] Deploy HTTPS cert to HTTP channel
@@ -163,7 +163,25 @@ Release 0.2 _(Human Grunt)_
  - [ ] Improve obfuscation
  
 ##### Controller
-- [ ] Restructure how listeners are configured and launched. This piece of work will likely take several weeks of re-engineering.
+- [ ] Restructure how listeners are configured and launched. This piece of work will be staged over serveral releases.
 
 ##### Campaign Viewer
 - [ ] Author separate viewer mechanisms for the client/blue team
+
+---
+ Release 0.4 _(Tauren Herbalist)_ 
+##### Implant Manager Web App
+ - [ ] Allow admins to view, start, stop, and configure all active listeners.
+ - [ ] Refector Webapp JS into suitable structure. 
+ - [ ] UI Overhaul
+ 
+
+##### Implant
+ - [ ] Create DNS comms channel
+ - [ ] Create DLL implant PoC
+ 
+##### Controller
+ - [ ] Create DNS Listener
+ - [ ] Create user R/R+W permission inheritance campaign -> implant template -> active implant
+
+

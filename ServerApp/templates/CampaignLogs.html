@@ -1,19 +1,19 @@
 {% extends "ImplantMain.html" %}
 {% block main2 %}
 <div class="row">
-    <div class="col-md-3">
+    <div class="col-md-1">
         <div>imp crte</div>
         <div id="imp_crte"></div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-6">
         <div>cmd reg</div>
         <div id="cmd_reg"></div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-1">
         <div>cmd pickup</div>
         <div id="cmd_pickup"></div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-1">
         <div>cmd resp</div>
         <div id="cmd_resp"></div>
     </div>
@@ -41,7 +41,41 @@ function render_campaign_data(){
         }
     })
 }
-render_campaign_data()
+
+function unix_to_human_time(unixtime){
+
+var foo = new Date;
+var unixTimestamp = parseInt(unixtime);
+var unixTimeToDate = new Date(unixTimestamp * 1000);
+return unixTimeToDate
+}
+
+function render_campaign_data_list(){
+    $.ajax({
+        url:"/{{ cid }}/logs",
+        type:"POST",
+        success: function (response) {
+
+            for (item in response){
+                ToWrite = ""
+                if (response[item]['event'] === "new_imp") {
+                    ToWrite = "<br> New implant activated<br>Common Name: "+response[item]['generated_title']+"<br>Description: "+response[item]['description']+"<br>Time: "+unix_to_human_time(response[item]['lo-time'])+"<hr>"
+                } else if (response[item]['event'] === "cmd_reg") {
+                    ToWrite = "<br>New command reg<br>Implant: "+response[item]['uik']+"<br>Cmd Registered: "+response[item]['log_entry']+"<br>Time: "+unix_to_human_time(response[item]['lo-time'])+"<hr>"
+                } else if (response[item]['event'] === "imp_read") {
+                    ToWrite = "<br>Command read by Implant<br>Implant: "+response[item]['uik']+"<br>Cmd Registered: "+response[item]['log_entry']+"<br>Time: "+unix_to_human_time(response[item]['lo-time'])+"<hr>"
+                } else if (response[item]['event'] === "response"){
+                    ToWrite = "<br>Command Response<br>Implant: "+response[item]['uik']+"<br>Response: "+response[item]['log_entry']+"<br>Time: "+unix_to_human_time(response[item]['lo-time'])+"<hr>"
+                }
+
+                document.getElementById('cmd_reg').innerHTML = document.getElementById('cmd_reg').innerHTML + ToWrite;
+
+            }
+        }
+    })
+}
+
+render_campaign_data_list()
 </script>
 {% endblock %}
 

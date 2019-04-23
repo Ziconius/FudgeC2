@@ -38,7 +38,6 @@ def inject_dict_for_all_campaign_templates(cid=None):
     if cid != None:
         return dict(campaign=cname, cid=cid)
     else:
-        print("context processor")
         return dict()
 
 
@@ -188,9 +187,11 @@ def BaseImplantSettings(cid):
     g.setdefault('cid', cid)
     Users = db.Get_SettingsUsers(cid, current_user.user_email)
     if request.method == "POST":
+        print(request.form)
         UsrMgmt.AddUserToCampaign(current_user.user_email, request.form, cid)
         return redirect(url_for('BaseImplantSettings', cid=cid))
     else:
+        print(Users)
         return render_template("settings/CampaignSettings.html", users=Users)
 
 

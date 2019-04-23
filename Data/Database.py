@@ -314,7 +314,7 @@ class Database():
         I = self.Session.query(Implants).filter(Implants.stager_key==StagerKey).first()
         UIK = random.randint(000000,999999)
         new_title = str(I.title) +"_"+ str(UIK)
-        GI=GeneratedImplants(unique_implant_id = UIK,last_check_in = 0,current_beacon = I.beacon,iid = I.iid, generated_title = new_title)
+        GI=GeneratedImplants(unique_implant_id = UIK,last_check_in = 0,current_beacon = I.beacon,iid = I.iid, generated_title = new_title, time=int(time.time()))
         self.Session.add(GI)
         try:
             self.Session.commit()
