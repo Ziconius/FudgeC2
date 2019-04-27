@@ -5,13 +5,13 @@ class ImplantSingleton:
         # -- The Implant class is sole class responible for controlling data to and from implants.
         # --    it manages  these interaction across all types of implants and communication protocols.
 
-        def AddCommand(self, User, UniqueImplantKey,Command):
+        def AddCommand(self, User, cid, UniqueImplantKey,Command):
             # -- Add record to issue command table with username - time - command - UID
             # -- Implement the logging calls to ensure entries got to DB. and get recorded on pick up
             # Writes command to the database.
             #   checks for authorisation to write commands.
             #   The AddCommand should only be called form 'ImplantManagement'
-            db.Register_ImplantCommand(User, UniqueImplantKey, Command)
+            db.Register_ImplantCommand(User, UniqueImplantKey, Command, cid=cid)
 
         def IssueCommand(self,UIK=0):
             if UIK != 0:
@@ -26,7 +26,7 @@ class ImplantSingleton:
                             tmpImpLogs.append(x)
                     if len(tmpImpLogs) != 0:
                         Entry = min(tmpImpLogs, key=lambda x: x.time)
-                        if db.Register_ImplantCommandPickup(Entry.uik,Entry.log_entry,Entry.time):
+                        if db.Register_ImplantCommandPickup(Entry):
                             return Entry.log_entry
 
             # -- Create a suitable null response.
@@ -36,7 +36,9 @@ class ImplantSingleton:
                 return "=="
         def CommandResponse(self,result):
             aa = result.split("::", 1)
-            db.Register_ImplantResponse(aa[0],aa[1])
+            generated_implant_data = db.Get_GeneratedImplantDataFromUIK(aa[0])
+            print(generated_implant_data)
+            db.Register_ImplantResponse(generated_implant_data[0]['cid'],aa[0],aa[1])
             # -- Legacy Format Below: To remove -- #
             # self.CommandOutput.append(result)
             return 0

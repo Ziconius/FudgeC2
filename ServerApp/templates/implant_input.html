@@ -36,7 +36,7 @@
     </div>
 
     <div class="col-lg-6" id="Response"></div>
-    <div class="col-lg-2" id="ImplantStatus">
+    <div class="col-lg-3" id="ImplantStatus">
         Implant Check in:
         <div class="" id="ImplantStatusValues">
         {% if Implants %}
@@ -49,9 +49,12 @@
 </div>
 <script src="{{ url_for('static', filename='ImplantController.js') }}"></script>
 <script>
+
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+// Gets command results and outputs to screen.
 var contained_list=[];
 async function get_command_response (){
     while(true){
@@ -87,7 +90,10 @@ async function get_command_response (){
     await sleep(10000);
     }
 }
+
 get_command_response()
+
+// Submits the commands to the backend.
 $(function() {
     $('#AnswerBtn').on('click', function (e) {
         e.preventDefault(); // disable the default form submit event
@@ -119,6 +125,8 @@ $(function() {
         //document.getElementById('comment').innerHTML=("");//
     });
 });
+
+
 Get_ImplantCallback ({{cid}})
 Get_Awaiting_Cmds ({{cid}})
 </script>

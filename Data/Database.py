@@ -3,16 +3,20 @@ from sqlalchemy import create_engine, func, extract
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
-from Data.models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs, declarative_base
+from Data.models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs, CampaignLogs,declarative_base
 from Storage.settings import Settings
 import uuid
 import bcrypt
 import time
+import ast
 import random
 from Data.Logging import Logging
+from Data.CampaignLogging import *
 L=Logging()
+CL = log_test_dec()
 class Database():
     def __init__(self):
+
         engine = create_engine("sqlite:///Storage/{}?check_same_thread=False".format(Settings.database_name))
         # -- TODO: RefactorGet_AllCampaignImplants
         self.selectors = {
@@ -24,6 +28,9 @@ class Database():
 
         self.__does_admin_exist()
 
+        #self.
+
+    # CL = ""
     def __enter__(self):
         return self
 
@@ -49,6 +56,7 @@ class Database():
 
 
     ## -- PRIVATE METHODS -- #
+
     def __get_userid__(self,email):
         # -- Require further improvement i.e try:catch
         query = self.Session.query(Users.uid).filter(Users.user_email == email).first()
@@ -113,6 +121,8 @@ class Database():
         self.Session.add(users)
         self.Session.commit()
         return True
+
+
     def User_HasCompletedFirstLogon(self,email):
         # -- Return (true/false)
         HasLoggedOn = self.Session.query(Users).filter(Users.first_logon == 0,Users.user_email == email).all()
@@ -307,6 +317,7 @@ class Database():
         print("TODO")
         # -- Check for reference and remove after.
 
+    @CL.log_implant_activation
     def Register_NewImplantFromStagerKey(self, StagerKey):
         # -- We are registering a NEW implant and generating a unique_stager_key (or UIK)
         # -- Moving forward all reference to ImplantKey/UII should be changed to StagerID
@@ -340,8 +351,8 @@ class Database():
         a =self.Session.query(GeneratedImplants).filter(GeneratedImplants.unique_implant_id==GeneratedImplantKey).update({"last_check_in": (int(time.time()))})
         self.Session.commit()
 
-
-    def Register_ImplantCommand(self, username, uik, command):
+    @CL.log_cmdreg
+    def Register_ImplantCommand(self, username, uik, command,  cid=0):
         # -- Requirements: username unique_implant_key, command
         # -- Checks: User can register commands against a generated implant
 
@@ -392,21 +403,21 @@ class Database():
         else:
             return []
 
-    def Register_ImplantCommandPickup(self,uik, cmd, reg_time):
-        # a = self.Session.query(GeneratedImplants).filter(
-        #     GeneratedImplants.unique_implant_id == GeneratedImplantKey).update({"last_check_in": (int(time.time()))})
+    @CL.log_cmdpickup
+    def Register_ImplantCommandPickup(self, record):
         ImplantPickup = self.Session.query(ImplantLogs).filter(
-            ImplantLogs.uik == uik,
-            ImplantLogs.log_entry == cmd,
-            ImplantLogs.time == reg_time).update({'read_by_implant':(int(time.time()))})
+            ImplantLogs.uik == record.uik,
+            ImplantLogs.log_entry == record.log_entry,
+            ImplantLogs.time == record.time).update({'read_by_implant':(int(time.time()))})
         try:
             self.Session.commit()
             return True
         except Exception as E:
-            print(E)
+            print("Exception: ",E)
             return False
 
-    def Register_ImplantResponse(self,UIK,Response):
+    @CL.log_cmdresponse
+    def Register_ImplantResponse(self,cid,UIK,Response):
         # -- TODO: REBUILD
         # Pull back the first record which matches the UIK, contain both the Campaign the IID is associated from the implant the UIk is associated with.
         info=self.Session.query(Implants,Campaigns,GeneratedImplants).filter(Campaigns.cid==Implants.cid
@@ -420,8 +431,10 @@ class Database():
         try:
             print("Commiting values")
             self.Session.commit()
+            return True
         except Exception as E:
             print(E)
+
 
 
 
@@ -527,3 +540,30 @@ class Database():
             self.Session.commit()  # flush check if this will work...
         except:
             return False
+
+    def Log_CampaignAction(self,dict_of_stuff):
+        try:
+            logs = CampaignLogs(
+                user=dict_of_stuff['user'],
+                campaign=dict_of_stuff['campaign'],
+                time=dict_of_stuff['time'],
+                log_type=dict_of_stuff['log_type'],
+                entry=str(dict_of_stuff['entry'])
+            )
+            self.Session.add(logs)
+            self.Session.commit()
+            print("Log: Log_CampaignAction::"+dict_of_stuff['log_type']+" success.")
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def Log_GetCampaignActions(self,cid):
+        R = self.Session.query(CampaignLogs).filter(CampaignLogs.campaign == cid).all()
+        ret_dict = {}
+
+        for count, row in enumerate(R):
+            ret_dict[count]=row.__dict__
+            del ret_dict[count]['_sa_instance_state']
+            ret_dict[count]['entry'] = ast.literal_eval(ret_dict[count]['entry'])
+        return ret_dict

@@ -100,6 +100,16 @@ class AppLogs(Base):
     type = Column(String(255), nullable=False)
     data = Column(String(255),nullable=False)
 
+class CampaignLogs(Base):
+    __tablename__='campaign_logs'
+    auto_id = Column(INTEGER(11), nullable=False, index=True, primary_key=True)
+    user = Column(INTEGER(8),nullable=False)
+    campaign = Column(INTEGER(8),nullable=False)
+    time = Column(INTEGER(32),nullable=False)
+    log_type = Column(String(32), nullable=False)
+    entry = Column(String(1024), nullable=False)
+
+
 # -- Generate an empty database if non-existent.
 engine = create_engine("sqlite:///Storage/{}?check_same_thread=False".format(Settings.database_name), echo=False)
 Base.metadata.create_all(engine)

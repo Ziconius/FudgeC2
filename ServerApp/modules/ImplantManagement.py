@@ -58,7 +58,7 @@ class ImplantManagement():
                 return {"cmd_reg":{"result":False,"reason":"No implants listed."}}
             for implant in ListOfImplants:
                 # -- Create return from the Implant.AddCommand() method.
-                self.Imp.AddCommand(username,implant['unique_implant_id'], processed_command)
+                self.Imp.AddCommand(username,cid,implant['unique_implant_id'], processed_command)
             return {"cmd_reg":{"result":True,"reason":"Command registered"}}
         return {"cmd_reg":{"result":False,"reason":"Incorrect implant given, or non-existant active implant."}}
 
@@ -156,6 +156,16 @@ class ImplantManagement():
                 List.insert(index - 1, Item)
                 break
         return List
+
+
+    def Get_CampaignLogs(self, username, cid):
+        User = self.db.Verify_UserCanReadCampaign(username, cid)
+        if User == False:
+            return {
+                "cmd_reg": {"result": False, "reason": "You are not authorised to view commands in this campaign."}}
+        return self.db.Log_GetCampaignActions(cid)
+
+
     def Get_ChronologicallyOrderedCampaignLogsJSON(self,username,cid):
         # -- TODO: BUG. This doesn't properly return the list, all cmd_reg elements replaced by
         # --     cmd_pickup. Likely an issue with the way the list is being structured.

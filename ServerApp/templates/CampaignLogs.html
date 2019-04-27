@@ -1,53 +1,26 @@
 {% extends "ImplantMain.html" %}
 {% block main2 %}
 <div class="row">
-    <div class="col-md-1">
-        <div>imp crte</div>
-        <div id="imp_crte"></div>
-    </div>
     <div class="col-md-6">
-        <div>cmd reg</div>
-        <div id="cmd_reg"></div>
-    </div>
-    <div class="col-md-1">
-        <div>cmd pickup</div>
-        <div id="cmd_pickup"></div>
-    </div>
-    <div class="col-md-1">
-        <div>cmd resp</div>
-        <div id="cmd_resp"></div>
+        <div><h3>Campaign Logs</h3></div>
+        <div id="campaign_logs"></div>
     </div>
 </div>
 <script>
-function render_campaign_data(){
-    $.ajax({
-        url:"/{{ cid }}/logs",
-        type:"POST",
-        success: function (response) {
-
-            for (subitem in response['implants']){
-                //document.getElementById('cmd_reg');
-                a = response['implants'][subitem]
-                console.log(a)
-            }
-            for (sb_1 in response['commands']){
-                console.log(sb_1);
-                //b = response['commands'][sb_1]['time'];
-                GG = document.getElementById('cmd_reg');
-                WP = "<p>Name:"+response['commands'][sb_1]['uik']+"<br>Cmd: "+response['commands'][sb_1]['log_entry']+"<br>Time: "+response['commands'][sb_1]['time']+"</p><hr>";
-                //console.log(b)
-                document.getElementById('cmd_reg').innerHTML = document.getElementById('cmd_reg').innerHTML + WP;
-            }
-        }
-    })
-}
 
 function unix_to_human_time(unixtime){
-
-var foo = new Date;
-var unixTimestamp = parseInt(unixtime);
-var unixTimeToDate = new Date(unixTimestamp * 1000);
-return unixTimeToDate
+    var utcSeconds = unixtime;
+    var d = new Date(0);
+    d.setUTCSeconds(utcSeconds);
+    var date = new Date(unixtime*1000);
+    var year = date.getFullYear();
+    var month = date.getMonth();
+    var day = date.getDate();
+    var hours = "0" + date.getHours();
+    var minutes = "0" + date.getMinutes();
+    var seconds = "0" + date.getSeconds();
+    time_last_seen = hours.substr(-2)+":"+minutes.substr(-2)+':'+seconds.substr(-2)+' '+day+'/'+month+'/'+year
+    return time_last_seen
 }
 
 function render_campaign_data_list(){
@@ -58,17 +31,18 @@ function render_campaign_data_list(){
 
             for (item in response){
                 ToWrite = ""
-                if (response[item]['event'] === "new_imp") {
+                if (response[item]['log_type'] === "new_imp") {
                     ToWrite = "<br> New implant activated<br>Common Name: "+response[item]['generated_title']+"<br>Description: "+response[item]['description']+"<br>Time: "+unix_to_human_time(response[item]['lo-time'])+"<hr>"
-                } else if (response[item]['event'] === "cmd_reg") {
-                    ToWrite = "<br>New command reg<br>Implant: "+response[item]['uik']+"<br>Cmd Registered: "+response[item]['log_entry']+"<br>Time: "+unix_to_human_time(response[item]['lo-time'])+"<hr>"
-                } else if (response[item]['event'] === "imp_read") {
-                    ToWrite = "<br>Command read by Implant<br>Implant: "+response[item]['uik']+"<br>Cmd Registered: "+response[item]['log_entry']+"<br>Time: "+unix_to_human_time(response[item]['lo-time'])+"<hr>"
-                } else if (response[item]['event'] === "response"){
-                    ToWrite = "<br>Command Response<br>Implant: "+response[item]['uik']+"<br>Response: "+response[item]['log_entry']+"<br>Time: "+unix_to_human_time(response[item]['lo-time'])+"<hr>"
+                } else if (response[item]['log_type'] === "cmd_reg") {
+                    ToWrite = "<br>New command reg<br>Implant: "+response[item]['entry']['uik']+"<br>CMD: "+response[item]['entry']['cmd']+"<br>Time: "+unix_to_human_time(response[item]['time'])+"<hr>"
+                } else if (response[item]['log_type'] === "cmd_pickup") {
+                    //console.log("a")
+                    ToWrite = "<br>Command read by Implant<br>Implant: "+response[item]['entry']['uik']+"<br>CMD: "+response[item]['entry']['cmd']+"<br>Time: "+unix_to_human_time(response[item]['time'])+"<hr>"
+                } else if (response[item]['log_type'] === "cmd_response"){
+                    ToWrite = "<br>Command Response<br>Implant: "+response[item]['entry']['uik']+"<br>Response: "+response[item].entry.response+"<br>Time: "+unix_to_human_time(response[item].time)+"<hr>"
                 }
 
-                document.getElementById('cmd_reg').innerHTML = document.getElementById('cmd_reg').innerHTML + ToWrite;
+                document.getElementById('campaign_logs').innerHTML = document.getElementById('campaign_logs').innerHTML + ToWrite;
 
             }
         }

@@ -239,7 +239,7 @@ def ImplantStager(cid):
 @app.route("/<cid>/implant/status", methods=['GET','POST'])
 @login_required
 def GetImplantStatus(cid):
-    a = db.Get_AllCampaignImplants("1")
+    a = db.Get_AllCampaignImplants(cid)
     data = {}
     count = 1
     # TODO: Revise this section entirely.
@@ -273,8 +273,10 @@ def CampaignLogs(cid):
     g.setdefault('cid',cid)
     if request.method == "POST":
         # -- Replace with pre-organised campaign logs - simplifies JS component.
-
-        return jsonify(ImpMgmt.Get_ChronologicallyOrderedCampaignLogsJSON(current_user.user_email,cid))
+        # Get_CampaignLogs
+        return jsonify(ImpMgmt.Get_CampaignLogs(current_user.user_email, cid))
+        # Old method
+        # return jsonify(ImpMgmt.Get_ChronologicallyOrderedCampaignLogsJSON(current_user.user_email,cid))
     return render_template("CampaignLogs.html")
 
 # -- Implant command execution -- #
@@ -286,7 +288,7 @@ def ImplantCommandRegistration(cid):
         # -- This is the new format using ImpMgmt to handle validation of user and command.
         registration_response = ImpMgmt.ImplantCommandRegistration(cid, current_user.user_email, request.form)
         # -- Currently no return value is required. This should be defined.
-        print(registration_response)
+        # print(registration_response)
         return jsonify(registration_response)
 
     return "000"
