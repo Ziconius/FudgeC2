@@ -13,26 +13,33 @@ The simplest route to get a basic Fudge server up and running is:
 ```
 git clone https://github.com/Ziconius/Fudge
 cd Fudge
-pip3 install -r requirements.txt
+sudo pip3 install -r requirements.txt
 sudo python3 Controller.py
 ```
 
-Settings:
+##### Settings:
+
 Fudge comes with default boot configurations, which can be altered in:
 
 `<install dir>/Storage/settings.py`
 
 These settings include Fudge application port, SSL, and database.
 
-Depending on your network design/RT architecture deployment, you will likely need to configure a number of proxy and routing adjustments. The most common configuration  setup is to use Fudge over HTTP(S) using a reverse NGINX/Apache2 proxy.
+Depending on your network design/RT architecture deployment, you will likely need to configure a number of proxy and routing adjustments. The most common configuration setup is to use Fudge over HTTP(S) using a reverse NGINX/Apache2 proxy.
 
 #### First Login
-After the initial installation you can log in with the default admin account using the credentials: `admin:letmein`. You will be prompted to the admin password as this point. 
+After the initial installation you can log in with the default admin account using the credentials: 
+
+```admin:letmein```
+
+You will be prompted to the change the admin password as this point. 
 
 ## Users
 Users within Fudge are divided into 2 groups, admins and standard users. Admins have all of the usual functionality, such as user creation, and are required to create a new campaigns.
 
 Within campaign a users permissions can be configured to either have None/Read/Read+Write. Without read permissions, a user will not be able to see the existence of a campaign, nor will they be able to read implant responses, or registered commands.
+
+User with read permission will only be able to view the commands and their output, and the campaigns logging page. This role will typically be assigned to a junior tester, or an observer.
 
 Users with write permissions will be able to create implant templates, and execute commands on all active implants.
 
@@ -43,9 +50,9 @@ An admin can create a new user from within the Global Settings options. They wil
 
 ## Campaigns
 #### What is a campaign?
-A campaign is a method of organising a red team, which allows access control to be applied on aper user basis
+A campaign is a method of organising a red team, which allows access control to be applied on a per user basis
 
-Each campaign contains a unique name and, implants, and logs while a user can be a member of multiple campaigns
+Each campaign contains a unique name, implants, and logs while a user can be a member of multiple campaigns
 
 
 
