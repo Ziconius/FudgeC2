@@ -66,10 +66,10 @@ class ImplantManagement():
         # -- This is creating a new Implant Template
         User = self.db.Get_UserObject(user)
         if User.admin == 0:
-            return "Insufficient Priviledges"
+            return False, "Insufficient Priviledges"
         CampPriv = self.db.Verify_UserCanWriteCampaign(user,cid)
         if CampPriv == False:
-            return "User cannot write to this campaign"
+            return False, "User cannot write to this campaign"
         # -- From here we know the user is able to write to the Campaign and an admin.
 
         try:
@@ -78,7 +78,7 @@ class ImplantManagement():
                 if obfuscation_level == None:
                     print("OL", obfuscation_level)
                     raise ValueError('Missing, or invalid obfuscation levels')
-                if form['title'] =="" or form['url'] =="" or form['description'] == "":
+                if form['title'] == "" or form['url'] == "" or form['description'] == "":
                     raise ValueError('Mandatory values left blank')
                 title = form['title']
                 url=form['url']
@@ -101,17 +101,17 @@ class ImplantManagement():
                     comms_dns = 1
                 if "comms_binary" in form :
                     comms_binary = 1
-                if comms_binary == 0 and comms_dns == 0 and comms_http ==0:
+                if comms_binary == 0 and comms_dns == 0 and comms_http == 0:
                     raise ValueError('No communitcation channel selected. ')
                 a = self.db.Add_Implant(cid, title ,url,port,beacon,initial_delay,comms_http,comms_dns,comms_binary,description,obfuscation_level)
                 if a == True:
-                    return "Implant created."
+                    return True, "Implant created."
                 else:
                     raise ValueError("Error creating entry. Ensure filename is unique")
         except Exception as e:
             print("NewImplant: ",e)
-            # -- Implicting returning page with Error --#
-            return e
+            # --  returning page with generic Error --#
+            return False, e
 
     def Get_RegisteredImplantCommands(self, username, cid=0):
         # -- Return list of dictionaries, not SQLAlchemy Objects.
@@ -127,36 +127,6 @@ class ImplantManagement():
         else:
             return False
 
-    def ReorderList(self, List, Item, event=None, key='time'):
-        # print(":: ",Item)
-        if len(List) == 0:
-            Item['lo-time'] = Item[key]
-            if key == 'time':
-                Item['time-type'] = 'time'
-            else:
-                Item['time-type'] = 'read_by_implant'
-            Item['event'] = event
-            List.append(Item)
-            # print(List)
-            return List
-        # print(Item)
-        for index, value in enumerate(List):
-            # print("@@",index, value)
-            # print(value['lo-time'], Item[key])
-            # print(value['lo-time'] - Item[key])
-            if value['lo-time'] < Item[key]:
-                # print(key, Item)
-                Item['event'] = event
-                Item['lo-time'] = Item[key]
-                if key == 'time':
-                    Item['time-type'] = 'time'
-                else:
-                    Item['time-type'] = 'read_by_implant'
-                print(key, "::", Item['time-type'], Item['lo-time'], Item)
-                List.insert(index - 1, Item)
-                break
-        return List
-
 
     def Get_CampaignLogs(self, username, cid):
         User = self.db.Verify_UserCanReadCampaign(username, cid)
@@ -164,119 +134,3 @@ class ImplantManagement():
             return {
                 "cmd_reg": {"result": False, "reason": "You are not authorised to view commands in this campaign."}}
         return self.db.Log_GetCampaignActions(cid)
-
-
-    def Get_ChronologicallyOrderedCampaignLogsJSON(self,username,cid):
-        # -- TODO: BUG. This doesn't properly return the list, all cmd_reg elements replaced by
-        # --     cmd_pickup. Likely an issue with the way the list is being structured.
-        unorder_logs = self.Get_CampaignLogsJson(username,cid)
-
-        final_list = []
-
-        for key in unorder_logs.keys():
-            if key == "metadata":
-                break
-            for i in unorder_logs[key]:
-                #print(unorder_logs[key][i])
-                if key == "commands":
-                    #print(unorder_logs[key][i]['time'])
-                    a = unorder_logs[key][i]
-                    final_list = self.ReorderList(final_list, a, "cmd_reg")
-                    for x in final_list:
-                        print("''''",x['event'])
-                    a = None
-                    a = unorder_logs[key][i]
-                    print("%%",a)
-                    if unorder_logs[key][i]['read_by_implant'] != 0:
-                        print("Implant read")
-                        final_list = self.ReorderList(final_list, a,"imp_read", 'read_by_implant')
-                    for x in final_list:
-                        print("''''",x['event'])
-                    # do pick up
-                elif key == "implants":
-                    final_list = self.ReorderList(final_list, unorder_logs[key][i], "new_imp")
-                    pass
-                elif  key == "response":
-                    final_list = self.ReorderList(final_list, unorder_logs[key][i], "response")
-
-        ordered_logs = {}
-        return final_list
-
-    def Get_CampaignLogsJson(self, username, cid):
-        a = '''
-        Get all data on a campaign
-         - Registered commands
-         - implants
-          - response implant_logs
-           - implant_response
-
-        timeline pathways:
-         - New active implant registrations (AllGeneratedImplants)
-         - Command registrations (RegistererdImplantsCommands)
-         - command pickup (RegistererdImplantsCommands)
-         - Implant response (Campaign Implant Response
-        '''
-
-        User = self.db.Verify_UserCanReadCampaign(username, cid)
-        if User == False:
-            return {"cmd_reg": {"result": False, "reason": "You are not authorised to register commands in this campaign."}}
-
-        EarliestInteraction = 0
-        LastestInteraction = 0
-        def TimeCompare(UnixTime, EarliestInteraction, LastestInteraction):
-
-            if UnixTime < EarliestInteraction or EarliestInteraction == 0:
-                EarliestInteraction = UnixTime
-            if UnixTime > LastestInteraction:
-                LastestInteraction = UnixTime
-            return EarliestInteraction, LastestInteraction
-
-        normalised_data = {"implants": {},
-                           "commands": {},
-                           "response": {},
-                           "metadata": {},
-                           }
-
-        aa = self.db.Get_AllGeneratedImplantsFromCID(cid)
-        bb = self.db.Get_RegisteredImplantCommandsFromCID(cid)
-        cc = self.db.Get_CampaignImplantResponses(cid)
-
-        counter = 0
-        # -- Normalise generated implants
-        for x in aa:
-            b = x
-            if '_sa_instance_state' in b:
-                del b['_sa_instance_state']
-            normalised_data["implants"][counter]= b
-            counter +=1
-        # -- Normalise RegisteredImplants
-        counter = 0
-        for gg in bb:
-            jj = gg.__dict__
-            if '_sa_instance_state' in jj:
-                del jj['_sa_instance_state']
-            normalised_data['commands'][counter]=jj
-            counter +=1
-        # -- Get command response
-        counter = 0
-        for x in cc:
-            normalised_data['response'][counter]=x
-            counter+=1
-
-        for keys in normalised_data.keys():
-            for x in normalised_data[keys]:
-                if 'time' in normalised_data[keys][x]:
-                    # print("::",keys)
-                    EarliestInteraction, LastestInteraction = TimeCompare(normalised_data[keys][x]['time'],EarliestInteraction, LastestInteraction)
-                if 'read_by_implant' in normalised_data[keys][x]:
-                    EarliestInteraction, LastestInteraction = TimeCompare(normalised_data[keys][x]['read_by_implant'],EarliestInteraction, LastestInteraction)
-                elif 'blah' in normalised_data[keys][x]:
-                    print("No.")
-
-        from datetime import datetime
-
-        # print(datetime.fromtimestamp(EarliestInteraction))
-        # print(datetime.fromtimestamp(LastestInteraction))
-        normalised_data['metadata']['earliest_interaction'] = EarliestInteraction
-        normalised_data['metadata']['last_interaction'] = LastestInteraction
-        return normalised_data

@@ -11,7 +11,7 @@
 
 <!-- TODO: insert Implants into selectable. -->
             <div class="form-group">
-              <label for="sel1">Select list:</label>
+              <label for="sel1">Select implant:</label>
               <select class="form-control" id="sel1" name="ImplantSelect">
                   {% if Implants %}
                   <option name="a" id="b">ALL</option>
@@ -53,7 +53,20 @@
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-
+function unix_to_human_time(unixtime){
+    var utcSeconds = unixtime;
+    var d = new Date(0);
+    d.setUTCSeconds(utcSeconds);
+    var date = new Date(unixtime*1000);
+    var year = date.getFullYear();
+    var month = date.getMonth();
+    var day = date.getDate();
+    var hours = "0" + date.getHours();
+    var minutes = "0" + date.getMinutes();
+    var seconds = "0" + date.getSeconds();
+    time_last_seen = hours.substr(-2)+":"+minutes.substr(-2)+':'+seconds.substr(-2)+' '+day+'/'+month+'/'+year
+    return time_last_seen
+}
 // Gets command results and outputs to screen.
 var contained_list=[];
 async function get_command_response (){
@@ -76,7 +89,7 @@ async function get_command_response (){
                     GG = response[element].log_id;
                     var utcSeconds = response[element].time;
                     var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
-                    d.setUTCSeconds(utcSeconds);
+                    d=unix_to_human_time(response[element].time)
                     // console.log(response[element]);
                     GG = "<div><p>IID: "+response[element].title+"<br>Time: "+d+"<br>Rsp: <code>"+response[element].log_entry+"</code></p></div><hr>";
                     WP = document.getElementById('Response').innerHTML;
@@ -97,32 +110,20 @@ get_command_response()
 $(function() {
     $('#AnswerBtn').on('click', function (e) {
         e.preventDefault(); // disable the default form submit event
-
-
         var $form = $('#AnswerForm');
-        console.log($form.serialize())
         $.ajax({
             url: $form.attr("action"),
             type: $form.attr("method"),
             data: $form.serialize(),
             success: function (response) {
-                // if response
-                //alert('response received');
-                console.log("++"+response+"++")
-                //document.getElementById('Response').innerHTML =(response['msg']);
-                // ajax success callback
-                console.log("@@@"+document.getElementById('implantCmd').innerHTML)
                 document.getElementById('implantCmd').value="";
-                console.log("###"+response['cmd_reg']['result'])
                 if (response['cmd_reg']['result']===false){alert(response['cmd_reg']['reason'])}
             },
             error: function (response) {
                 alert('ajax failed');
-                // ajax error callback
             },
 
         });
-        //document.getElementById('comment').innerHTML=("");//
     });
 });
 

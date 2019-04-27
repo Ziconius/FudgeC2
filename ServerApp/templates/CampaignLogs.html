@@ -41,9 +41,7 @@ function render_campaign_data_list(){
                 } else if (response[item]['log_type'] === "cmd_response"){
                     ToWrite = "<br>Command Response<br>Implant: "+response[item]['entry']['uik']+"<br>Response: "+response[item].entry.response+"<br>Time: "+unix_to_human_time(response[item].time)+"<hr>"
                 }
-
                 document.getElementById('campaign_logs').innerHTML = document.getElementById('campaign_logs').innerHTML + ToWrite;
-
             }
         }
     })

@@ -1,6 +1,8 @@
 {% extends "HeaderTemplate.html" %}
 {% block NavbarBlock %}
 <body id="LoginForm">
+<script src="{{ url_for('static', filename='particles.min.js') }}"></script>
+<script src="{{ url_for('static', filename='app.js') }}" defer></script>
 <div class="container">
 <div id="particles-js"></div>
 <div class="login-form form-rounded">

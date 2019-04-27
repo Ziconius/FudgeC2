@@ -12,8 +12,8 @@ import ast
 import random
 from Data.Logging import Logging
 from Data.CampaignLogging import *
-L=Logging()
-CL = log_test_dec()
+L = Logging()
+CL = CampaignLoggingDecorator()
 class Database():
     def __init__(self):
 
