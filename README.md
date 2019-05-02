@@ -21,7 +21,7 @@ sudo python3 Controller.py
 
 Fudge comes with default boot configurations, which can be altered in:
 
-`<install dir>/Storage/settings.py`
+`<install dir>/Fudge/Storage/settings.py`
 
 These settings include Fudge application port, SSL, and database.
 

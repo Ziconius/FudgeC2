@@ -5,6 +5,7 @@ from Implant.Implant import ImplantSingleton
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user
 from Data.Database import Database
 from ServerApp.modules.UserManagement import UserManagementController
+from ServerApp.modules.StagerGeneration import StagerGeneration
 from ServerApp.modules import ImplantManagement
 import time
 #from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField
@@ -14,6 +15,7 @@ db = Database()
 Imp=ImplantSingleton.instance
 UsrMgmt = UserManagementController()
 ImpMgmt = ImplantManagement.ImplantManagement()
+StagerGen = StagerGeneration()
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -231,9 +233,13 @@ def ImplantStager(cid):
     g.setdefault('cid', cid)
     # -- get request: return list of implants --
     # -- Will update to a dropdown when exporting Word docs etc is possible -- #
+    if request.method == "POST":
+        # TODO: Replace with content from webpage request.
+        #       Must return as file.
+        return StagerGen.GenerateSingleStagerFile(cid, current_user.user_email,"docx")
 
     ACI = db.Get_AllImplantBaseFromCid(cid)
-
+    static_stagers = StagerGen.GenerateStaticStagers(cid, current_user.user_email)
     return render_template("ImplantStagerPage.html", implantList=ACI)
 
 @app.route("/<cid>/implant/status", methods=['GET','POST'])
@@ -257,7 +263,7 @@ def GetImplantStatus(cid):
         count = count + 1
     return jsonify(data)
 
-@app.route("/<cid>/Graphs", methods=['GET','POST'])
+@app.route("/<cid>/graphs", methods=['GET','POST'])
 @login_required
 def CampaignGraph(cid):
     g.setdefault('cid', cid)
