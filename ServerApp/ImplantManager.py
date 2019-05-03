@@ -15,7 +15,7 @@ db = Database()
 Imp=ImplantSingleton.instance
 UsrMgmt = UserManagementController()
 ImpMgmt = ImplantManagement.ImplantManagement()
-StagerGen = StagerGeneration()
+StagerGen = StagerGeneration(db)
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -240,7 +240,7 @@ def ImplantStager(cid):
 
     ACI = db.Get_AllImplantBaseFromCid(cid)
     static_stagers = StagerGen.GenerateStaticStagers(cid, current_user.user_email)
-    return render_template("ImplantStagerPage.html", implantList=ACI)
+    return render_template("ImplantStagerPage.html", implantList=static_stagers)
 
 @app.route("/<cid>/implant/status", methods=['GET','POST'])
 @login_required
