@@ -134,7 +134,7 @@ Release 0.2 _(Human Grunt)_
 - [x] Add help page with implant special tags using `::cmd::` format.
 - [x] Order implant check-in by time
 - [ ] Review how implant responses are displayed within the main campaign page to improve readability.
-- [ ] Create log page with detailed logging of for each implant, including time, command, implant, pickup, and pickup time.
+- [x] Create log page with detailed logging of for each implant, including time, command, implant, pickup, and pickup time.
 - [x] Provide feedback to read-only campaign users with feedback if they are not authorised to execute commands. Basic implementation only.
 - [ ] Add filter for implants on implant page to reduce noise.
 - [x] Improve Campaign Settings radio buttons to display the current configuration.
@@ -163,6 +163,7 @@ Release 0.2 _(Human Grunt)_
 - [ ] Create admin-only campaign extract function, encrypting with AES256. This require viewer tool.
 - [ ] Reduce data sent to implant page, increase responsiveness.
 - [ ] Password reset
+- [ ] Review how campaign logging data is presented
 
 ##### Implant
  - [ ] Add persistence mechanism
