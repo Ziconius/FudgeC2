@@ -284,16 +284,18 @@ class Database():
 
     def Get_AllImplantBaseFromCid(self,cid):
         # -- THIS NEED TO BE REBUILT
-        a = self.Session.query(Implants).filter(Implants.cid == cid).all()
-        ret_list = []
-        for x in a:
-            b= x.__dict__
-            ret_list.append(b)
-        # print(ret_list)
-        if a != None:
-            return a
+        SA_Implants = self.Session.query(Implants).filter(Implants.cid == cid).all()
+        processed_implants = []
+        for implant in SA_Implants:
+            b= implant.__dict__
+            if '_sa_instance_state' in b:
+                del b['_sa_instance_state']
+            processed_implants.append(b)
+
+        if processed_implants != None:
+            return processed_implants
         else:
-            return False
+            return []
 
     def Get_AllGeneratedImplantsFromCID(self, CID):
         raw_implants= self.Session.query(GeneratedImplants, Implants).filter(GeneratedImplants.iid == Implants.iid, Implants.cid == CID).all()
@@ -323,25 +325,27 @@ class Database():
         # -- Moving forward all reference to ImplantKey/UII should be changed to StagerID
 
         I = self.Session.query(Implants).filter(Implants.stager_key==StagerKey).first()
-        UIK = random.randint(000000,999999)
-        new_title = str(I.title) +"_"+ str(UIK)
-        GI=GeneratedImplants(unique_implant_id = UIK,last_check_in = 0,current_beacon = I.beacon,iid = I.iid, generated_title = new_title, time=int(time.time()))
-        self.Session.add(GI)
-        try:
-            self.Session.commit()
-            q = self.Session.query(GeneratedImplants).first()
-            print(q)
+        if I != None:
+            UIK = random.randint(000000,999999)
+            new_title = str(I.title) +"_"+ str(UIK)
+            GI=GeneratedImplants(unique_implant_id = UIK,last_check_in = 0,current_beacon = I.beacon,iid = I.iid, generated_title = new_title, time=int(time.time()))
+            self.Session.add(GI)
+            try:
+                self.Session.commit()
+                q = self.Session.query(GeneratedImplants).first()
+                print("~",q)
 
-        except Exception as e:
-            print("db.Add_Implant: ", e)
-            return False
+            except Exception as e:
+                print("db.Add_Implant: ", e)
+                return False
 
-        GetImplant = self.Session.query(GeneratedImplants, Implants).filter(Implants.iid == GeneratedImplants.iid, GeneratedImplants.unique_implant_id == UIK).first()
-        GetImplant = self.__splice_implants_and_generated_implants__(GetImplant)
-        # GetImplant=self.Session.query(Implants,GeneratedImplants).filter(GeneratedImplants.iid == Implants.iid).filter(Implants.stager_key == StagerKey).first()
-        print("Post splicechecl: ",GetImplant)
-        # -- Return Raw objects, and caller to manage them,
-        return GetImplant
+            GetImplant = self.Session.query(GeneratedImplants, Implants).filter(Implants.iid == GeneratedImplants.iid, GeneratedImplants.unique_implant_id == UIK).first()
+            GetImplant = self.__splice_implants_and_generated_implants__(GetImplant)
+            # GetImplant=self.Session.query(Implants,GeneratedImplants).filter(GeneratedImplants.iid == Implants.iid).filter(Implants.stager_key == StagerKey).first()
+            print("Post splicechecl: ",GetImplant)
+            # -- Return Raw objects, and caller to manage them,
+            return GetImplant
+        return False
 
 
     # -- Active Implant Queries -- #

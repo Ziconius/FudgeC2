@@ -4,17 +4,21 @@
     <h4>Existing Implants & Stagers</h4>
     {% if implantList %}
         {% for implant in implantList %}
-    <p><span class="font-weight-bold">Name:</span> {{ implant }}<br>
-        <span class="font-weight-bold">Description:</span> {{ implantList[implant].description  }}<br>
-        <span class="font-weight-bold">URL:</span> {{ implantList[implant].url }}</p>
+        <p>
+            <span class="font-weight-bold">Name:</span> {{ implant }}<br>
+            <span class="font-weight-bold">Description:</span> {{ implantList[implant].description  }}<br>
+            <span class="font-weight-bold">URL:</span> {{ implantList[implant].url }}
+        </p>
+        <p class="text-secondary">Click to show stager</p>
+        <div>
+            <p data-toggle="collapse" data-target="#{{ implantList[implant].stager_key }}-ps1" class="text-success">Powershell</p>
+            <pre id="{{ implantList[implant].stager_key }}-ps1" class="collapse in"><code>{{ implantList[implant].powershell_stager }}</code></pre>
 
+            <p data-toggle="collapse" data-target="#{{ implantList[implant].stager_key }}-docm" class="text-success">Docm Macro</p>
+            <pre id="{{ implantList[implant].stager_key }}-docm" class="collapse in "><code>{{ implantList[implant].docm_macro_stager }}</code></pre>
 
-            <div>
-        <code>{{ implantList[implant].stager_string }}</code><br>
-        <form method="POST" action="/1/implant/stagers">
-            <button type="submit">Download</button>
-        </form>
-    </div><hr>
+        </div>
+        <hr>
         {% endfor %}
     {% else %}
         <p>There are no implant associated with this campaign yet.</p>

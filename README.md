@@ -144,7 +144,7 @@ Release 0.2 _(Human Grunt)_
 
 - [ ] Add further work on implant obfuscation levels/configuration.
 - [x] Add implant special tags formatted: `::cmd::`
-- [ ] Create further staging options (docx, pfd, etc)
+- [x] Create further staging options (docm)
 - [ ] Improve format of returning data.
 - [ ] Deploy HTTPS cert to HTTP channel
 

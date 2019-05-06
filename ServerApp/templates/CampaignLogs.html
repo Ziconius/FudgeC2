@@ -32,7 +32,11 @@ function render_campaign_data_list(){
             for (item in response){
                 ToWrite = ""
                 if (response[item]['log_type'] === "new_imp") {
-                    ToWrite = "<br> New implant activated<br>Common Name: "+response[item]['generated_title']+"<br>Description: "+response[item]['description']+"<br>Time: "+unix_to_human_time(response[item]['lo-time'])+"<hr>"
+                    var obfs_lvl = "Unknown"
+                    if ( response[item]['entry']['obfuscation_level'] === 0){
+                        obfs_lvl = "Full"
+                    }
+                    ToWrite = "<br> New implant activated<br>Common Name: "+response[item]['entry']['generated_title']+"<br>Callback URL: "+response[item]['entry']['callback_url']+"<br>Time: "+unix_to_human_time(response[item]['time'])+"<br>Obfuscation Level: "+obfs_lvl+"<hr>"
                 } else if (response[item]['log_type'] === "cmd_reg") {
                     ToWrite = "<br>New command reg<br>Implant: "+response[item]['entry']['uik']+"<br>CMD: "+response[item]['entry']['cmd']+"<br>Time: "+unix_to_human_time(response[item]['time'])+"<hr>"
                 } else if (response[item]['log_type'] === "cmd_pickup") {

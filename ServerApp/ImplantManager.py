@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, request, jsonify, g, current_app,url_for, redirect, make_response, session
+from flask import Flask, render_template, flash, request, jsonify, g, current_app,url_for, redirect, make_response, session, send_file
 from flask_sqlalchemy import SQLAlchemy
 import base64
 from Implant.Implant import ImplantSingleton
@@ -234,13 +234,16 @@ def ImplantStager(cid):
     # -- get request: return list of implants --
     # -- Will update to a dropdown when exporting Word docs etc is possible -- #
     if request.method == "POST":
+        if 'id' in request.args:
+            try:
+                if int(request.args['id']):
+                    print("this is int")
+            except:
+                print("error")
         # TODO: Replace with content from webpage request.
-        #       Must return as file.
-        return StagerGen.GenerateSingleStagerFile(cid, current_user.user_email,"docx")
+        return send_file(StagerGen.GenerateSingleStagerFile(cid, current_user.user_email,"docx"), attachment_filename='file.docx')
 
-    ACI = db.Get_AllImplantBaseFromCid(cid)
-    static_stagers = StagerGen.GenerateStaticStagers(cid, current_user.user_email)
-    return render_template("ImplantStagerPage.html", implantList=static_stagers)
+    return render_template("ImplantStagerPage.html", implantList=StagerGen.GenerateStaticStagers(cid, current_user.user_email))
 
 @app.route("/<cid>/implant/status", methods=['GET','POST'])
 @login_required
