@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="125" height="186" src="https://github.com/Ziconius/Fudge/blob/master/ServerApp/static/fudge.png">
+  <img width="125" height="186" src="https://github.com/Ziconius/Fudge/blob/master/FudgeC2/ServerApp/static/fudge.png">
 </p>
 
 # Fudge 
