@@ -5,6 +5,9 @@ from Implant import Implant
 from Listeners import HttpListener
 from ServerApp import ImplantManager
 from Storage.settings import Settings
+from Listeners import ListenerManagement
+
+
 
 # This will have to be ready to receive all HTTP requests, this will support ALL implants, and individual domains for C"
 #   should be
@@ -15,10 +18,10 @@ def start_listener():
     App.run(debug=True, use_reloader=False, host='0.0.0.0', port=5000, threaded=True)
 
 
-def start_controller():
+def start_controller(LM):
     #  Using ssl_context as a temp measure, this should be changed in a production environment to support SSL via
     #  WSGI and NGINX.
-
+    Manager.config['listener_management'] = LM
     Manager.run(debug=Settings.server_app_debug,
                 use_reloader=False,
                 host='0.0.0.0',
@@ -33,15 +36,16 @@ App = HttpListener.app  # Listener
 Manager = ImplantManager.app
 # Singleton in used to allow the app and the listeners to converse with implant object easily.
 Imp = Implant.ImplantSingleton.instance
-
+LM = ListenerManagement.ListenerManagement()
 # -- Build Database if none exists
 
 try:
     _thread.start_new_thread(start_listener, ())
-    _thread.start_new_thread(start_controller, ())
+    _thread.start_new_thread(start_controller, (LM,))
 except Exception as E:
     print("Error: unable to start thread")
 while 1:
     # Hold the application threads open
-    time.sleep(10)
+    time.sleep(15)
+    LM.get_active_listeners()
     pass

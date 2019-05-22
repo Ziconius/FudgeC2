@@ -87,6 +87,7 @@ class ImplantManagement():
                 beacon=form['beacon_delay']
                 initial_delay=form['initial_delay']
                 comms_http = 0
+                comms_https = 0
                 comms_dns = 0
                 comms_binary = 0
                 try:
@@ -95,15 +96,19 @@ class ImplantManagement():
                     if type(port) != int:
                         raise ValueError('Port is required as integer')
                 # -- Comms check --#
-                if "comms_http" in form :
+                if "comms_http" in form:
                     comms_http = 1
+                if "comms_https" in form:
+                    comms_https = 1
                 if "comms_dns" in form :
                     comms_dns = 1
                 if "comms_binary" in form :
                     comms_binary = 1
-                if comms_binary == 0 and comms_dns == 0 and comms_http == 0:
+                if comms_binary == 0 and comms_dns == 0 and comms_http == 0 and comms_https == 0:
                     raise ValueError('No communitcation channel selected. ')
-                a = self.db.Add_Implant(cid, title ,url,port,beacon,initial_delay,comms_http,comms_dns,comms_binary,description,obfuscation_level)
+                if comms_http ==1 and comms_https == 1:
+                    raise ValueError("Please select HTTP or HTTPS")
+                a = self.db.Add_Implant(cid, title ,url,port,beacon,initial_delay,comms_http,comms_https,comms_dns,comms_binary,description,obfuscation_level)
                 if a == True:
                     return True, "Implant created."
                 else:

@@ -57,6 +57,7 @@ class Implants(Base):
     beacon = Column(INTEGER(10))
     initial_delay = Column(INTEGER(10))
     comms_http = Column(INTEGER(1))
+    comms_https = Column(INTEGER(1))
     comms_dns = Column(INTEGER(1))
     comms_binary = Column(INTEGER(1))
     obfuscation_level = Column(INTEGER(1), nullable=False)

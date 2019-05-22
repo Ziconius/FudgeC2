@@ -182,6 +182,7 @@ Release 0.2 _(Human Grunt)_
  - [ ] Allow admins to view, start, stop, and configure all active listeners.
  - [ ] Refector Webapp JS into suitable structure. 
  - [ ] UI Overhaul
+ - [ ] Refactor Webapp flask into Flask Blueprints.
  
 
 ##### Implant

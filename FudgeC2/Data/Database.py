@@ -217,7 +217,7 @@ class Database():
         return IID
 
     # -- Implant Content --#
-    def Add_Implant(self, cid, title, url, port, beacon, initial_delay, comms_http=0, comms_dns=0, comms_binary=0, description="Implant: Blank description.", obfuscation_level=0):
+    def Add_Implant(self, cid, title, url, port, beacon, initial_delay, comms_http=0, comms_https=0, comms_dns=0, comms_binary=0, description="Implant: Blank description.", obfuscation_level=0):
         # -- TODO: Refactor
         print("In Add_Implant_Function")
         implant = Implants(cid=cid,title=title)
@@ -227,6 +227,7 @@ class Database():
                               beacon=beacon,
                               initial_delay=initial_delay,
                               comms_http=comms_http,
+                              comms_https=comms_https,
                               comms_dns=comms_dns,
                               comms_binary = comms_binary,
                               obfuscation_level = obfuscation_level

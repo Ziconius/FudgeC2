@@ -22,6 +22,10 @@ app.config.from_object(__name__)
 app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
 login = LoginManager(app)
 login.init_app(app)
+
+# TODO: Controller dev work.
+listener_management = None
+
 # -- Context Processors --#
 @app.context_processor
 def inject_dict_for_all_auth_templates():
@@ -305,6 +309,13 @@ def ImplantCommandRegistration(cid):
 @login_required
 def HelpPage():
     return render_template("HelpPage.html")
+
+@app.route("/test", methods = ['GET','POST'])
+def test_endpoint():
+    print(request.form)
+    a = app.config['listener_management'].start_listener()
+    print(str(a))
+    return "000"
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5001, threaded=True)
