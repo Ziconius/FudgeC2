@@ -21,9 +21,9 @@ sudo python3 Controller.py
 
 Fudge comes with default boot configurations, which can be altered in:
 
-`<install dir>/Fudge/Storage/settings.py`
+`<install dir>/FudgeC2/Storage/settings.py`
 
-These settings include Fudge application port, SSL, and database.
+These settings include FudgeC2 application port, SSL, and database name.
 
 Depending on your network design/RT architecture deployment, you will likely need to configure a number of proxy and routing adjustments. The most common configuration setup is to use Fudge over HTTP(S) using a reverse NGINX/Apache2 proxy.
 
@@ -32,28 +32,29 @@ After the initial installation you can log in with the default admin account usi
 
 ```admin:letmein```
 
-You will be prompted to the change the admin password as this point. 
+You will be prompted to the change the admin password once you login for the first time. 
 
 ## Users
-Users within Fudge are divided into 2 groups, admins and standard users. Admins have all of the usual functionality, such as user creation, and are required to create a new campaigns.
+Users within Fudge are divided into 2 groups, admins and standard users. Admins have all of the usual functionality, such as user and campaign creation, and are required to create a new campaigns.
 
-Within campaign a users permissions can be configured to either have None/Read/Read+Write. Without read permissions, a user will not be able to see the existence of a campaign, nor will they be able to read implant responses, or registered commands.
+Within campaign a users permissions can be configured to once of the following: None/Read/Read+Write. Without read permissions, a user will not be able to see the existence of a campaign, nor will they be able to read implant responses, or registered commands.
 
-User with read permission will only be able to view the commands and their output, and the campaigns logging page. This role will typically be assigned to a junior tester, or an observer.
+User with read permission will only be able to view the commands and their output, and the campaigns logging page. This role would typically be assigned to a junior tester, or an observer.
 
 Users with write permissions will be able to create implant templates, and execute commands on all active implants.
 
-#### User configuration
+_Note: in further development this will become more granular, allow write permissions on specific implants._
 
-An admin can create a new user from within the Global Settings options. They will have the option to set the user up with admin privileges.
+#### User Creation
+
+An admin can create a new user from within the Global Settings options. They will also have the option to configure a user with admin privileges.
 
 
 ## Campaigns
-#### What is a campaign?
-A campaign is a method of organising a red team, which allows access control to be applied on a per user basis
+#### What is a lcampaign?
+A campaign is a method of organising a engagement against a client, which allows access control to be applied on a per user basis
 
-Each campaign contains a unique name, implants, and logs while a user can be a member of multiple campaigns
-
+Each campaign contains a unique name, implants, and logs while a user can be a member of multiple campaigns.
 
 
 ## Implants
@@ -72,10 +73,11 @@ The list of required configurations are:
 * Initial callback delay
 * Port (where applicable)
 * Beacon delay
-* Protocols to use:
+* Protocol:
   * HTTP (Default)
-  * DNS (Optional)
-  * Binary (Optional)
+  * HTTPS 
+  * DNS
+  * Binary
   
 Once a template has been created the stager options will be displayed in the Campaign Stagers page.
 
@@ -85,13 +87,13 @@ The stagers are small scripts/macros etc which are responsible for downloaded an
 
 Once an implant has been generated the stagers page will provide a number of basic techniques which can be used to compromise the target. The stagers which are currently available are:
 
-* IEX
-* Windows Words Macro (In development)
+* IEX method
+* Windows Words macro
 
 
 ### Active Implants
 
-Active implants are the result of sucessful stager executions. When a stager connects back to the Fudge C2 server a new implant is generated, and delivered to the target host. Each stager execution & check-in create a new active implant entry.
+Active implants are the result of successful stager executions. When a stager connects back to the Fudge C2 server a new active implant is generated, and delivered to the target host. Each stager execution & check-in creates a new active implant entry.
 
 
 ##### _Example_

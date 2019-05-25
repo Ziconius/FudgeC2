@@ -2,7 +2,9 @@ from flask import Flask, render_template, flash, request, jsonify, g, current_ap
 import base64
 from Implant.Implant import ImplantSingleton
 from Data.Database import Database
+
 Imp=ImplantSingleton.instance
+
 def ImplantManager(a):
     if "X-Implant" in a:
         print("Checked in implant is: ",a["X-Implant"])

@@ -1,0 +1,12 @@
+{% extends "BaseNavbar.html" %}
+{% block main %}
+
+<div class="row justify-content-lg-center m-4">
+    <div class="col-lg-10 p-3 m-3 rounded iplm">
+        <div><h1>Listeners</h1><p>Listeners can be configured from here, please consider other campaigns before any listeners is terminated.</p></div>
+        <p>Active Listeners:</p>
+        <p>{{ test_data }}</p>
+    </div>
+</div>
+<!--<script src="{{ url_for('static', filename='Settings.js') }}"></script>-->
+{% endblock %}

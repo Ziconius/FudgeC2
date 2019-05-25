@@ -37,13 +37,18 @@ Manager = ImplantManager.app
 # Singleton in used to allow the app and the listeners to converse with implant object easily.
 Imp = Implant.ImplantSingleton.instance
 LM = ListenerManagement.ListenerManagement()
-# -- Build Database if none exists
+
 
 try:
-    _thread.start_new_thread(start_listener, ())
+    # _thread.start_new_thread(start_listener, ())
     _thread.start_new_thread(start_controller, (LM,))
 except Exception as E:
-    print("Error: unable to start thread")
+    print("Error: unable to start thread", E)
+
+# Hardcoding starting a listener on port 5000.
+#   This will be held here until a further testing, and implementing database support + autostart on reboot funcationality.
+LM.create_listener("http",5000, True)
+
 while 1:
     # Hold the application threads open
     time.sleep(15)

@@ -113,6 +113,8 @@ def PasswordReset():
 
 # -- JSON Response for command responses and waiting commands -- #
 # -------------------------------------------------------------- #
+# TODO: Replace JSON enpoints with websockets.
+
 
 @app.route("/<cid>/cmd_response", methods =['GET','POST'])
 @login_required
@@ -168,6 +170,13 @@ def GlobalSettingsPage():
         return jsonify(Result)
     return  render_template("settings/GlobalSettings.html")
 
+
+@app.route("/listener", methods=['GET','POST'])
+@login_required
+def GlobalListenerPage():
+    if request.method == "POST":
+        return "000"
+    return render_template("listeners/listeners.html", test_data=app.config['listener_management'].get_active_listeners())
 
 # -- CAMPAIGN SPECIFIC PAGES -- #
 # ----------------------------- #
@@ -313,7 +322,9 @@ def HelpPage():
 @app.route("/test", methods = ['GET','POST'])
 def test_endpoint():
     print(request.form)
-    a = app.config['listener_management'].start_listener()
+
+    # a = app.config['listener_management'].start_listener("http", 80)
+    a = app.config['listener_management'].create_listener("http",8080, True)
     print(str(a))
     return "000"
 
