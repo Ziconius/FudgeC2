@@ -319,12 +319,13 @@ def ImplantCommandRegistration(cid):
 def HelpPage():
     return render_template("HelpPage.html")
 
+# TODO: Remove in production builds.
 @app.route("/test", methods = ['GET','POST'])
 def test_endpoint():
     print(request.form)
 
     # a = app.config['listener_management'].start_listener("http", 80)
-    a = app.config['listener_management'].create_listener("http",8080, True)
+    a = app.config['listener_management'].create_listener("https",8080 )
     print(str(a))
     return "000"
 

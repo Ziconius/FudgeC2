@@ -4,8 +4,29 @@
 <div class="row justify-content-lg-center m-4">
     <div class="col-lg-10 p-3 m-3 rounded iplm">
         <div><h1>Listeners</h1><p>Listeners can be configured from here, please consider other campaigns before any listeners is terminated.</p></div>
-        <p>Active Listeners:</p>
-        <p>{{ test_data }}</p>
+        <h5>Configured Listeners:</h5>
+
+        <span>
+            {% for key_2 in test_data %}
+            Common Name: <code>{{ test_data[key_2].common_name }}</code><br>
+            Proto: <code>{{ test_data[key_2].type }}</code><br>
+            Port: <code>{{ test_data[key_2].port }}</code><br>
+            {% if test_data[key_2].state == 1 %}
+                Port: <span class="text-success">Running</span><br>
+            {% elif test_data[key_2].state == 0 %}
+                Port: <span class="text-danger">Stopped</span><br>
+            {% endif %}
+            <hr>
+            {% endfor %}
+        </span><br>
+
+
+    add start/stop/rename (common name) for created listeners. Listeners cannot be deleted for historic integrity.
+
+    new listener button + model
+
+    response based on failure/success
+
     </div>
 </div>
 <!--<script src="{{ url_for('static', filename='Settings.js') }}"></script>-->

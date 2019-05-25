@@ -50,8 +50,8 @@ class ImplantSingleton:
 
         def GeneratePayload(self, NewSplicedImplantData):
             # TODO: Add a payload obfuscation level - this will be dealt within then render implant function.
-            aaa = ImplantGenerator()
-            return aaa.render_implant_(NewSplicedImplantData)
+            ImpGen = ImplantGenerator()
+            return ImpGen.render_implant_(NewSplicedImplantData)
 
     instance = None
     def __init__(self):

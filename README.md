@@ -149,19 +149,20 @@ Release 0.2 _(Human Grunt)_
 - [x] Create further staging options (docm)
 - [ ] Improve format of returning data.
 - [ ] Deploy HTTPS cert to HTTP channel
+    - [ ] Allow stager/implant to run on untrusted cert.
 
 
 
 ##### Controller
 - [x] Check for `fudge.db` in the working dir, if not configure new setup. 
    - [ ] Check for bugs in admin password setting.
-- [ ] Code refactor Controller to boot server & listener 
+- [x] Code refactor Controller to boot server & listener 
 
  
  ---
  Release 0.3 _(Dwarven Blacksmith)_
 ##### Implant Manager Web App
-- [ ] Fill chronological graph page with real data.
+- [ ] Allow admins to view, start, stop, and configure all active listeners.
 - [ ] Create admin-only campaign extract function, encrypting with AES256. This require viewer tool.
 - [ ] Reduce data sent to implant page, increase responsiveness.
 - [ ] Password reset
@@ -181,7 +182,7 @@ Release 0.2 _(Human Grunt)_
 ---
  Release 0.4 _(Tauren Herbalist)_ 
 ##### Implant Manager Web App
- - [ ] Allow admins to view, start, stop, and configure all active listeners.
+ - [ ] Fill chronological graph page with real data.
  - [ ] Refector Webapp JS into suitable structure. 
  - [ ] UI Overhaul
  - [ ] Refactor Webapp flask into Flask Blueprints.
@@ -194,5 +195,5 @@ Release 0.2 _(Human Grunt)_
 ##### Controller
  - [ ] Create DNS Listener
  - [ ] Create user R/R+W permission inheritance campaign -> implant template -> active implant
-
+ - [ ] Add logging for listener actions (Create/Rename/Start/Stop) + values (port/proto/common name/etc)
 

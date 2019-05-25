@@ -69,7 +69,11 @@ class ListenerManagement():
 
         print("Starting: ", id)
         self.listeners[id]['state'] = 1
-        self.__start_http_listener(self.listeners[id])
+
+        if self.listeners[id]['type'] == "http":
+            self.__start_http_listener(self.listeners[id])
+        elif self.listeners[id]['type'] == "https":
+            self.__start_https_listener(self.listeners[id])
         return
     def __stop_listener(self, id):
         print("Stopping: ", id)
@@ -82,10 +86,20 @@ class ListenerManagement():
 
         return True
 
+
+    # TODO: Refactor this code to remove as much code duplication.
     def __start_http_listener(self, obj):
         print("Pre-Thread",obj)
         _thread.start_new_thread(self.start_http_listener_thread, (obj,))
 
+    def __start_https_listener(self, obj):
+        print("Pre-Thread",obj)
+        _thread.start_new_thread(self.start_https_listener_thread, (obj,))
+
     def start_http_listener_thread(self, obj):
         App = HttpListener.app
         App.run(debug=True, use_reloader=False, host='0.0.0.0', port=obj['port'], threaded=True)
+
+    def start_https_listener_thread(self, obj):
+        App = HttpListener.app
+        App.run(debug=True, use_reloader=False, host='0.0.0.0', port=obj['port'], threaded=True, ssl_context='adhoc')

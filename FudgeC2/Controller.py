@@ -45,8 +45,8 @@ try:
 except Exception as E:
     print("Error: unable to start thread", E)
 
-# Hardcoding starting a listener on port 5000.
-#   This will be held here until a further testing, and implementing database support + autostart on reboot funcationality.
+# -- Hardcoding starting a listener on port 5000.
+# --    This will be held here until a further testing, and implementing database support + autostart on reboot funcationality.
 LM.create_listener("http",5000, True)
 
 while 1:
