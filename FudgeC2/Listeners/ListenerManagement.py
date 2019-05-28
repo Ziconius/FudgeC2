@@ -20,7 +20,7 @@ class ListenerManagement():
                 id = "0000" + str(len(self.listeners))
                 id = id[-4:]
                 # --
-                listener = {"type":listener_type, "port":port, "state":int(0), "id":id, "common_name":"Blah: {}".format(id)}
+                listener = {"type":listener_type, "port":port, "state":int(0), "id":id, "common_name":"Listener: {}".format(id)}
                 if auto_start == True:
                     listener["state"] = int(3)
 
@@ -98,8 +98,10 @@ class ListenerManagement():
 
     def start_http_listener_thread(self, obj):
         App = HttpListener.app
+        App.config['listener_type'] = "http"
         App.run(debug=True, use_reloader=False, host='0.0.0.0', port=obj['port'], threaded=True)
 
     def start_https_listener_thread(self, obj):
-        App = HttpListener.app
-        App.run(debug=True, use_reloader=False, host='0.0.0.0', port=obj['port'], threaded=True, ssl_context='adhoc')
+        AppSsl = HttpListener.app
+        AppSsl.config['listener_type'] = "https"
+        AppSsl.run(debug=True, use_reloader=False, host='0.0.0.0', port=obj['port'], threaded=True, ssl_context='adhoc')

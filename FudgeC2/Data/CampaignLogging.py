@@ -85,7 +85,7 @@ class CampaignLoggingDecorator():
                 b['campaign']=args[1]
                 b['time']=time.time()
                 b['log_type'] = "cmd_response"
-                b['entry']={"uik":args[2],"response":args[3]}
+                b['entry']={"uik":args[2],"response":args[3], "c2_protocol":args[4]}
                 # print(*args)
                 args[0].Log_CampaignAction(b)
             return a

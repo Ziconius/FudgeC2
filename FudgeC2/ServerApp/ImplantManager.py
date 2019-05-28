@@ -322,11 +322,12 @@ def HelpPage():
 # TODO: Remove in production builds.
 @app.route("/test", methods = ['GET','POST'])
 def test_endpoint():
-    print(request.form)
+    # print(request.form)
 
     # a = app.config['listener_management'].start_listener("http", 80)
-    a = app.config['listener_management'].create_listener("https",8080 )
-    print(str(a))
+    a = app.config['listener_management'].create_listener("https",8080, True )
+    # print(str(a))
+    print(app.config)
     return "000"
 
 if __name__ == "__main__":

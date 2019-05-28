@@ -4,28 +4,27 @@
 <div class="row justify-content-lg-center m-4">
     <div class="col-lg-10 p-3 m-3 rounded iplm">
         <div><h1>Listeners</h1><p>Listeners can be configured from here, please consider other campaigns before any listeners is terminated.</p></div>
+        <div><p class="text-danger">Note: Customised Listeners are currently in development.</p></div>
         <h5>Configured Listeners:</h5>
 
-        <span>
+        <p>
             {% for key_2 in test_data %}
             Common Name: <code>{{ test_data[key_2].common_name }}</code><br>
             Proto: <code>{{ test_data[key_2].type }}</code><br>
             Port: <code>{{ test_data[key_2].port }}</code><br>
             {% if test_data[key_2].state == 1 %}
-                Port: <span class="text-success">Running</span><br>
+                State: <span class="text-success">Running</span><br>
             {% elif test_data[key_2].state == 0 %}
-                Port: <span class="text-danger">Stopped</span><br>
+                State: <span class="text-danger">Stopped</span><br>
             {% endif %}
             <hr>
             {% endfor %}
-        </span><br>
+        </p><br>
+        <p>Due for release in v0.3 (Dwarven Blacksmith):</p>
+        <p>New listener button + model</p>
+        <p>Add start/stop/rename listener functionality. Listeners cannot be deleted for historic integrity.</p>
+        <p>Response based on failure/success</p>
 
-
-    add start/stop/rename (common name) for created listeners. Listeners cannot be deleted for historic integrity.
-
-    new listener button + model
-
-    response based on failure/success
 
     </div>
 </div>

@@ -422,7 +422,7 @@ class Database():
             return False
 
     @CL.log_cmdresponse
-    def Register_ImplantResponse(self,cid,UIK,Response):
+    def Register_ImplantResponse(self,cid,UIK,Response, c2_protocol):
         # -- TODO: REBUILD
         # Pull back the first record which matches the UIK, contain both the Campaign the IID is associated from the implant the UIk is associated with.
         info=self.Session.query(Implants,Campaigns,GeneratedImplants).filter(Campaigns.cid==Implants.cid

