@@ -8,8 +8,7 @@ from Listeners import ListenerManagement
 
 
 def start_controller(listener_management):
-    #  Using ssl_context as a temp measure, this should be changed in a production environment to support SSL via
-    #  WSGI and NGINX.
+    # Server configuration can be found in Storage/settings.py
     Manager.config['listener_management'] = listener_management
     Manager.run(debug=Settings.server_app_debug,
                 use_reloader=False,
@@ -26,8 +25,11 @@ Manager = ImplantManager.app
 LM = ListenerManagement.ListenerManagement()
 
 # -- Hardcoding a listener on port 5000.
-# --    This will be held here until a further testing, and implementing database support + autostart on reboot funcationality.
-LM.create_listener("http",5000, True)
+# --    This will be held here until a further testing, and implementing database support + autostart on reboot
+# --    functionality. Passing in the user "admin" which as a hardcoded value. If 'admin' if not a real admin
+# --    account this will fail.
+LM.create_listener("hardcoded http listener", "http",5000, True)
+LM.create_listener("hardcoded https listener", "https",8080)
 
 try:
     _thread.start_new_thread(start_controller, (LM,))

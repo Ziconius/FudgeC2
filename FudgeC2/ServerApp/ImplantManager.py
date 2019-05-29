@@ -174,9 +174,18 @@ def GlobalSettingsPage():
 @app.route("/listener", methods=['GET','POST'])
 @login_required
 def GlobalListenerPage():
-    if request.method == "POST":
-        return "000"
+    # flash('blah')
+
     return render_template("listeners/listeners.html", test_data=app.config['listener_management'].get_active_listeners())
+
+@app.route("/listener/change", methods=['GET', 'POST'])
+@login_required
+def Listener_Updates():
+    if request.method == "POST":
+        print(request.form)
+        form_response = app.config['listener_management'].listener_form_submission(current_user.user_email, request.form)
+        flash(form_response[1])
+        return redirect(url_for('GlobalListenerPage'))
 
 # -- CAMPAIGN SPECIFIC PAGES -- #
 # ----------------------------- #
@@ -297,8 +306,6 @@ def CampaignLogs(cid):
         # -- Replace with pre-organised campaign logs - simplifies JS component.
         # Get_CampaignLogs
         return jsonify(ImpMgmt.Get_CampaignLogs(current_user.user_email, cid))
-        # Old method
-        # return jsonify(ImpMgmt.Get_ChronologicallyOrderedCampaignLogsJSON(current_user.user_email,cid))
     return render_template("CampaignLogs.html")
 
 # -- Implant command execution -- #
@@ -325,7 +332,7 @@ def test_endpoint():
     # print(request.form)
 
     # a = app.config['listener_management'].start_listener("http", 80)
-    a = app.config['listener_management'].create_listener("https",8080, True )
+    a = app.config['listener_management'].create_listener("admin","https",8080, True )
     # print(str(a))
     print(app.config)
     return "000"

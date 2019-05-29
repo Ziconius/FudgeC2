@@ -65,6 +65,10 @@ class Database():
         else:
             return query[0]
         # TODO: Improve and avoid race conditions.
+    def __get_user_object_from_email(self, email):
+        return self.Session.query(Users).filter(Users.user_email == email).first()
+
+
     def __update_last_logged_in__(self,email):
         Result = self.Session.query(Users).filter(Users.user_email == email).update({"last_login": (time.time())})
         self.Session.commit()
@@ -147,6 +151,12 @@ class Database():
                 return UpdatedUserObj
             else:
                 return False
+    def User_IsUserAdminAccount(self, email):
+        user_object  = self.__get_user_object_from_email(email)
+        if user_object:
+            if int(user_object.admin) == 1:
+                return True
+        return False
 
     def Get_UserFirstLogonGuid(self, email):
         pre_guid =str(uuid.uuid4())

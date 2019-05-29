@@ -91,6 +91,7 @@ Once an implant has been generated the stagers page will provide a number of bas
 * Windows Words macro
 
 
+
 ### Active Implants
 
 Active implants are the result of successful stager executions. When a stager connects back to the Fudge C2 server a new active implant is generated, and delivered to the target host. Each stager execution & check-in creates a new active implant entry.
@@ -111,8 +112,17 @@ Moozle Implant_810021
 
 Each of these implants can be individually interacted with, or using the "ALL" keyword to register a command against all active implants.
 
-Implant communication
+### Implant communication
 
+Implants will communicate back to the C2 server using whatever protocols the implant template was configured to use. If an implant is setup to use both HTTP and HTTPS, 2 listeners will be required to ensure that full commincation with the implant occurs.
+
+Listeners are configured globally within Fudge from the Listeners page. Setting up and modifying the state of listeners requires admin rights, as changes to stagers may impact other on-going campaigns using the same Fudge server.
+
+Currently the listeners page displays active listeners, but will allow admins to:
+ - Create listeners for HTTP/S, DNS, or binary channels on customisable ports
+ - Start created listeners
+ - Stop active listeners
+ - Assign common names to listeners
 
 #### Implant configuration further info.
 URL: An implant will be configured to call back to a given URL, or IP address.
@@ -155,7 +165,6 @@ Release 0.2 _(Human Grunt)_
 
 ##### Controller
 - [x] Check for `fudge.db` in the working dir, if not configure new setup. 
-   - [ ] Check for bugs in admin password setting.
 - [x] Code refactor Controller to boot server & listener 
 
  
