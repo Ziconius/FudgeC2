@@ -142,9 +142,8 @@ class Database():
             return False
         else:
             if bcrypt.checkpw(current_password.encode(), UserObj.password):
-                print("Correct PW")
                 hashedpassword = self.__hash_cleartext_password__(new_password)
-                Result = self.Session.query(Users).filter(Users.first_logon_guid==guid).update({"password":(hashedpassword),"first_logon":1})
+                Result = self.Session.query(Users).filter(Users.first_logon_guid==guid).update({"password":(hashedpassword), "first_logon":1})
                 self.Session.commit()
                 UpdatedUserObj = self.Session.query(Users).filter(Users.password==hashedpassword).first()
                 print(dir(UpdatedUserObj))
@@ -357,7 +356,15 @@ class Database():
             # -- Return Raw objects, and caller to manage them,
             return GetImplant
         return False
-
+    def Set_GeneratedImplantCopy(self, NewSplicedImplantData, generated_implant):
+        # This will store a copy of the PS implant to the "Generated_Implants" table
+        #   This will allow RT to send analysable copy to BT for signaturing etc.
+        try:
+            uik =NewSplicedImplantData[0]['unique_implant_id']
+            self.Session.query(GeneratedImplants).filter(GeneratedImplants.unique_implant_id == uik).update({"implant_copy": (generated_implant)})
+            self.Session.commit()
+        except Exception as E:
+            pass
 
     # -- Active Implant Queries -- #
     # ---------------------------- #
@@ -441,6 +448,7 @@ class Database():
         cid = info[1].cid
         uik = info[2].unique_implant_id
         # print("Record\ncid:    {}\niid:    {}\nentry:  {}\ntime:   {}".format(cid,iid,Response,int(time.time())))
+
         RL=ResponseLogs(cid=cid, uik=uik, log_entry=Response,time=int(time.time()))
         self.Session.add(RL)
         try:

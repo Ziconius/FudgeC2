@@ -40,9 +40,7 @@ class ImplantSingleton:
         # -- Used by Implant - Logs command responses from infected machines.
         def CommandResponse(self,result, c2_protocol=None):
             aa = result.split("::", 1) # Remove the identifying prefix
-            print(c2_protocol)
             generated_implant_data = db.Get_GeneratedImplantDataFromUIK(aa[0])
-            print(generated_implant_data)
             db.Register_ImplantResponse(generated_implant_data[0]['cid'],aa[0],aa[1], c2_protocol)
             # -- Legacy Format Below: To remove -- #
             # self.CommandOutput.append(result)
@@ -58,7 +56,9 @@ class ImplantSingleton:
         def GeneratePayload(self, NewSplicedImplantData):
             # TODO: Add a payload obfuscation level - this will be dealt within then render implant function.
             ImpGen = ImplantGenerator()
-            return ImpGen.render_implant_(NewSplicedImplantData)
+            rendered_implant = ImpGen.render_implant_(NewSplicedImplantData)
+            db.Set_GeneratedImplantCopy(NewSplicedImplantData, rendered_implant)
+            return rendered_implant
 
         # TODO:
         # create functions for all listener/webapp/stager actions to avoid direct DB queries from ImplantManager, HttpListener/HttpsListener etc

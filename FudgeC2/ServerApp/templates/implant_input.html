@@ -91,7 +91,9 @@ async function get_command_response (){
                     var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
                     d=unix_to_human_time(response[element].time)
                     // console.log(response[element]);
-                    GG = "<div><p>IID: "+response[element].title+"<br>Time: "+d+"<br>Rsp: <code>"+response[element].log_entry+"</code></p></div><hr>";
+                    tmp_text = response[element].log_entry
+                    response_data = tmp_text.replace(new RegExp('\r?\n','g'), '<br />');
+                    GG = "<div><p>IID: "+response[element].title+"<br>Time: "+d+"<br>Rsp: <code>"+response_data+"</code></p></div><hr>";
                     WP = document.getElementById('Response').innerHTML;
                     // alert(WP);
                     document.getElementById('Response').innerHTML = GG + WP;

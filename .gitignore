@@ -11,3 +11,6 @@ modules/__pycache__/*
 scratch*
 *-journal
 log.txt
+*.pem
+*.key
+*.crt

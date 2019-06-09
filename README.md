@@ -8,7 +8,7 @@ Fudge is a campaign orientated Powershell implant framework built on Python3/Fla
 ## Setup
 ### Installation
 
-The simplest route to get a basic Fudge server up and running is:
+To quickly run FudgeC2 on a Linux host run the following:
 
 ```
 git clone https://github.com/Ziconius/Fudge
@@ -17,22 +17,33 @@ sudo pip3 install -r requirements.txt
 sudo python3 Controller.py
 ```
 
+For those who wish to use FudgeC2 via Docker, a template Dockerfile exists within the repo as well.
+
 ##### Settings:
 
-Fudge comes with default boot configurations, which can be altered in:
+FudgeC2' default server configurations can be found in the settings file:
 
 `<install dir>/FudgeC2/Storage/settings.py`
 
-These settings include FudgeC2 application port, SSL, and database name.
+These settings include FudgeC2 server application port, SSL configuration, and database name. For further details see the Server Configuration section.
 
-Depending on your network design/RT architecture deployment, you will likely need to configure a number of proxy and routing adjustments. The most common configuration setup is to use Fudge over HTTP(S) using a reverse NGINX/Apache2 proxy.
+N.b. Depending on your network design/RT architecture deployment, you will likely need to configure a number of proxy and routing adjustments.
 
 #### First Login
 After the initial installation you can log in with the default admin account using the credentials: 
 
 ```admin:letmein```
 
-You will be prompted to the change the admin password once you login for the first time. 
+You will be prompted to the change the admin password after you login for the first time. 
+
+### Server Settings
+
+< Reworking >
+
+Certificate: How to deploy/Where to deploy
+Port - consider listeners
+DB name:
+
 
 ## Users
 Users within Fudge are divided into 2 groups, admins and standard users. Admins have all of the usual functionality, such as user and campaign creation, and are required to create a new campaigns.
@@ -51,7 +62,7 @@ An admin can create a new user from within the Global Settings options. They wil
 
 
 ## Campaigns
-#### What is a lcampaign?
+#### What is a campaign?
 A campaign is a method of organising a engagement against a client, which allows access control to be applied on a per user basis
 
 Each campaign contains a unique name, implants, and logs while a user can be a member of multiple campaigns.
@@ -71,10 +82,10 @@ An implant template is the what we will create to generate our stagers. The impl
 The list of required configurations are:
 * URL
 * Initial callback delay
-* Port (where applicable)
+* Port
 * Beacon delay
 * Protocol:
-  * HTTP (Default)
+  * HTTP (default)
   * HTTPS 
   * DNS
   * Binary
@@ -145,10 +156,9 @@ Release 0.2 _(Human Grunt)_
 #### Implant Manager Web App
 - [x] Add help page with implant special tags using `::cmd::` format.
 - [x] Order implant check-in by time
-- [ ] Review how implant responses are displayed within the main campaign page to improve readability.
+- [x] Review how implant responses are displayed within the main campaign page to improve readability.
 - [x] Create log page with detailed logging of for each implant, including time, command, implant, pickup, and pickup time.
 - [x] Provide feedback to read-only campaign users with feedback if they are not authorised to execute commands. Basic implementation only.
-- [ ] Add filter for implants on implant page to reduce noise.
 - [x] Improve Campaign Settings radio buttons to display the current configuration.
 
 
@@ -157,15 +167,16 @@ Release 0.2 _(Human Grunt)_
 - [ ] Add further work on implant obfuscation levels/configuration.
 - [x] Add implant special tags formatted: `::cmd::`
 - [x] Create further staging options (docm)
-- [ ] Improve format of returning data.
-- [ ] Deploy HTTPS cert to HTTP channel
-    - [ ] Allow stager/implant to run on untrusted cert.
+- [x] Improve format of returning data.
+- [x] Deploy HTTPS listener
+    - [x] Allow C2 to run on untrusted cert. (Deploying own certs instead - untrusted cannot be used.)
 
 
 
 ##### Controller
 - [x] Check for `fudge.db` in the working dir, if not configure new setup. 
 - [x] Code refactor Controller to boot server & listener 
+- [ ] Clean code for version release
 
  
  ---
@@ -195,6 +206,7 @@ Release 0.2 _(Human Grunt)_
  - [ ] Refector Webapp JS into suitable structure. 
  - [ ] UI Overhaul
  - [ ] Refactor Webapp flask into Flask Blueprints.
+ - [ ] Add filter for implants on implant page to reduce noise.
  
 
 ##### Implant
@@ -205,4 +217,5 @@ Release 0.2 _(Human Grunt)_
  - [ ] Create DNS Listener
  - [ ] Create user R/R+W permission inheritance campaign -> implant template -> active implant
  - [ ] Add logging for listener actions (Create/Rename/Start/Stop) + values (port/proto/common name/etc)
+ - [ ] Add checks for HTTPS listener certs existence
 

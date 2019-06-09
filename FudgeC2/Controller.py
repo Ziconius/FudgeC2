@@ -29,7 +29,7 @@ LM = ListenerManagement.ListenerManagement()
 # --    functionality. Passing in the user "admin" which as a hardcoded value. If 'admin' if not a real admin
 # --    account this will fail.
 LM.create_listener("hardcoded http listener", "http",5000, True)
-LM.create_listener("hardcoded https listener", "https",8080)
+LM.create_listener("hardcoded https listener", "https",8080, True)
 
 try:
     _thread.start_new_thread(start_controller, (LM,))

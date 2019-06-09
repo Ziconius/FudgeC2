@@ -107,7 +107,7 @@ class ImplantManagement():
                 if comms_binary == 0 and comms_dns == 0 and comms_http == 0 and comms_https == 0:
                     raise ValueError('No communitcation channel selected. ')
                 if comms_http ==1 and comms_https == 1:
-                    raise ValueError("Please select HTTP or HTTPS")
+                    raise ValueError("Please select either HTTP or HTTPS. Multiprotocol is not yet supported.")
                 a = self.db.Add_Implant(cid, title ,url,port,beacon,initial_delay,comms_http,comms_https,comms_dns,comms_binary,description,obfuscation_level)
                 if a == True:
                     return True, "Implant created."

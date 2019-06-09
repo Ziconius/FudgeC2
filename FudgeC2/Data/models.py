@@ -70,6 +70,7 @@ class GeneratedImplants(Base):
     iid = Column(INTEGER(11), ForeignKey("implants.iid"), nullable=False, index=True)
     generated_title = Column(String(255),nullable=False)
     time = Column(INTEGER(16), nullable=False)
+    implant_copy = Column(String())
 
 class ImplantLogs(Base):
     __tablename__='implant_logs'
