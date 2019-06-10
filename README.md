@@ -164,7 +164,7 @@ Release 0.2 _(Human Grunt)_
 
 ##### Implant
 
-- [ ] Add further work on implant obfuscation levels/configuration.
+
 - [x] Add implant special tags formatted: `::cmd::`
 - [x] Create further staging options (docm)
 - [x] Improve format of returning data.
@@ -176,7 +176,7 @@ Release 0.2 _(Human Grunt)_
 ##### Controller
 - [x] Check for `fudge.db` in the working dir, if not configure new setup. 
 - [x] Code refactor Controller to boot server & listener 
-- [ ] Clean code for version release
+- [x] Clean code for version release - partial
 
  
  ---
@@ -191,10 +191,10 @@ Release 0.2 _(Human Grunt)_
 ##### Implant
  - [ ] Add persistence mechanism
  - [ ] Add .docx macro
- - [ ] Improve obfuscation
+ - [ ] Add further work on implant obfuscation levels/configuration.
  
 ##### Controller
-- [ ] Restructure how listeners are configured and launched. This piece of work will be staged over serveral releases.
+- [ ] Restructure how listeners are configured and launched. This piece of work will be staged over several releases.
 
 ##### Campaign Viewer
 - [ ] Author separate viewer mechanisms for the client/blue team
@@ -207,6 +207,7 @@ Release 0.2 _(Human Grunt)_
  - [ ] UI Overhaul
  - [ ] Refactor Webapp flask into Flask Blueprints.
  - [ ] Add filter for implants on implant page to reduce noise.
+ 
  
 
 ##### Implant

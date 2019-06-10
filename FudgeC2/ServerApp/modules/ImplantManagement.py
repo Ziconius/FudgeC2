@@ -11,7 +11,6 @@ class ImplantManagement():
         for x in form:
             if "obfus" in x:
                 a  = x.split("-")
-                print("ll", a[1])
                 # -- returning first value, we should only receive a single entry.
                 try:
                     return int(a[1])
@@ -105,16 +104,15 @@ class ImplantManagement():
                 if "comms_binary" in form :
                     comms_binary = 1
                 if comms_binary == 0 and comms_dns == 0 and comms_http == 0 and comms_https == 0:
-                    raise ValueError('No communitcation channel selected. ')
+                    raise ValueError('No communication channel selected.')
                 if comms_http ==1 and comms_https == 1:
-                    raise ValueError("Please select either HTTP or HTTPS. Multiprotocol is not yet supported.")
+                    raise ValueError("Please select either HTTP or HTTPS. Multi-protocol is not yet supported.")
                 a = self.db.Add_Implant(cid, title ,url,port,beacon,initial_delay,comms_http,comms_https,comms_dns,comms_binary,description,obfuscation_level)
                 if a == True:
                     return True, "Implant created."
                 else:
-                    raise ValueError("Error creating entry. Ensure filename is unique")
+                    raise ValueError("Error creating entry. Ensure implant title is unique")
         except Exception as e:
-            print("NewImplant: ",e)
             # --  returning page with generic Error --#
             return False, e
 

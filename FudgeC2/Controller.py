@@ -41,5 +41,4 @@ except Exception as E:
 while 1:
     # Hold the application threads open
     time.sleep(15)
-    # LM.get_active_listeners()
     pass

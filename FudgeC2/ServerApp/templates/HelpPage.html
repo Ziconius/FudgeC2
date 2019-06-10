@@ -8,23 +8,24 @@
     </div>
     <div class="col-md-10 m-0 p-2">
         <div class="p-3 m-0 rounded iplm  ">
-            <h1>Help</h1>
-
-            <h2>Configuration</h2>
+            <h1>FudgeC2 Documentation</h1>
+            <p class="text-warning">This documentation contain incomplete information, as well as documentation on unimplemented features.</p>
+            <h3>Configuration</h3>
             <h4>User Account</h4>
             <h5>Add user</h5>
             <p>Adding a user account can be done by any admin in the global settings:
                 <a href="/settings">/settings</a>   </p>
 
             <h5>Configure campaign users</h5>
-            <p>http://fudge.moozle.wtf:5001/1/settings</p>
+            <p>This can be found within the campaign settings, under <code>/[campaign id]/settings</code> </p>
             <h5>Password Reset</h5>
-            <p>Global settings <b>IN DEVELOPMENT</b></p>
+            <p>Resetting a users password can be achieve in the global settings. This will generated a one-time password, which the user will change on first logon. (Not yet implemented)<br>
+                <a href="/settings">/settings</a>   </p>
 
             <br>
             <h4>Listeners</h4>
             <p>
-                Listeners are the device which catch communication from implants, and issue commands. Configuring listeners requires admin providlegs.</p>
+                Listeners are the device which catch communication from implants, and issue commands. Configuring listeners requires admin privileges.</p>
 
             <p class="text-danger">Caution: When stopping a listener it will impact all implants, not just those from your own campaign. Communicate to your wider teams.</p>
 
@@ -33,13 +34,16 @@
             <p>Once a listener has been set up for a given protocol and port it does not need to be done against for a separate campaign. All campaign which used an identical implant configuration will use this listener.</p>
 
             <p>Common examples of shared listeners are HTTP on port 80, or HTTPS on port 443. Once a listener has been set up, all implant, for all campaign can use it (and once stopped, it will stop for all).</p>
+            <p>When creating listeners you have the option to auto-start a listener, this will enable the listener upon creation.</p>
+            <p>Listeners can be configured here:<br>
+            <a href="/listener">/listeners</a></p>
 
 
             <h2>Built in commands</h2>
             <p>Active implants have a number of builtin commands designed to perform common actions, and harvest host information.<br>
             below is the list of current implant commands:</p>
             <code>:: sys_info</code>
-            <p> Sys_info: Collects username and hostname</p>
+            <p> Sys_info: Collects username and hostname. (Not yet implemented)</p>
             <code>:: network_info</code>
             <p>Collects network information including domain, hostname, ip address, active network services.</p>
 

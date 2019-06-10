@@ -3,7 +3,7 @@ from Implant.ImplantGeneratorDecorators import ImplantGenerator
 
 class ImplantSingleton:
     class __OnlyOne:
-        # -- The Implant class is sole class responible for controlling data to and from implants.
+        # -- The Implant class is sole class responsible for controlling data to and from implants.
         # --    it manages  these interaction across all types of implants and communication protocols.
 
         def AddCommand(self, User, cid, UniqueImplantKey,Command):
@@ -39,12 +39,10 @@ class ImplantSingleton:
 
         # -- Used by Implant - Logs command responses from infected machines.
         def CommandResponse(self,result, c2_protocol=None):
-            aa = result.split("::", 1) # Remove the identifying prefix
-            generated_implant_data = db.Get_GeneratedImplantDataFromUIK(aa[0])
-            db.Register_ImplantResponse(generated_implant_data[0]['cid'],aa[0],aa[1], c2_protocol)
-            # -- Legacy Format Below: To remove -- #
-            # self.CommandOutput.append(result)
-            return 0
+            uik_and_response_data = result.split("::", 1) # Remove the identifying prefix
+            generated_implant_data = db.Get_GeneratedImplantDataFromUIK(uik_and_response_data[0])
+            db.Register_ImplantResponse(generated_implant_data[0]['cid'],uik_and_response_data[0],uik_and_response_data[1], c2_protocol)
+
 
         # -- Used by webapp.
         def Get_CommandResult(self,cid):
