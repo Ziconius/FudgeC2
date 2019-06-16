@@ -2,17 +2,17 @@
   <img width="125" height="186" src="https://github.com/Ziconius/Fudge/blob/master/FudgeC2/ServerApp/static/fudge.png">
 </p>
 
-# Fudge 
-Fudge is a campaign orientated Powershell implant framework built on Python3/Flask  - Designed for team collaboration and client interaction and campaign timelining.
+# FudgeC2
+FudgeC2 is a campaign orientated Powershell C2 framework built on Python3/Flask - Designed for team collaboration, client interaction, campaign timelining, and usage visibility.
 
 ## Setup
 ### Installation
 
-To quickly run FudgeC2 on a Linux host run the following:
+To quickly install & run FudgeC2 on a Linux host run the following:
 
 ```
-git clone https://github.com/Ziconius/Fudge
-cd Fudge
+git clone https://github.com/Ziconius/FudgeC2
+cd FudgeC2/FudgeC2
 sudo pip3 install -r requirements.txt
 sudo python3 Controller.py
 ```
@@ -29,6 +29,8 @@ These settings include FudgeC2 server application port, SSL configuration, and d
 
 N.b. Depending on your network design/RT architecture deployment, you will likely need to configure a number of proxy and routing adjustments.
 
+For upcoming development notes and recent changes see the [release.md file](/release.md)
+
 #### First Login
 After the initial installation you can log in with the default admin account using the credentials: 
 
@@ -41,7 +43,9 @@ You will be prompted to the change the admin password after you login for the fi
 < Reworking >
 
 Certificate: How to deploy/Where to deploy
+
 Port - consider listeners
+
 DB name:
 
 
@@ -147,76 +151,4 @@ Protocols: The implant will be able to use of of the following protocols:
 
 A user can enable and disable protocols depending on the environment they believe they are working in.
 
-
-## Active Development
-Below is an high-level overview of the on-going development to increase functionality, and reliability of Fudge. This is broken down into release cycles, which are focused around core functionality changes.
-
----
-Release 0.2 _(Human Grunt)_
-#### Implant Manager Web App
-- [x] Add help page with implant special tags using `::cmd::` format.
-- [x] Order implant check-in by time
-- [x] Review how implant responses are displayed within the main campaign page to improve readability.
-- [x] Create log page with detailed logging of for each implant, including time, command, implant, pickup, and pickup time.
-- [x] Provide feedback to read-only campaign users with feedback if they are not authorised to execute commands. Basic implementation only.
-- [x] Improve Campaign Settings radio buttons to display the current configuration.
-
-
-##### Implant
-
-
-- [x] Add implant special tags formatted: `::cmd::`
-- [x] Create further staging options (docm)
-- [x] Improve format of returning data.
-- [x] Deploy HTTPS listener
-    - [x] Allow C2 to run on untrusted cert. (Deploying own certs instead - untrusted cannot be used.)
-
-
-
-##### Controller
-- [x] Check for `fudge.db` in the working dir, if not configure new setup. 
-- [x] Code refactor Controller to boot server & listener 
-- [x] Clean code for version release - partial
-
- 
- ---
- Release 0.3 _(Dwarven Blacksmith)_
-##### Implant Manager Web App
-- [ ] Allow admins to view, start, stop, and configure all active listeners.
-- [ ] Create admin-only campaign extract function, encrypting with AES256. This require viewer tool.
-- [ ] Reduce data sent to implant page, increase responsiveness.
-- [ ] Password reset
-- [ ] Review how campaign logging data is presented
-
-##### Implant
- - [ ] Add persistence mechanism
- - [ ] Add .docx macro
- - [ ] Add further work on implant obfuscation levels/configuration.
- 
-##### Controller
-- [ ] Restructure how listeners are configured and launched. This piece of work will be staged over several releases.
-
-##### Campaign Viewer
-- [ ] Author separate viewer mechanisms for the client/blue team
-
----
- Release 0.4 _(Tauren Herbalist)_ 
-##### Implant Manager Web App
- - [ ] Fill chronological graph page with real data.
- - [ ] Refector Webapp JS into suitable structure. 
- - [ ] UI Overhaul
- - [ ] Refactor Webapp flask into Flask Blueprints.
- - [ ] Add filter for implants on implant page to reduce noise.
- 
- 
-
-##### Implant
- - [ ] Create DNS comms channel
- - [ ] Create DLL implant PoC
- 
-##### Controller
- - [ ] Create DNS Listener
- - [ ] Create user R/R+W permission inheritance campaign -> implant template -> active implant
- - [ ] Add logging for listener actions (Create/Rename/Start/Stop) + values (port/proto/common name/etc)
- - [ ] Add checks for HTTPS listener certs existence
 
