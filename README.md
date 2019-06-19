@@ -3,7 +3,9 @@
 </p>
 
 # FudgeC2
-FudgeC2 is a campaign orientated Powershell C2 framework built on Python3/Flask - Designed for team collaboration, client interaction, campaign timelining, and usage visibility.
+FudgeC2 is a campaign orientated Powershell C2 framework built on Python3/Flask - Designed for team collaboration, client interaction, campaign timelining, and usage visibility. 
+
+_Note: FudgeC2 is currently in alpha stage, and should be used with caution in non-test environments. Beta will be released later this year, at_ [BlackHat Arsenal](https://www.blackhat.com/us-19/arsenal/schedule/#fudge-a-collaborative-c2-framework-for-purple-teaming-16968). 
 
 ## Setup
 ### Installation
