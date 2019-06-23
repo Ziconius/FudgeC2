@@ -16,7 +16,7 @@ Web App:
  - [ ] Provide feedback if listener channel is in use, or not running
  
 Implant 
- - [ ] Implement random protocol selection for callback
+ - [x] Implement random protocol selection for callback
  - [ ] Ensure certificate validation is supported
 
 ---

@@ -329,13 +329,11 @@ def HelpPage():
 # TODO: Remove in production builds.
 @app.route("/test", methods = ['GET','POST'])
 def test_endpoint():
-    # print(request.form)
+    if request.method == "POST":
+        print(request.form)
+        ImpMgmt.Demo_CreateNewImplant(1, request.form,current_user.user_email)
 
-    # a = app.config['listener_management'].start_listener("http", 80)
-    a = app.config['listener_management'].create_listener("admin","https",8080, True )
-    # print(str(a))
-    print(app.config)
-    return "000"
+    return render_template("Demo_CreateImplant.html")
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5001, threaded=True)

@@ -49,17 +49,17 @@ class Implants(Base):
     stager_key = Column(String(255), nullable=False, unique=True)
     title = Column(String(255),nullable=False)
     cid = Column(INTEGER(11), nullable=False, index=True )
-    file_hash=Column(String(255), nullable=True)
-    filename=Column(String(255), nullable=True)
+    # file_hash=Column(String(255), nullable=True)              # Removed: Files are stored in GeneratedImplants
+    # filename=Column(String(255), nullable=True)               # Removed: No file hashes are stored
     callback_url = Column(String(255), nullable=False)
-    port = Column(INTEGER(5), nullable=False, default=0)
+    # port = Column(INTEGER(5), nullable=False, default=0)      # Removed: Ports are now stored on a per protocol basis
     description = Column(String(255))
-    beacon = Column(INTEGER(10))
+    beacon = Column(INTEGER(10), nullable=False)
     initial_delay = Column(INTEGER(10))
-    comms_http = Column(INTEGER(1))
-    comms_https = Column(INTEGER(1))
-    comms_dns = Column(INTEGER(1))
-    comms_binary = Column(INTEGER(1))
+    comms_http = Column(INTEGER(1), default=0)
+    comms_https = Column(INTEGER(1), default=0)
+    comms_dns = Column(INTEGER(1), default=0)
+    comms_binary = Column(INTEGER(1), default=0)
     obfuscation_level = Column(INTEGER(1), nullable=False)
 
 class GeneratedImplants(Base):

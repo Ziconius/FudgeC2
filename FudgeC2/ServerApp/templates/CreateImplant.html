@@ -10,9 +10,6 @@
         <div class="form-group"><div>Implant URL <span class="text-danger">*</span> [proto://]<b>[url]</b>[:port]</div>
             <input type="text" class="form-control" id="url" name="url" placeholder="Callback URL">
         </div>
-        <div class="form-group"><div>Implant Port (HTTP only)<span class="text-danger">*</span></div>
-            <input type="text" class="form-control" id="port" name="port" placeholder="TCP Port for HTTP Listener">
-        </div>
         <div class="form-group"><div>Implant Description <span class="text-danger">*</span></div>
             <input type="text" class="form-control" name="description" id="description" placeholder="Description">
         </div>
@@ -43,16 +40,20 @@
         Commincation Channels
         <div class="checkbox">
             <label><input type="checkbox" name="comms_http" > HTTP</label>
+            <input type="text" class="form-control" id="http-port" name="http-port" placeholder="TCP Port for HTTP listener">
         </div>
         <div class="checkbox">
             <label><input type="checkbox" name="comms_https" checked> HTTPS</label>
+            <input type="text" class="form-control" id="https-port" name="https-port" placeholder="TCP Port for HTTPS listener">
         </div>
         <div class="checkbox">
             <label><input type="checkbox" name="comms_dns" value="off" disabled> DNS</label>
+            <input type="text" class="form-control" id="dns-port" name="dns-port" disabled placeholder="TCP Port for DNS listener">
         </div>
         <div class="checkbox">
             <label><input type="checkbox" name="comms_binary" value="off" disabled> Binary</label>
-        </div>
+            <input type="text" class="form-control" id="binary-port" name="port" disabled placeholder="TCP Port for binary listener">
+        </div><br>
         <button type="submit" name="CreateImplant" class="btn btn-primary" id="ImplantButton">Create Implant</button>
 
     </form>

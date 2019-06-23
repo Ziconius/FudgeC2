@@ -10,12 +10,13 @@ class ImplantManagement():
     def _form_validated_obfucation_level_(self, form):
         for x in form:
             if "obfus" in x:
+                print(x)
                 a  = x.split("-")
                 # -- returning first value, we should only receive a single entry.
                 try:
                     return int(a[1])
                 except:
-                    return None
+                    return 0
         return None
 
 
@@ -61,60 +62,97 @@ class ImplantManagement():
             return {"cmd_reg":{"result":True,"reason":"Command registered"}}
         return {"cmd_reg":{"result":False,"reason":"Incorrect implant given, or non-existant active implant."}}
 
-    def CreateNewImplant(self,cid,form, user):
-        # -- This is creating a new Implant Template
+
+    def CreateNewImplant(self,cid, form, user):
+        # TODO: Create checks for conflicting ports.
+        implant_configuration = {
+            "title": None,
+            "description":None,
+            "url":None,
+            "beacon":None,
+            "inital_delay":None,
+            "obfuscation_level":None,
+            "protocol": {
+                "comms_http":None,
+                "comms_https":None,
+                "comms_binary":None,
+                "comms_dns":None
+            }
+        }
         User = self.db.Get_UserObject(user)
         if User.admin == 0:
-            return False, "Insufficient Priviledges"
-        CampPriv = self.db.Verify_UserCanWriteCampaign(user,cid)
+            return False, "Insufficient privileges"
+        CampPriv = self.db.Verify_UserCanWriteCampaign(user, cid)
         if CampPriv == False:
             return False, "User cannot write to this campaign"
-        # -- From here we know the user is able to write to the Campaign and an admin.
 
         try:
             if "CreateImplant" in form:
+
                 obfuscation_level = self._form_validated_obfucation_level_(form)
                 if obfuscation_level == None:
-                    print("OL", obfuscation_level)
+                    # print("OL", obfuscation_level)
                     raise ValueError('Missing, or invalid obfuscation levels')
+                else:
+                    implant_configuration['obfuscation_level'] = obfuscation_level
+
+                if 'initial_delay' in form:
+                    if int(form['initial_delay']) and int(form['initial_delay']) >= 0:
+                        implant_configuration['initial_delay'] = form['initial_delay']
+                    else:
+                        raise ValueError("Initial delay must be positive integer")
+                else:
+                    raise ValueError ("Inital delay not submitted")
                 if form['title'] == "" or form['url'] == "" or form['description'] == "":
                     raise ValueError('Mandatory values left blank')
-                title = form['title']
-                url=form['url']
-                port = form['port']
-                description= form['description']
-                beacon=form['beacon_delay']
-                initial_delay=form['initial_delay']
-                comms_http = 0
-                comms_https = 0
-                comms_dns = 0
-                comms_binary = 0
-                try:
-                    port = int(port)
-                except:
-                    if type(port) != int:
-                        raise ValueError('Port is required as integer')
-                # -- Comms check --#
-                if "comms_http" in form:
-                    comms_http = 1
-                if "comms_https" in form:
-                    comms_https = 1
-                if "comms_dns" in form :
-                    comms_dns = 1
-                if "comms_binary" in form :
-                    comms_binary = 1
-                if comms_binary == 0 and comms_dns == 0 and comms_http == 0 and comms_https == 0:
-                    raise ValueError('No communication channel selected.')
-                if comms_http ==1 and comms_https == 1:
-                    raise ValueError("Please select either HTTP or HTTPS. Multi-protocol is not yet supported.")
-                a = self.db.Add_Implant(cid, title ,url,port,beacon,initial_delay,comms_http,comms_https,comms_dns,comms_binary,description,obfuscation_level)
+                else:
+                    implant_configuration['title'] = form['title']
+                    implant_configuration['url'] = form['url']
+                    implant_configuration['description'] = form['description']
+
+
+                a = {"comms_http":"http-port",
+                     "comms_https":"https-port",
+                     "comms_dns":"dns-port",
+                     "comms_binary":"binary-port"}
+                for element in a.keys():
+                    print("::",element)
+                    if element in form:
+                        #print("@@", form[a[element]])
+                        if int(form[a[element]]):
+                            if int(form[a[element]]) > 0 or int(form[a[element]]) < 65536:
+                                #print(int(form[a[element]]))
+                                implant_configuration["protocol"][element] = int(form[a[element]])
+                            else:
+                                raise ValueError ("Submitted port for {} is out of range".format(a[element]))
+                        else:
+                            #print(form[element])
+                            raise ValueError ("Ports must be submitted as an integer")
+
+
+                protocol_set = False
+                for proto in  implant_configuration['protocol'].keys():
+                    if implant_configuration['protocol'][proto] != None:
+                        protocol_set = True
+                if protocol_set == False:
+                    raise ValueError('No protocol selected, ensure a protocol and port are selected.')
+
+
+                # print("Final configuration:")
+                # for element in implant_configuration.keys():
+                #     print(element,": ",implant_configuration[element])
+
+                a = self.db.Add_Implant(cid, implant_configuration)
                 if a == True:
                     return True, "Implant created."
                 else:
-                    raise ValueError("Error creating entry. Ensure implant title is unique")
-        except Exception as e:
-            # --  returning page with generic Error --#
-            return False, e
+                    raise ValueError("Error creating entry. Ensure implant title is unique.")
+
+        except Exception as E:
+            return (False, E)
+
+        return
+
 
     def Get_RegisteredImplantCommands(self, username, cid=0):
         # -- Return list of dictionaries, not SQLAlchemy Objects.

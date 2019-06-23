@@ -226,10 +226,10 @@ class Database():
         return IID
 
     # -- Implant Content --#
-    def Add_Implant(self, cid, title, url, port, beacon, initial_delay, comms_http=0, comms_https=0, comms_dns=0, comms_binary=0, description="Implant: Blank description.", obfuscation_level=0):
+    def REMOVE_Add_Implant(self, cid, title, url, port, beacon, initial_delay, comms_http=0, comms_https=0, comms_dns=0, comms_binary=0, description="Implant: Blank description.", obfuscation_level=0):
+        # -- REMOVE: Removed in Tauren Herbalist
         # -- TODO: Refactor
         print("In Add_Implant_Function")
-        implant = Implants(cid=cid,title=title)
         stager_key= random.randint(10000,99999)
         NewImplant = Implants(cid=cid,title=title,description=description,callback_url=url,stager_key=stager_key,file_hash="0",filename="0",
                               port=port,
@@ -250,6 +250,47 @@ class Database():
         except Exception as e:
             print("db.Add_Implant: ",e)
             return e
+    def Add_Implant(self, cid, config):
+        # -- Configuration template
+        # implant_configuration = {
+        #     "title": None,
+        #     "description": None,
+        #     "url": None,
+        #     "beacon": None,
+        #     "inital_delay": None,
+        #     "obfuscation_level": None,
+        #     "protocol": {
+        #         "comms_http": None,
+        #         "comms_https": None,
+        #         "comms_binary": None,
+        #         "comms_dns": None
+        #     }
+        # }
+        stager_key = random.randint(10000, 99999)
+        new_implant = Implants(
+            cid=cid,
+            title=config['title'],
+            description = config['description'],
+            stager_key = stager_key,
+            callback_url = config['url'],
+            beacon = config['beacon'],
+            initial_delay = config['initial_delay'],
+            obfuscation_level = config['obfuscation_level'],
+            comms_http = config['protocol']['comms_http'],
+            comms_https = config['protocol']['comms_https'],
+            comms_binary = config['protocol']['comms_binary'],
+            comms_dns = config['protocol']['comms_dns']
+        )
+        self.Session.add(new_implant)
+        try:
+            self.Session.commit()
+            q = self.Session.query(Implants).first()
+            print(q)
+            return True
+        except Exception as e:
+            print("db.Add_Implant: ", e)
+            return e
+
 
 
     # -- LOGIN CONTENT --#
@@ -447,8 +488,11 @@ class Database():
         iid = info[0].iid
         cid = info[1].cid
         uik = info[2].unique_implant_id
-        # print("Record\ncid:    {}\niid:    {}\nentry:  {}\ntime:   {}".format(cid,iid,Response,int(time.time())))
-
+        # TODO: This is a bug, which is likely the result of an exception happening in the implant. This should be
+        #       reviewed and corrected.
+        if Response == "":
+            print("Registering empty response.")
+            return False
         RL=ResponseLogs(cid=cid, uik=uik, log_entry=Response,time=int(time.time()))
         self.Session.add(RL)
         try:
