@@ -22,7 +22,7 @@ def start_controller(listener_management):
 # Singleton in used to allow the app and the listeners to converse with implant object easily.
 Imp = Implant.ImplantSingleton.instance
 Manager = ImplantManager.app
-LM = ListenerManagement.ListenerManagement()
+LM = ListenerManagement.ListenerManagement(Settings.tls_listener_cert, Settings.tls_listener_key)
 
 # -- Hardcoding a listener on port 5000.
 # --    This will be held here until a further testing, and implementing database support + autostart on reboot

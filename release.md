@@ -8,29 +8,31 @@ Release cross-protocol implant communications using HTTP/HTTPS
 
 C2 Server:
  - [ ] Capture and log returning protocol
- - [ ] Add certificate/key path and name into options
+ - [x] Add certificate/key path and name into options
  - [ ] Improve error checking + logging
  
 Web App:
- - [ ] Allow multiple protocols + port to be selected
- - [ ] Provide feedback if listener channel is in use, or not running
+ - [x] Allow multiple protocols + port to be selected
+ - [ ] Provide feedback if listener channel is in use, or not running when creating an implant
  
 Implant 
  - [x] Implement random protocol selection for callback
  - [ ] Ensure certificate validation is supported
-
+ - [x] Implement function/variable name randomisation in implant
+ 
 ---
 Release 0.4 _(Tauren Herbalist)_
 Review how data is captured from listeners and web app
  - [ ] Improve logging across web application
  - [ ] Add user action logs
  - [ ] Review Database.py and create common format for readability and maintainability
+ - [ ] Add check to look for latest version of FudgeC2 - Notify user of updates.
 
 ---
 Release 0.5 _(Goblin Sapper)_
 Create further obfuscation and jinja templatework
  C2 Server
- - [ ] Create function name randomisation
+ - [ ] Add function name randomisation for all functions
  - [ ] Create protocol obfuscation
  - [ ] Add comments and contact details into unobfuscated implant
  Web App

@@ -16,24 +16,29 @@
         <div class="form-group">Initial callback delay (Seconds)
             <input type="text" class="form-control" name="initial_delay" id="inital_delay" value=60 placeholder="60">
         </div>
-        <div class="form-group">Beacon delay (Seconds)(contains 10% jitter)
+        <div class="form-group">Beacon delay (seconds)
             <input type="text" class="form-control" name="beacon_delay" id="beacon_delay" value="3600" placeholder="3600">
         </div>
-        <div class="form-group">Implant obfuscation level
+        <div class="form-group"><b>Implant obfuscation level</b>
 
             <div class="form-check">
               <label class="form-check-label">
-                <input type="radio" class="form-check-input" name="obfus-0" checked=""> Full obfuscation
+                <input type="radio" class="form-check-input" name="obfuscation" value="0" checked=""> No obfuscation
               </label>
             </div>
             <div class="form-check">
               <label class="form-check-label">
-                <input type="radio" class="form-check-input" name="obfus-1"> Randomised function position
+                <input type="radio" class="form-check-input" name="obfuscation" value="1"> Randomised function positions
               </label>
             </div>
             <div class="form-check disabled">
               <label class="form-check-label">
-                <input type="radio" class="form-check-input" name="obfus-2" disabled> No obfuscation
+                <input type="radio" class="form-check-input" name="obfuscation" value="2"> Randomise function & variable names + function positions
+              </label>
+            </div>
+            <div class="form-check disabled">
+              <label class="form-check-label">
+                <input type="radio" class="form-check-input" name="obfuscation" value="3"> Full obfuscation
               </label>
             </div>
         </div>

@@ -7,6 +7,13 @@ class ListenerManagement():
     active_listener = 0
     listeners = {}
     db = Database()
+    tls_cert = None
+    tls_key = None
+    def __init__(self, tls_listener_cert, tls_listener_key):
+        # TODO: Implement checks to validate files at this point.
+        self.tls_cert = tls_listener_cert
+        self.tls_key = tls_listener_key
+
     def create_listener(self, listener_name, listener_type, port=None, auto_start=False, url=None):
         # Listener States:
         # 0 : Stopped
@@ -157,5 +164,4 @@ class ListenerManagement():
         AppSsl = HttpListener.app
         AppSsl.config['listener_type'] = "https"
         path = os.getcwd()+"/Storage/"
-        #print(path)
-        AppSsl.run(debug=False, use_reloader=False, host='0.0.0.0', port=obj['port'], threaded=True, ssl_context=(path+'server.crt', path+'server.key'))
+        AppSsl.run(debug=False, use_reloader=False, host='0.0.0.0', port=obj['port'], threaded=True, ssl_context=(path+self.tls_cert, path+self.tls_key))

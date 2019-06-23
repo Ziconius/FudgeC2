@@ -1,5 +1,5 @@
 from Data.Database import Database
-from Implant.ImplantGeneratorDecorators import ImplantGenerator
+from Implant.ImplantGenerator import ImplantGenerator
 
 class ImplantSingleton:
     class __OnlyOne:
@@ -52,9 +52,11 @@ class ImplantSingleton:
 
         # -- Used by Implant stagers to create a suitable implant based on implant template configuration
         def GeneratePayload(self, NewSplicedImplantData):
-            # TODO: Add a payload obfuscation level - this will be dealt within then render implant function.
+            # -- Refactor code: variable names + checks on types.
             ImpGen = ImplantGenerator()
-            rendered_implant = ImpGen.render_implant_(NewSplicedImplantData)
+            if len(NewSplicedImplantData) == 1:
+                NewSplicedImplantData = NewSplicedImplantData[0]
+            rendered_implant = ImpGen.generate_implant_from_template(NewSplicedImplantData)
             db.Set_GeneratedImplantCopy(NewSplicedImplantData, rendered_implant)
             return rendered_implant
 

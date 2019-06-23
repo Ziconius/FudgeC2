@@ -327,14 +327,14 @@ def HelpPage():
     return render_template("HelpPage.html")
 
 # TODO: Remove in production builds.
-@app.route("/test", methods = ['GET','POST'])
-def test_endpoint():
-    if request.method == "POST":
-        print(request.form)
-        ImpMgmt.Demo_CreateNewImplant(1, request.form,current_user.user_email)
-
-    return render_template("Demo_CreateImplant.html")
+# @app.route("/test", methods = ['GET','POST'])
+# def test_endpoint():
+#     if request.method == "POST":
+#         print(request.form)
+#         #ImpMgmt.Demo_CreateNewImplant(1, request.form,current_user.user_email)
+#
+#     return render_template("Demo_CreateImplant.html")
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5001, threaded=True)
-    print ("App running")
+    print("App running")

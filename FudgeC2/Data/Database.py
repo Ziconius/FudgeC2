@@ -87,6 +87,10 @@ class Database():
             for x in obj:
                 ResultofSplice={}
                 if str(type(x)) == "<class 'sqlalchemy.util._collections.result'>":
+                    # print(x[0].__dict__,x[1].__dict__)
+                    # b = x.__dict__
+                    # if '_sa_instance_state' in b:
+                    #     del b['_sa_instance_state']
                     ResultofSplice = {**x[0].__dict__, **x[1].__dict__}
                 CompletedList.append(ResultofSplice)
             return CompletedList
@@ -358,11 +362,18 @@ class Database():
 
     def Get_GeneratedImplantDataFromUIK(self,UIK):
         # -- Pulls all configuration data for a generated implant based on UIK.
-        # --    Used when implants checkin.
-        a = self.Session.query(GeneratedImplants, Implants).filter(Implants.iid==GeneratedImplants.iid, GeneratedImplants.unique_implant_id == UIK).all()
-        a = self.__splice_implants_and_generated_implants__(a)
-        if a != None:
-            return a
+        # --    Used when implants checks in.
+        result = self.Session.query(GeneratedImplants, Implants).filter(Implants.iid==GeneratedImplants.iid,
+                                                                        GeneratedImplants.unique_implant_id == UIK
+                                                                        ).first()
+
+        implant_list = self.__splice_implants_and_generated_implants__(result)
+        for implant_template in implant_list:
+            if '_sa_instance_state' in implant_template:
+                del implant_template['_sa_instance_state']
+
+        if implant_list is not None:
+            return implant_list
         else:
             return False
 
@@ -401,10 +412,11 @@ class Database():
         # This will store a copy of the PS implant to the "Generated_Implants" table
         #   This will allow RT to send analysable copy to BT for signaturing etc.
         try:
-            uik =NewSplicedImplantData[0]['unique_implant_id']
+            uik =NewSplicedImplantData['unique_implant_id']
             self.Session.query(GeneratedImplants).filter(GeneratedImplants.unique_implant_id == uik).update({"implant_copy": (generated_implant)})
             self.Session.commit()
         except Exception as E:
+            print(E)
             pass
 
     # -- Active Implant Queries -- #

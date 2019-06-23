@@ -7,3 +7,8 @@ class Settings():
     server_app_ssl = None # 'adhoc'
     # This should be set to False for any non-development/testing deployments.
     server_app_debug = True
+
+    # Cert & key file names used for TLS connections. These should be PEM formatted.
+    #   Files will be stored in: '<install dir>/FudgeC2/Storage'
+    tls_listener_cert = "server.crt"
+    tls_listener_key = "server.key"
