@@ -1,5 +1,6 @@
-from Data.Database import Database
-from Implant.Implant import ImplantSingleton
+from FudgeC2.Data.Database import Database
+from FudgeC2.Implant.Implant import ImplantSingleton
+
 import time
 class ImplantManagement():
     # -- The implant management class is responsible for performing pre-checks and validation before sending data

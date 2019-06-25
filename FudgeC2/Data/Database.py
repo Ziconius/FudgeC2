@@ -1,19 +1,24 @@
-# SQL Alchemy stuffs
-from sqlalchemy import create_engine, func, extract
-from sqlalchemy.orm import scoped_session
-from sqlalchemy.orm import sessionmaker
-
-from Data.models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs, CampaignLogs,declarative_base
-from Storage.settings import Settings
 import uuid
 import bcrypt
 import time
 import ast
 import random
-from Data.Logging import Logging
-from Data.CampaignLogging import *
-L = Logging()
+
+# SQLAlchemy imports
+from sqlalchemy import create_engine, func, extract
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import sessionmaker
+
+# FudgeC2 imports
+from FudgeC2.Data.models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs, CampaignLogs,declarative_base
+from FudgeC2.Storage.settings import Settings
+from FudgeC2.Data.Logging import Logging
+from FudgeC2.Data.CampaignLogging import CampaignLoggingDecorator
+
+L = Logging() # TODO: Remove
 CL = CampaignLoggingDecorator()
+
+
 class Database():
     def __init__(self):
 
@@ -421,9 +426,13 @@ class Database():
 
     # -- Active Implant Queries -- #
     # ---------------------------- #
-    def Update_ImplantLastCheckIn(self, GeneratedImplantKey):
+    def Update_ImplantLastCheckIn(self, generated_implant_key, c2_protocol):
         # -- TODO: Create error handling around invalid GeneratedImplantKey
-        a =self.Session.query(GeneratedImplants).filter(GeneratedImplants.unique_implant_id==GeneratedImplantKey).update({"last_check_in": (int(time.time()))})
+        self.Session.query(GeneratedImplants).filter(
+            GeneratedImplants.unique_implant_id == generated_implant_key).update(
+                {"last_check_in": (int(time.time())),
+                 "last_check_in_protocol": c2_protocol
+                 })
         self.Session.commit()
 
     @CL.log_cmdreg
@@ -479,11 +488,11 @@ class Database():
             return []
 
     @CL.log_cmdpickup
-    def Register_ImplantCommandPickup(self, record):
+    def Register_ImplantCommandPickup(self, record, protocol):
         ImplantPickup = self.Session.query(ImplantLogs).filter(
             ImplantLogs.uik == record.uik,
             ImplantLogs.log_entry == record.log_entry,
-            ImplantLogs.time == record.time).update({'read_by_implant':(int(time.time()))})
+            ImplantLogs.time == record.time).update({'read_by_implant': (int(time.time())), 'c2_protocol':str(protocol)})
         try:
             self.Session.commit()
             return True

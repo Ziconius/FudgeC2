@@ -1,5 +1,5 @@
-from Data.Database import Database
-from Implant.ImplantGenerator import ImplantGenerator
+from FudgeC2.Data.Database import Database
+from FudgeC2.Implant.ImplantGenerator import ImplantGenerator
 
 class ImplantSingleton:
     class __OnlyOne:
@@ -7,11 +7,8 @@ class ImplantSingleton:
         # --    it manages  these interaction across all types of implants and communication protocols.
 
         def AddCommand(self, User, cid, UniqueImplantKey,Command):
-            # -- Add record to issue command table with username - time - command - UID
-            # -- Implement the logging calls to ensure entries got to DB. and get recorded on pick up
-            # Writes command to the database.
-            #   checks for authorisation to write commands.
-            #   The AddCommand should only be called form 'ImplantManagement'
+            # AddCommand is responsible for creating new entries for implants to pickup.
+            #   User validation checks must occur before a command is registered.
             db.Register_ImplantCommand(User, UniqueImplantKey, Command, cid=cid)
 
 
@@ -19,6 +16,10 @@ class ImplantSingleton:
             if UIK != 0:
                 # -- Issue command based on unique implant identifiers (UIK)
                 # -- UIK is embedded into the implant via Jinja on delivery.
+
+                # Updates an implants last check-in time.
+                db.Update_ImplantLastCheckIn(UIK, c2_protocol)
+
                 ImplantObj=db.Get_GeneratedImplantDataFromUIK(UIK)
                 for implant in ImplantObj:
                     ImpLogs = db.Get_RegisteredImplantCommandsFromUIK(implant['unique_implant_id'])
@@ -28,7 +29,7 @@ class ImplantSingleton:
                             tmpImpLogs.append(x)
                     if len(tmpImpLogs) != 0:
                         Entry = min(tmpImpLogs, key=lambda x: x.time)
-                        if db.Register_ImplantCommandPickup(Entry):
+                        if db.Register_ImplantCommandPickup(Entry, c2_protocol):
                             return Entry.log_entry
 
             # -- Create a suitable null response.
@@ -38,10 +39,9 @@ class ImplantSingleton:
                 return "=="
 
         # -- Used by Implant - Logs command responses from infected machines.
-        def CommandResponse(self,result, c2_protocol=None):
-            uik_and_response_data = result.split("::", 1) # Remove the identifying prefix
-            generated_implant_data = db.Get_GeneratedImplantDataFromUIK(uik_and_response_data[0])
-            db.Register_ImplantResponse(generated_implant_data[0]['cid'],uik_and_response_data[0],uik_and_response_data[1], c2_protocol)
+        def CommandResponse(self,unique_implant_key , cmd_result, c2_protocol=None):
+            generated_implant_data = db.Get_GeneratedImplantDataFromUIK(unique_implant_key)
+            db.Register_ImplantResponse(generated_implant_data[0]['cid'],unique_implant_key,cmd_result, c2_protocol)
 
 
         # -- Used by webapp.

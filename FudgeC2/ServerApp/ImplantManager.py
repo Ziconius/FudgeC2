@@ -174,8 +174,9 @@ def GlobalSettingsPage():
 @app.route("/listener", methods=['GET','POST'])
 @login_required
 def GlobalListenerPage():
-    # flash('blah')
 
+    if app.config['listener_management'].check_tls_certificates() is False:
+        flash('TLS certificates do not exist within the <install dir>/FudgeC2/Storage directory.')
     return render_template("listeners/listeners.html", test_data=app.config['listener_management'].get_active_listeners())
 
 @app.route("/listener/change", methods=['GET', 'POST'])

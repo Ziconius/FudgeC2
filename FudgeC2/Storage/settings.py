@@ -9,6 +9,7 @@ class Settings():
     server_app_debug = True
 
     # Cert & key file names used for TLS connections. These should be PEM formatted.
-    #   Files will be stored in: '<install dir>/FudgeC2/Storage'
+    #   Files will be stored in: '<install dir>/FudgeC2/Storage'. If these are set to
+    #   None then HTTPS will not not be enabled.
     tls_listener_cert = "server.crt"
     tls_listener_key = "server.key"

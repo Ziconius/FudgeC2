@@ -7,7 +7,7 @@ Release 0.3 _(Dwarven Blacksmith)_
 Release cross-protocol implant communications using HTTP/HTTPS
 
 C2 Server:
- - [ ] Capture and log returning protocol
+ - [x] Capture and log returning protocol
  - [x] Add certificate/key path and name into options
  - [ ] Improve error checking + logging
  
@@ -17,7 +17,7 @@ Web App:
  
 Implant 
  - [x] Implement random protocol selection for callback
- - [ ] Ensure certificate validation is supported
+ - [x] Ensure C2 certificates are present
  - [x] Implement function/variable name randomisation in implant
  
 ---

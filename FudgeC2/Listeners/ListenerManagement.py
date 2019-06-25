@@ -1,9 +1,10 @@
-from Listeners import HttpListener
+import sys
 import _thread
 import os
-from Data.Database import Database
+from FudgeC2.Data.Database import Database
 
 class ListenerManagement():
+    # TODO: Add checks for failed/failing listeners (i.e. certs not configured & thread dies.)
     active_listener = 0
     listeners = {}
     db = Database()
@@ -13,6 +14,15 @@ class ListenerManagement():
         # TODO: Implement checks to validate files at this point.
         self.tls_cert = tls_listener_cert
         self.tls_key = tls_listener_key
+
+    def check_tls_certificates(self):
+        cert_result = os.path.isfile(os.getcwd() + "/Storage/" + self.tls_cert)
+        key_result = os.path.isfile(os.getcwd() + "/Storage/" + self.tls_key)
+        if key_result is False or cert_result is False:
+            print("Warning: ListenerManagement.check_tls_certificates() has failed. Generate certificates.")
+            return False
+        else:
+            return True
 
     def create_listener(self, listener_name, listener_type, port=None, auto_start=False, url=None):
         # Listener States:
@@ -31,7 +41,8 @@ class ListenerManagement():
 
         if listener_type in supported_listeners:
             if int(port):
-                #print("Creating: ", listener_type, port)
+
+
                 # TODO: Likely to contain bugs if deletion is implemented?
                 id = "0000" + str(len(self.listeners))
                 id = id[-4:]
@@ -43,17 +54,14 @@ class ListenerManagement():
                     listener["state"] = int(3)
 
                 self.__validate_listener(listener)
-
-
                 self.listeners[id] = listener
+
                 if auto_start == True:
                     self.__review_listeners()
             else:
                 return(False, "Please submit the port as an integer.")
             return(False, "Invalid listener configuration.")
-
         return (True, "Success")
-
 
     def listener_form_submission(self,user, form):
         # This will process the values submitted and decided what to call next
@@ -97,55 +105,45 @@ class ListenerManagement():
         return self.listeners
 
     def __check_for_listener_duplicate_element(self, value, key):
-        for x in self.listeners.keys():
-            #print(self.listeners[x][key], "==",value)
-            if self.listeners[x][key] == value:
+        for listener_id in self.listeners.keys():
+            if self.listeners[listener_id][key] == value:
                 print(value, key)
                 return False
         return True
 
     def __review_listeners(self):
-        for l in self.listeners.keys():
-            #print("+",self.listeners[l])
-            if int(self.listeners[l]['state']) == 2:
-                #print("state 2 found for ID:",l)
-                self.__stop_listener(l)
-            if int(self.listeners[l]['state']) == 3:
-                self.__start_listener(l)
-
+        for listener_id in self.listeners.keys():
+            if int(self.listeners[listener_id]['state']) == 2:
+                self.__stop_listener(listener_id)
+            if int(self.listeners[listener_id]['state']) == 3:
+                self.__start_listener(listener_id)
 
     def __start_listener(self, id):
-
-        #print("Starting: ", id)
         self.listeners[id]['state'] = 1
-
         if self.listeners[id]['type'] == "http":
             self.__start_http_listener(self.listeners[id])
         elif self.listeners[id]['type'] == "https":
             self.__start_https_listener(self.listeners[id])
         elif self.listeners[id]['type'] == "dns":
             self.__start_dns_listener(self.listeners[id])
-
         return
+
     def __stop_listener(self, id):
-        #print("Stopping: ", id)
         self.listeners[id]['state'] = 0
         return
-
 
     def __validate_listener(self, listener):
         # This will check for any conflicting arguments i.e. conflicting ports.
         return True
 
-
     # TODO: Refactor this code to remove as much code duplication.
     def __start_http_listener(self, obj):
-        #print("Pre-Thread",obj)
-        self.listeners[obj['id']]['listener_thread'] = _thread.start_new_thread(self.start_http_listener_thread, (obj,))
+        flask_listener_object = self.create_app("http")
+        self.listeners[obj['id']]['listener_thread'] = _thread.start_new_thread(self.start_http_listener_thread, (obj, flask_listener_object, ))
 
     def __start_https_listener(self, obj):
-        #print("Pre-Thread",obj)
-        _thread.start_new_thread(self.start_https_listener_thread, (obj,))
+        flask_listener_object = self.create_app("https")
+        self.listeners[obj['id']]['listener_thread'] = _thread.start_new_thread(self.start_https_listener_thread, (obj, flask_listener_object, ))
 
     def __start_dns_listener(self, obj):
         # -- This listener is not implemented yet.
@@ -155,13 +153,21 @@ class ListenerManagement():
         # -- This listener is not implemented yet.
         return
 
-    def start_http_listener_thread(self, obj):
-        App = HttpListener.app
-        App.config['listener_type'] = "http"
+    def create_app(self, listener_type):
+        import FudgeC2.Listeners.HttpListener
+        del sys.modules["FudgeC2.Listeners.HttpListener"]
+        import FudgeC2.Listeners.HttpListener as HL
+        HL.app.config['listener_type'] = listener_type
+        return HL.app
+
+    def start_http_listener_thread(self, obj, App):
         App.run(debug=False, use_reloader=False, host='0.0.0.0', port=obj['port'], threaded=True)
 
-    def start_https_listener_thread(self, obj):
-        AppSsl = HttpListener.app
-        AppSsl.config['listener_type'] = "https"
+    def start_https_listener_thread(self, obj, App):
         path = os.getcwd()+"/Storage/"
-        AppSsl.run(debug=False, use_reloader=False, host='0.0.0.0', port=obj['port'], threaded=True, ssl_context=(path+self.tls_cert, path+self.tls_key))
+        if self.check_tls_certificates():
+            App.run(debug=False, use_reloader=False, host='0.0.0.0', port=obj['port'], threaded=True, ssl_context=(path+self.tls_cert, path+self.tls_key))
+        else:
+            print()
+            # -- User has not set up certificates in the Storage dir
+            return False

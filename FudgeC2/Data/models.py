@@ -1,14 +1,12 @@
 # coding: utf-8
 from sqlalchemy import Column, Date, DateTime, Float, ForeignKey, Index, String, Table, Text, text, create_engine
 from sqlalchemy.dialects.mysql import BIGINT, INTEGER #, MEDIUMTEXT, TINYINT, VARCHAR
-# from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
-from Storage.settings import Settings
+from FudgeC2.Storage.settings import Settings
 Base = declarative_base()
 metadata = Base.metadata
 
 # TODO: Create a auth log table.
-
 class Users(Base):
     __tablename__='users'
     uid = Column(INTEGER,primary_key=True)
@@ -45,7 +43,7 @@ class ResponseLogs(Base):
 
 class Implants(Base):
     __tablename__='implants'
-    iid=Column(INTEGER(11), nullable=False, index=True, primary_key=True)
+    iid = Column(INTEGER(11), nullable=False, index=True, primary_key=True)
     stager_key = Column(String(255), nullable=False, unique=True)
     title = Column(String(255),nullable=False)
     cid = Column(INTEGER(11), nullable=False, index=True )
@@ -62,15 +60,18 @@ class Implants(Base):
     comms_binary = Column(INTEGER(1), default=0)
     obfuscation_level = Column(INTEGER(1), nullable=False)
 
+
 class GeneratedImplants(Base):
     __tablename__='generated_implants'
     unique_implant_id = Column(INTEGER(16), unique=True,nullable=False, primary_key=True)
     last_check_in = Column(INTEGER(16))
+    last_check_in_protocol = Column(String())
     current_beacon = Column(INTEGER(16))
     iid = Column(INTEGER(11), ForeignKey("implants.iid"), nullable=False, index=True)
     generated_title = Column(String(255),nullable=False)
     time = Column(INTEGER(16), nullable=False)
     implant_copy = Column(String())
+
 
 class ImplantLogs(Base):
     __tablename__='implant_logs'
@@ -79,8 +80,10 @@ class ImplantLogs(Base):
     uid =Column(INTEGER(11), nullable=False, index=True)
     uik=Column(INTEGER(11), nullable=False, index=True)
     time =Column(INTEGER(11), nullable=False, index=True)
-    log_entry =Column(String(255), nullable=False)
+    log_entry = Column(String(255), nullable=False)
     read_by_implant = Column(INTEGER(16),nullable=False, server_default=text("0"))
+    c2_protocol = Column(String(128))
+
 
 class Campaigns(Base):
     __tablename__='campaigns'
