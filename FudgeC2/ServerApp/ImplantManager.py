@@ -1,15 +1,14 @@
-from flask import Flask, render_template, flash, request, jsonify, g, current_app,url_for, redirect, make_response, session, send_file
-from flask_sqlalchemy import SQLAlchemy
-import base64
-from Implant.Implant import ImplantSingleton
-from flask_login import LoginManager, login_required, current_user, login_user, logout_user
-from Data.Database import Database
-from ServerApp.modules.UserManagement import UserManagementController
-from ServerApp.modules.StagerGeneration import StagerGeneration
-from ServerApp.modules import ImplantManagement
 import time
-#from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField
-# This is the web app to control implants and campaigns
+import uuid
+
+from flask import Flask, render_template, flash, request, jsonify, g, current_app, url_for, redirect, make_response, session, send_file
+from flask_login import LoginManager, login_required, current_user, login_user, logout_user
+
+from FudgeC2.Implant.Implant import ImplantSingleton
+from FudgeC2.Data.Database import Database
+from FudgeC2.ServerApp.modules.UserManagement import UserManagementController
+from FudgeC2.ServerApp.modules.StagerGeneration import StagerGeneration
+from FudgeC2.ServerApp.modules import ImplantManagement
 
 db = Database()
 Imp=ImplantSingleton.instance
@@ -19,7 +18,7 @@ StagerGen = StagerGeneration(db)
 
 app = Flask(__name__)
 app.config.from_object(__name__)
-app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
+app.config['SECRET_KEY'] = str(uuid.uuid4())
 login = LoginManager(app)
 login.init_app(app)
 
@@ -73,7 +72,6 @@ def login():
     if request.method=="POST":
         if 'email' in request.form and 'password' in request.form and request.form['email'] != None and request.form['password'] != None:
             a = db.Get_UserObjectLogin(request.form['email'],request.form['password'])
-            print(a, dir(a))
             if a == False:
                 return render_template("auth/LoginPage.html", error="Incorrect Username/Password")
             if a.first_logon == 1:

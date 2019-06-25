@@ -2,7 +2,6 @@ import jinja2
 import string
 import random
 
-
 class ImplantGenerator:
     # ImplantGenerator has a single public method (generate_implant_from_template)
     #   which is used to generate a new active implant in the event of a stager
@@ -160,7 +159,7 @@ while($true){
         constructed_implant = self._manage_implant_function_order(id, implant_functions)
         string = ""
         proto_count = 0
-        proto_list = {'comms_http': 'http-connection; Write-O',
+        proto_list = {'comms_http': 'http-connection',
                       'comms_https': 'https-connection',
                       'comms_dns': 'dns-connection'}
 
@@ -195,10 +194,10 @@ while($true){
 
 blah = '''
 render_implant (Public)
- - Takes the generated implant info (Gneretaed implants (by UIK)
+ - Takes the generated implant info (Generated implants (by UIK)
  
 process_modules 
- - this controls which protocols and additional modules are used by the implant.
- - Generated the main function multi proto selection
+ - This controls which protocols and additional modules are embedded into the implant.
+ - Generates the main function multi proto selection
 
 '''

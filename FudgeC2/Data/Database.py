@@ -5,21 +5,21 @@ import ast
 import random
 
 # SQLAlchemy imports
-from sqlalchemy import create_engine, func, extract
+from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
 # FudgeC2 imports
-from FudgeC2.Data.models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs, CampaignLogs,declarative_base
+from FudgeC2.Data.models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs, CampaignLogs
 from FudgeC2.Storage.settings import Settings
 from FudgeC2.Data.Logging import Logging
 from FudgeC2.Data.CampaignLogging import CampaignLoggingDecorator
 
-L = Logging() # TODO: Remove
+L = Logging()  # TODO: Remove
 CL = CampaignLoggingDecorator()
 
 
-class Database():
+class Database:
     def __init__(self):
 
         engine = create_engine("sqlite:///Storage/{}?check_same_thread=False".format(Settings.database_name))
@@ -33,17 +33,14 @@ class Database():
 
         self.__does_admin_exist()
 
-        #self.
 
-    # CL = ""
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.Session.remove()
-
-    def raw_query(self, sql_query_string, sqlinput=None):
-        return []
+    # def __enter__(self):
+    #     return self
+    #
+    # def __exit__(self, exc_type, exc_value, traceback):
+    #     self.Session.remove()
+    # def raw_query(self, sql_query_string, sqlinput=None):
+    #     return []
 
     ## -- Queries from here on -- #
     def test(self, email):
@@ -75,7 +72,7 @@ class Database():
 
 
     def __update_last_logged_in__(self,email):
-        Result = self.Session.query(Users).filter(Users.user_email == email).update({"last_login": (time.time())})
+        self.Session.query(Users).filter(Users.user_email == email).update({"last_login": (time.time())})
         self.Session.commit()
         return True
     def __get_campaignid__(self,campaign):
@@ -199,7 +196,7 @@ class Database():
         # a
         cid = self.Session.query(Campaigns.cid).filter(Campaigns.title==CampaignTitle).one()[0]
         uid = self.Session.query(Users.uid).filter(Users.user_email==Email).one()[0]
-        print(cid,uid)
+        # print(cid,uid)
         query=CampaignUsers(cid=cid,uid=uid,permissions=Permission)
         try:
             self.Session.add(query)
@@ -306,7 +303,6 @@ class Database():
     @L.log("User logged in.")
     def Get_UserObjectLogin(self, email, password):
         # Auths a user and returns user object
-        print(email,password)
         user = self.Session.query(Users).filter(Users.user_email==email).first()
         if user != None:
             #print(password.encode(), user.password.encode())

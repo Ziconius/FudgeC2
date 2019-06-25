@@ -1,4 +1,4 @@
-class StagerGeneration():
+class StagerGeneration:
     # TODO: This needs cleaned up to ensure expandability with database changes.
 
     db = None

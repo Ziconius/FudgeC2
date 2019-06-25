@@ -9,7 +9,7 @@ Release cross-protocol implant communications using HTTP/HTTPS
 C2 Server:
  - [x] Capture and log returning protocol
  - [x] Add certificate/key path and name into options
- - [ ] Improve error checking + logging
+ - [x] Improve error checking + logging
  
 Web App:
  - [x] Allow multiple protocols + port to be selected

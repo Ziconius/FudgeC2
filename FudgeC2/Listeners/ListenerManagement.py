@@ -71,12 +71,12 @@ class ListenerManagement():
         # else:
         #     return (True, "Temp success value.")
         if 'state_change' in form:
-            print("State change requested")
+            # print("State change requested")
             if self.listeners[form['state_change']]['state'] == 0:
-                print(form['state_change'])
+                # print(form['state_change'])
                 self.update_listener(form['state_change'],"start")
             elif self.listeners[form['state_change']]['state'] == 1:
-                print(form['state_change'])
+                # print(form['state_change'])
                 self.update_listener(form['state_change'],"stop")
 
         elif 'listener_name' in form and 'listener_protocol' in form and 'listener_port' in form:
@@ -88,11 +88,11 @@ class ListenerManagement():
             a = self.create_listener(form['listener_name'], form['listener_protocol'].lower(), form['listener_port'],auto_start)
             return a
 
-        return (True, "Placeholder content")
+        return (True, "Implant started sucessfully.")
 
     # User action
     def update_listener(self, id, action):
-        print(id,action)
+        # print(id,action)
         if action ==  "stop":
             self.listeners[id]["state"] = 2
         if action == "start":
