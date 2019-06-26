@@ -16,7 +16,7 @@ class ImplantGenerator:
     play_audio = '''
 function {{ ron.RemotePlayAudio }} {
     $args[0]
-}generate_implant_from_template
+}
             '''
     fde_func_a = '''
 function aaaaaa() {}
