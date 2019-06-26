@@ -58,7 +58,6 @@ function http-connection(){
         $kni = "=="
     }
     return $kni
-    
 }
     '''
 
