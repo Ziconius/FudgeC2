@@ -8,13 +8,15 @@ from FudgeC2.Implant.Implant import ImplantSingleton
 from FudgeC2.Data.Database import Database
 from FudgeC2.ServerApp.modules.UserManagement import UserManagementController
 from FudgeC2.ServerApp.modules.StagerGeneration import StagerGeneration
-from FudgeC2.ServerApp.modules import ImplantManagement
+from FudgeC2.ServerApp.modules.ImplantManagement import ImplantManagement
+from FudgeC2.ServerApp.modules.ApplicationManager import AppManager
 
 db = Database()
 Imp=ImplantSingleton.instance
 UsrMgmt = UserManagementController()
-ImpMgmt = ImplantManagement.ImplantManagement()
+ImpMgmt = ImplantManagement()
 StagerGen = StagerGeneration(db)
+AppManager = AppManager()
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -95,8 +97,6 @@ def logout():
 def PasswordReset():
     # -- TODO: Move to the UserManagement Class.
     if request.method =="POST":
-        a = request
-        print(request.form)
         pw_1=request.form['password_one']
         pw_2=request.form['password_two']
         pw_c=request.form['current_password']
@@ -137,8 +137,8 @@ def waitingcommands(cid):
 @app.route("/")
 @login_required
 def BaseHomePage():
-    a = db.Get_AllUserCampaigns(current_user.user_email)
-    return render_template("Homepage.html")
+    # a = db.Get_AllUserCampaigns(current_user.user_email)
+    return render_template("Homepage.html", out_of_date=AppManager.check_software_version())
 
 @app.route("/CreateCampaign", methods=['GET','POST'])
 @login_required

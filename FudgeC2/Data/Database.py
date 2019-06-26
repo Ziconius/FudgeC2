@@ -137,10 +137,8 @@ class Database:
         # -- Return (true/false)
         HasLoggedOn = self.Session.query(Users).filter(Users.first_logon == 0,Users.user_email == email).all()
         if HasLoggedOn:
-            print(HasLoggedOn)
             return True
         else:
-            print("Else: ",HasLoggedOn)
             return False
     def User_ChangePasswordOnFirstLogon(self,guid, current_password,new_password):
         UserObj = self.Session.query(Users).filter(Users.first_logon_guid==guid).first()
@@ -149,10 +147,9 @@ class Database:
         else:
             if bcrypt.checkpw(current_password.encode(), UserObj.password):
                 hashedpassword = self.__hash_cleartext_password__(new_password)
-                Result = self.Session.query(Users).filter(Users.first_logon_guid==guid).update({"password":(hashedpassword), "first_logon":1})
+                self.Session.query(Users).filter(Users.first_logon_guid==guid).update({"password":(hashedpassword), "first_logon":1})
                 self.Session.commit()
                 UpdatedUserObj = self.Session.query(Users).filter(Users.password==hashedpassword).first()
-                print(dir(UpdatedUserObj))
                 return UpdatedUserObj
             else:
                 return False
@@ -165,7 +162,7 @@ class Database:
 
     def Get_UserFirstLogonGuid(self, email):
         pre_guid =str(uuid.uuid4())
-        Result = self.Session.query(Users).filter(Users.user_email == email).update({"first_logon_guid": (pre_guid)})
+        self.Session.query(Users).filter(Users.user_email == email).update({"first_logon_guid": (pre_guid)})
         self.Session.commit()
         return pre_guid
 
