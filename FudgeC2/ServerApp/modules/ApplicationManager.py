@@ -22,3 +22,13 @@ class AppManager:
         except Exception as exception_text:
             print(exception_text)
             return False
+
+    @staticmethod
+    def get_software_verision_number():
+        try:
+            with open("../version.txt", 'r') as v_file:
+                local_version_number = str(v_file.read())
+                return local_version_number
+        except Exception as exception_text:
+            print(exception_text)
+            return "0.0.0"

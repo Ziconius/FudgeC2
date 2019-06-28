@@ -138,7 +138,7 @@ def waitingcommands(cid):
 @login_required
 def BaseHomePage():
     # a = db.Get_AllUserCampaigns(current_user.user_email)
-    return render_template("Homepage.html", out_of_date=AppManager.check_software_version())
+    return render_template("Homepage.html", out_of_date=AppManager.check_software_version(), version_number=AppManager.get_software_verision_number())
 
 @app.route("/CreateCampaign", methods=['GET','POST'])
 @login_required
