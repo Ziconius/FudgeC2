@@ -2,16 +2,18 @@
 {% block main %}
 <div class="row justify-content-md-center m-4">
     <div class="col-lg-4 rounded p-3 iplm">
-
+    {% if error %}
+        <span class="text-danger">{{ error }}</span>
+    {% endif %}
     <form id="Login" method="POST" action="CreateCampaign" name="CC">
-        <div class="form-group">Campaign Title
-            <input onfocus="this.placeholder=''" type="text" class="form-control" id="inputEmail" name="title" placeholder="Campaign Title">
+        <div class="form-group">Campaign title
+            <input onfocus="this.placeholder=''" type="text" class="form-control" id="inputEmail" name="title" placeholder="Campaign title">
         </div>
-        <div class="form-group">Campaign Description
+        <div class="form-group">Campaign description
             <input onfocus="this.placeholder=''" type="text" class="form-control" name="description" id="description" placeholder="Description">
         </div>
 
-        <button type="submit" name="CreateCampaign" class="btn btn-primary" id="CampaignButton">Create Campaign</button>
+        <button type="submit" name="CreateCampaign" class="btn btn-primary" id="CampaignButton">Create campaign</button>
 
     </form>
 

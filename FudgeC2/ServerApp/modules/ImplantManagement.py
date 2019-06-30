@@ -10,14 +10,18 @@ class ImplantManagement:
 
     def _form_validated_obfucation_level_(self, form):
         if "obfuscation" in form:
-            print(form)
-            if int(form['obfuscation']):
-                if int(form['obfuscation']) < 0:
+            try:
+                obfuscation_value = int(form['obfuscation'])
+
+                if obfuscation_value < 0:
                     return 0
-                elif int(form['obfuscation']) > 3:
+                elif obfuscation_value > 3:
                     return 3
                 else:
-                    return int(form['obfuscation'])
+                    return obfuscation_value
+            except:
+                print("None integer submitted.")
+                return None
         return None
 
 
@@ -80,6 +84,7 @@ class ImplantManagement:
                 "comms_dns": None
             }
         }
+        print(form)
         User = self.db.Get_UserObject(user)
         if User.admin == 0:
             return False, "Insufficient privileges."
@@ -91,7 +96,7 @@ class ImplantManagement:
             if "CreateImplant" in form:
                 obfuscation_level = self._form_validated_obfucation_level_(form)
                 if obfuscation_level is None:
-                    raise ValueError('Missing, or invalid obfuscation levels')
+                    raise ValueError('Missing, or invalid obfuscation level.')
                 else:
                     implant_configuration['obfuscation_level'] = obfuscation_level
 

@@ -1,21 +1,19 @@
 import time
 import uuid
 
-from flask import Flask, render_template, flash, request, jsonify, g, current_app, url_for, redirect, make_response, session, send_file
+from flask import Flask, render_template, flash, request, jsonify, g, url_for, redirect, send_file  # ,make_response, session, current_app,
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user
 
 from FudgeC2.Implant.Implant import ImplantSingleton
-from FudgeC2.Data.Database import Database
 from FudgeC2.ServerApp.modules.UserManagement import UserManagementController
 from FudgeC2.ServerApp.modules.StagerGeneration import StagerGeneration
 from FudgeC2.ServerApp.modules.ImplantManagement import ImplantManagement
 from FudgeC2.ServerApp.modules.ApplicationManager import AppManager
 
-db = Database()
-Imp=ImplantSingleton.instance
+Imp = ImplantSingleton.instance
 UsrMgmt = UserManagementController()
 ImpMgmt = ImplantManagement()
-StagerGen = StagerGeneration(db)
+StagerGen = StagerGeneration()
 AppManager = AppManager()
 
 app = Flask(__name__)
@@ -27,61 +25,69 @@ login.init_app(app)
 # TODO: Controller dev work.
 listener_management = None
 
+
 # -- Context Processors --#
 @app.context_processor
 def inject_dict_for_all_auth_templates():
-    # -- Returns the list of Campaigns the auth'd user has read access to --#
+    # -- Returns the list of Campaigns the authenticated user has at least read access to
     if current_user.is_authenticated:
-        # Return the list of the users available campaigns for the navbar dropdown.
-        return dict(campaignlist=db.Get_AllUserCampaigns(current_user.user_email))
+        return dict(campaignlist=UsrMgmt.campaign_get_user_campaign_list(current_user.user_email))
     else:
         return dict()
 
+
 @app.context_processor
-def inject_dict_for_all_campaign_templates(cid=None):
+def inject_dict_for_all_campaign_templates():
     if 'cid' in g:
-        cid =g.get('cid')
-        cname=db.Get_CampaignNameFromCID(cid)
-    if cid != None:
-        return dict(campaign=cname, cid=cid)
-    else:
-        return dict()
+        cid = g.get('cid')
+        campaign_name = AppManager.campaign_get_campaign_name_from_cid(cid)
+        if cid is not None:
+            return dict(campaign=campaign_name, cid=cid)
+    return dict()
 
 
 # -- Managing the error and user object. -- #
 # ----------------------------------------- #
 @login.user_loader
-def load_user(id):
-    return db.Get_UserObject(id)
+def load_user(user):
+    return UsrMgmt.get_user_object(user)
+
+
 @app.before_request
 def before_request():
     return
+
+
 @app.after_request
 def add_header(r):
     return r
+
+
 @app.errorhandler(404)
 def page_not_found(e):
-    return redirect(url_for('BaseHomePage'),302) # This should be a proper 404?
+    return redirect(url_for('BaseHomePage'), 302)  # This should be a proper 404?
+
+
 @app.errorhandler(401)
 def page_not_found(e):
-    return redirect(url_for(('login')), 302)
+    return redirect(url_for('login'), 302)
+
 
 # -- Authentication endpoints -- #
 # ------------------------------ #
-
-@app.route("/auth/login", methods=['GET','POST'])
+@app.route("/auth/login", methods=['GET', 'POST'])
 def login():
-    if request.method=="POST":
+    if request.method == "POST":
         if 'email' in request.form and 'password' in request.form and request.form['email'] != None and request.form['password'] != None:
-            a = db.Get_UserObjectLogin(request.form['email'],request.form['password'])
-            if a == False:
+            UserObject = UsrMgmt.user_login(request.form['email'],request.form['password'])
+            if UserObject == False:
                 return render_template("auth/LoginPage.html", error="Incorrect Username/Password")
-            if a.first_logon == 1:
-                login_user(a)
+            if UserObject.first_logon == 1:
+                login_user(UserObject)
                 return redirect(url_for("BaseHomePage"))
             else:
-                GUID = db.Get_UserFirstLogonGuid(request.form['email'])
-                return render_template("auth/PasswordResetPage.html",guid=GUID)
+                guid = UsrMgmt.get_first_logon_guid(request.form['email'])
+                return render_template("auth/PasswordResetPage.html",guid=guid)
     return render_template("auth/LoginPage.html")
 
 @app.route("/auth/logout")
@@ -93,19 +99,14 @@ def logout():
     else:
         return redirect(url_for("login"))
 
-@app.route("/auth/passwordreset", methods = ['GET','POST'])
+@app.route("/auth/passwordreset", methods=['GET', 'POST'])
 def PasswordReset():
-    # -- TODO: Move to the UserManagement Class.
+
     if request.method =="POST":
-        pw_1=request.form['password_one']
-        pw_2=request.form['password_two']
-        pw_c=request.form['current_password']
-        guid=request.form['id']
-        if pw_1 == pw_2:
-            UserObj = db.User_ChangePasswordOnFirstLogon(guid, pw_c,pw_1)
-            if UserObj:
-                login_user(UserObj)
-                return redirect(url_for('BaseHomePage'))
+        UserObject = UsrMgmt.change_password_first_logon(request.form)
+        if UserObject is not False:
+            login_user(UserObject)
+            return redirect(url_for('BaseHomePage'))
     return redirect(url_for('login'))
 
 
@@ -114,68 +115,63 @@ def PasswordReset():
 # TODO: Replace JSON enpoints with websockets.
 
 
-@app.route("/<cid>/cmd_response", methods =['GET','POST'])
+@app.route("/<cid>/cmd_response", methods=['GET', 'POST'])
 @login_required
 def cmdreturn(cid):
     # -- Javascript appears to not be printing out all entries
-    if db.Verify_UserCanAccessCampaign(current_user.user_email,cid):
+    if UsrMgmt.campaign_get_user_access_right_cid(current_user.user_email, cid):
         return jsonify(Imp.Get_CommandResult(cid))
     else:
         return str(0)
 
-@app.route("/<cid>/waiting_commands", methods=['GET','POST'])
+
+@app.route("/<cid>/waiting_commands", methods=['GET', 'POST'])
 @login_required
 def waitingcommands(cid):
     # -- Get JSON blob which contains all implant commands and then registration state
-    Commands = ImpMgmt.Get_RegisteredImplantCommands(current_user.user_email, cid)
-    return jsonify(Commands)
+    commands = ImpMgmt.Get_RegisteredImplantCommands(current_user.user_email, cid)
+    return jsonify(commands)
 
 
 # -- Main endpoints -- #
 # -------------------- #
-
 @app.route("/")
 @login_required
 def BaseHomePage():
-    # a = db.Get_AllUserCampaigns(current_user.user_email)
-    return render_template("Homepage.html", out_of_date=AppManager.check_software_version(), version_number=AppManager.get_software_verision_number())
+    return render_template("Homepage.html",
+                           out_of_date=AppManager.check_software_version(),
+                           version_number=AppManager.get_software_verision_number())
 
-@app.route("/CreateCampaign", methods=['GET','POST'])
+
+@app.route("/CreateCampaign", methods=['GET', 'POST'])
 @login_required
-def CreateNewItem():
-    if request.method=="POST":
-        if 'CreateCampaign' in request.form:
-            print("Building Campaign")
-            print(request.form)
-            #print(dir())
-            # WOrk out if Implant or Campaign
-            db.Create_Campaign(request.form['title'],current_user.user_email,request.form['description'])
+def create_new_campaign():
+    if request.method == "POST":
+        success_bool, success_msg = AppManager.campaign_create_campaign(current_user.user_email, request.form)
+        if success_bool is True:
             return redirect(url_for('BaseHomePage'))
-    else:
-        return render_template('CreateCampaign.html')
+        else:
+            return render_template('CreateCampaign.html', error=success_msg)
+    return render_template('CreateCampaign.html')
 
 
-# -- Non-Campaign Specific Pages -- #
-# --------------------------------- #
-
-@app.route("/settings",methods=['GET','POST'])
+@app.route("/settings", methods=['GET', 'POST'])
 @login_required
-def GlobalSettingsPage():
+def global_settings_page():
     if request.method == "POST":
         # -- Add user returns a dict with action/result/reason keys.
-        Result = UsrMgmt.AddUser(request.form,current_user.user_email)
-        print("Check form type and call respecitive function")
-        return jsonify(Result)
-    return  render_template("settings/GlobalSettings.html")
+        result = UsrMgmt.add_new_user(request.form, current_user.user_email)
+        return jsonify(result)
+    return render_template("settings/GlobalSettings.html")
 
 
-@app.route("/listener", methods=['GET','POST'])
+@app.route("/listener", methods=['GET', 'POST'])
 @login_required
 def GlobalListenerPage():
-
     if app.config['listener_management'].check_tls_certificates() is False:
         flash('TLS certificates do not exist within the <install dir>/FudgeC2/Storage directory.')
     return render_template("listeners/listeners.html", test_data=app.config['listener_management'].get_active_listeners())
+
 
 @app.route("/listener/change", methods=['GET', 'POST'])
 @login_required
@@ -192,44 +188,44 @@ def Listener_Updates():
 @app.route("/<cid>/")
 @login_required
 def BaseImplantPage(cid):
+    # Returns the implant interaction page if any implant templates exist.
     g.setdefault('cid', cid)
-    # -- This needs to return the implant_input.html template if any implants exist, if not reuturn ImplantMain
-    # --    also need to work out the CID across the pages...
-    Implants = db.Get_AllCampaignImplants(cid)
-    if len(Implants) >0:
-        return render_template("implant_input.html", Implants=Implants)
-    return render_template("ImplantMain.html",cid=cid, Msg="No implants have called back in association with this campaign - create an implant base and use the stager page.")
+    implant_list = UsrMgmt.campaign_get_all_implant_base_from_cid(current_user.user_email, cid)
+    if implant_list is not False:
+        if len(implant_list) > 0:
+            return render_template("implant_input.html", Implants=implant_list)
+
+    msg = "No implants have called back in association with this campaign - create an implant base and use the stager page."
+    return render_template("ImplantMain.html", cid=cid, Msg=msg)
 
 
+
+@app.route("/<cid>/settings", methods=['GET', 'POST'])
 @login_required
-@app.route ("/<cid>/settings", methods=['GET','POST'])
 def BaseImplantSettings(cid):
-    # -- Gather Data for settings:
-    # -- Users + read/write/none
-    # -- Implant List
+    # Allows updating the permissions of users in a campaign, and the visualisation of allowed users.
     g.setdefault('cid', cid)
-    Users = db.Get_SettingsUsers(cid, current_user.user_email)
     if request.method == "POST":
-        print(request.form)
         UsrMgmt.AddUserToCampaign(current_user.user_email, request.form, cid)
         return redirect(url_for('BaseImplantSettings', cid=cid))
     else:
-        print(Users)
-        return render_template("settings/CampaignSettings.html", users=Users)
+        users = UsrMgmt.get_current_campaign_users_settings_list(current_user.user_email, cid)
+        return render_template("settings/CampaignSettings.html", users=users)
 
 
-@app.route("/<cid>/implant/create", methods=['GET','POST'])
+@app.route("/<cid>/implant/create", methods=['GET', 'POST'])
 @login_required
 def NewImplant(cid):
     # -- set SID and user DB to convert --#
-    g.setdefault('cid',cid)
-    if request.method =="POST":
-        result, result_text= ImpMgmt.CreateNewImplant(cid, request.form, current_user.user_email)
-        if result==True:
+    g.setdefault('cid', cid)
+    if request.method == "POST":
+        result, result_text = ImpMgmt.CreateNewImplant(cid, request.form, current_user.user_email)
+        if result is True:
             return render_template('CreateImplant.html', success=result_text)
         else:
             return render_template('CreateImplant.html', error=result_text)
     return render_template('CreateImplant.html')
+
 
 # -- This may no longer be required -- #
 @app.route("/<cid>/implant/generate", methods=["GET", "POST"])
@@ -238,7 +234,8 @@ def ImplantGenerate():
     # -- Get iid from the POST request
     return "405"
 
-@app.route("/<cid>/implant/cmd", methods=["GET","POST"])
+
+@app.route("/<cid>/implant/cmd", methods=["GET", "POST"])
 @login_required
 def ImplantCmdRegister(cid):
     # -- GET FORM --#
@@ -248,7 +245,8 @@ def ImplantCmdRegister(cid):
     print(request.form)
     return "404"
 
-@app.route("/<cid>/implant/stagers", methods=["GET","POST"])
+
+@app.route("/<cid>/implant/stagers", methods=["GET", "POST"])
 @login_required
 def ImplantStager(cid):
     g.setdefault('cid', cid)
@@ -263,31 +261,37 @@ def ImplantStager(cid):
                 print("error")
         # TODO: Replace with content from webpage request.
         return send_file(StagerGen.GenerateSingleStagerFile(cid, current_user.user_email,"docx"), attachment_filename='file.docx')
-
     return render_template("ImplantStagerPage.html", implantList=StagerGen.GenerateStaticStagers(cid, current_user.user_email))
 
-@app.route("/<cid>/implant/status", methods=['GET','POST'])
+
+@app.route("/<cid>/implant/status", methods=['GET', 'POST'])
 @login_required
-def GetImplantStatus(cid):
-    a = db.Get_AllCampaignImplants(cid)
+def get_active_implant_status(cid):
+    # This creates a JSON object which contains all the status of every activated implant.
+    active_implant_list = UsrMgmt.campaign_get_all_implant_base_from_cid(current_user.user_email, cid)
     data = {}
     count = 1
-    # TODO: Revise this section entirely.
-    for x in a:
-        b = x['beacon']
-        a = time.time() - x['last_check_in']
-        c = {"status": None, "title": x['generated_title'],"last_checked_in": x['last_check_in']}
-        if a < b:
-            c['status'] = "good"
-        elif a < b * 2:
-            c['status'] = "normal"
+    for implant in active_implant_list:
+        implant_status_obj = {"status": None,
+                              "title": implant['generated_title'],
+                              "last_checked_in": implant['last_check_in']
+                              }
+        beacon = implant['beacon']
+        time_from_last_check_in = time.time() - implant['last_check_in']
+
+        if time_from_last_check_in < beacon * 1.5:
+            implant_status_obj['status'] = "good"
+        elif time_from_last_check_in < beacon * 2.5:
+            implant_status_obj['status'] = "normal"
         else:
-            c['status'] = "poor"
-        data[count] = c
+            implant_status_obj['status'] = "poor"
+
+        data[count] = implant_status_obj
         count = count + 1
     return jsonify(data)
 
-@app.route("/<cid>/graphs", methods=['GET','POST'])
+
+@app.route("/<cid>/graphs", methods=['GET', 'POST'])
 @login_required
 def CampaignGraph(cid):
     g.setdefault('cid', cid)
@@ -297,7 +301,8 @@ def CampaignGraph(cid):
         return jsonify(blah)
     return render_template("CampaignGraph.html")
 
-@app.route("/<cid>/logs", methods=["GET","POST"])
+
+@app.route("/<cid>/logs", methods=["GET", "POST"])
 @login_required
 def CampaignLogs(cid):
     g.setdefault('cid',cid)
@@ -307,23 +312,26 @@ def CampaignLogs(cid):
         return jsonify(ImpMgmt.Get_CampaignLogs(current_user.user_email, cid))
     return render_template("CampaignLogs.html")
 
+
 # -- Implant command execution -- #
 @app.route("/<cid>/implant/register_cmd", methods=["POST"])
 @login_required
 def ImplantCommandRegistration(cid):
     if request.method == "POST":
-        print("\nCID: ",cid,"\nFRM: ",request.form)
+        # print("\nCID: ", cid, "\nFRM: ",request.form)
         # -- This is the new format using ImpMgmt to handle validation of user and command.
         registration_response = ImpMgmt.ImplantCommandRegistration(cid, current_user.user_email, request.form)
         # -- Currently no return value is required. This should be defined.
         # print(registration_response)
         return jsonify(registration_response)
-
     return "000"
-@app.route("/help",methods = ["GET"])
+
+
+@app.route("/help", methods=["GET"])
 @login_required
 def HelpPage():
     return render_template("HelpPage.html")
+
 
 # TODO: Remove in production builds.
 # @app.route("/test", methods = ['GET','POST'])

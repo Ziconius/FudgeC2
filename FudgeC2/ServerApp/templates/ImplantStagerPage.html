@@ -11,12 +11,24 @@
         </p>
         <p class="text-secondary">Click to show stager</p>
         <div>
-            <p data-toggle="collapse" data-target="#{{ implantList[implant].stager_key }}-ps1" class="text-success">Powershell</p>
-            <pre id="{{ implantList[implant].stager_key }}-ps1" class="collapse in"><code>{{ implantList[implant].powershell_stager }}</code></pre>
 
-            <p data-toggle="collapse" data-target="#{{ implantList[implant].stager_key }}-docm" class="text-success">Docm Macro</p>
-            <pre id="{{ implantList[implant].stager_key }}-docm" class="collapse in "><code>{{ implantList[implant].docm_macro_stager }}</code></pre>
-
+            <div data-toggle="collapse" data-target="#{{ implantList[implant].stager_key }}-ps1" class="text-success font-weight-bold"> Powershell </div>
+            <div id="{{ implantList[implant].stager_key }}-ps1" class="collapse in">
+                <button onclick="copy_stager('{{ implantList[implant].stager_key }}_ps1_code')" type="button" class="btn btn-dark">Copy Payload</button><br>
+                <br>
+                <div class="bg-dark p-2">
+                <code class="font-weight-normal" id="{{ implantList[implant].stager_key }}_ps1_code">{{ implantList[implant].powershell_stager }}</code>
+                </div>
+            </div>
+            <br>
+            <div data-toggle="collapse" data-target="#{{ implantList[implant].stager_key }}-docm" class="text-success font-weight-bold"> Docm Macro </div>
+            <div id="{{ implantList[implant].stager_key }}-docm" class="collapse in">
+                <button onclick="copy_stager('{{ implantList[implant].stager_key }}_docm_code')" type="button" class="btn btn-dark">Copy Payload</button><br>
+                <br>
+                <div class="bg-dark p-2">
+                    <pre class="font-weight-normal text-success" id="{{ implantList[implant].stager_key }}_docm_code">{{ implantList[implant].docm_macro_stager }}</pre>
+                </div>
+            </div>
         </div>
         <hr>
         {% endfor %}
@@ -24,6 +36,14 @@
         <p>There are no implant associated with this campaign yet.</p>
     {% endif %}
 
+    <script>
+        function copy_stager(element) {
+            var stager_text = document.getElementById(element).innerHTML;
+            var dummy = $('<input style="white-space: pre-wrap;">').val(stager_text).appendTo('body').select()
+            document.execCommand('copy')
+        }
+    </script>
 
 </div>
 {% endblock %}
+

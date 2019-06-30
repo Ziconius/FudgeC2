@@ -3,8 +3,7 @@ import random
 import string
 class UserManagementController:
     db = Database()
-
-    def AddUser(self, formdata=None, submitting_user=None):
+    def add_new_user(self, formdata=None, submitting_user=None):
         # -- Refacteror/Clean Add failure checks
         # -- Check for the keys in formdata, if none then return an error.
         # -- UserName/is_admin
@@ -57,9 +56,53 @@ class UserManagementController:
                 if S.admin:
                     U = self.db.Get_UserObject(User)
                     if U:
-                        C = self.db.Verify_UserCanAccessCampaign(S.user_email,Campaign)
+                        C = self.db.Verify_UserCanAccessCampaign(S.user_email, Campaign)
                         if C:
-                            self.db.User_SetCampaignAccessRights(U.uid, Campaign,Users[User])
+                            self.db.User_SetCampaignAccessRights(U.uid, Campaign, Users[User])
                 else:
                     return False
             return True
+
+# -- New methods added in Tauren Herbalist to abstract functionality from the web application.
+# --    This improves maintainability between frontend <-> Database changes.
+    def user_login(self, user, password):
+        # Returns False or user database object.
+        return self.db.Get_UserObjectLogin(user, password)
+
+    def get_first_logon_guid(self, user):
+        return self.db.Get_UserFirstLogonGuid(user)
+
+    def get_user_object(self, user):
+        return self.db.Get_UserObject(user)
+
+    def change_password_first_logon(self, form):
+        pw_1 = form['password_one']
+        pw_2 = form['password_two']
+        pw_c = form['current_password']
+        guid = form['id']
+        if pw_1 == pw_2:
+            user_object = self.db.User_ChangePasswordOnFirstLogon(guid, pw_c, pw_1)
+            return user_object
+        else:
+            return False
+
+    def get_current_campaign_users_settings_list(self, user, cid):
+        # Returns a list of user dictionaries. Remove the current user so that a user cannot attempt to
+        #   update, or remove their own configurations.
+        list_of_user_settings = self.db.get_campaign_user_settings(cid)
+        for x in list_of_user_settings:
+            if x['user'] == user:
+                list_of_user_settings.remove(x)
+        return list_of_user_settings
+
+    def campaign_get_user_access_right_cid(self, user, cid):
+        # Return a boolean.
+        return self.db.Verify_UserCanAccessCampaign(user, cid)
+
+    def campaign_get_user_campaign_list(self, user):
+        return self.db.get_all_user_campaigns(user)
+
+    def campaign_get_all_implant_base_from_cid(self, user, cid):
+        if self.db.Verify_UserCanReadCampaign(user, cid) is True:
+            return self.db.get_all_campaign_implant_templates_from_cid(cid)
+        return False

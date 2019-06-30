@@ -8,7 +8,7 @@ Review how data is captured from listeners and webapp
  - [ ] Improve logging across web application
  - [ ] Add user action logs
  - [ ] Review Database.py and create common format for readability and maintainability
- - [ ] Add check to look for latest version of FudgeC2 - Notify user of updates.
+ - [X] Add check to look for latest version of FudgeC2 - Notify user of updates.
 
 ---
 **Release 0.5 _(Goblin Sapper)_**

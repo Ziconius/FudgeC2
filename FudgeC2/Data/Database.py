@@ -166,20 +166,12 @@ class Database:
         self.Session.commit()
         return pre_guid
 
-
-    def Create_Campaign(self, title, email, description="Default"):
-        # check user:
-        uid=self.__get_userid__(email)
-        if uid == False:
-            return False
-        campaign = Campaigns(title=title,created=time.time(),description=description)
-        #c_user = CampaignUsers(cid=,uid=,read=,write=)
+    def create_campaign(self, user, title, description="Default"):
+        campaign = Campaigns(title=title, created=time.time(), description=description)
         self.Session.add(campaign)
         try:
-            self.Session.commit() # flush check if this will work...
-            #q=self.Session.query(Campaigns.cid).filter(Campaigns.title==title).one()
-            #print("1",q[0])
-            if self.Add_CampaignUser(title,email,2):
+            self.Session.commit()  # flush check if this will work...
+            if self.Add_CampaignUser(title, user, 2):
                 print("Success adding a new campaign user.")
                 return True
         except Exception as e:
@@ -209,50 +201,27 @@ class Database:
         for x in q:
             print("User:",email,x.title,x.description,x.created)
 
-    def Get_AllUserCampaigns(self,email):
-        q=self.Session.query(Campaigns.cid, Campaigns.title).filter(
-            Users.user_email==email,
-            CampaignUsers.uid==Users.uid,
-            Campaigns.cid==CampaignUsers.cid
-        ).group_by(Campaigns.title).all()
-        campaignList = []
-        campDict = {}
-        for x in q:
-            campDict[x[0]]=x[1]
-            #print(x)
-            campaignList.append(x[0])
-        return campDict
+
+    def get_all_user_campaigns(self, email):
+        campaigns_by_title = self.Session.query(Campaigns.cid, Campaigns.title).filter(
+            Users.user_email == email,
+            CampaignUsers.uid == Users.uid,
+            Campaigns.cid == CampaignUsers.cid
+            ).group_by(Campaigns.title).all()
+
+        campaign_dict = {}
+        for campaign in campaigns_by_title:
+            campaign_dict[campaign[0]] = campaign[1]
+
+        return campaign_dict
+
     def Get_AllImplantIDFromTitle(self, Implant_title):
         # -- Return list containing generated implant dictionaries.
         IID = self.Session.query(GeneratedImplants, Implants).filter(Implants.iid == GeneratedImplants.iid, GeneratedImplants.generated_title == Implant_title).all()
         IID = self.__splice_implants_and_generated_implants__(IID)
         return IID
 
-    # -- Implant Content --#
-    def REMOVE_Add_Implant(self, cid, title, url, port, beacon, initial_delay, comms_http=0, comms_https=0, comms_dns=0, comms_binary=0, description="Implant: Blank description.", obfuscation_level=0):
-        # -- REMOVE: Removed in Tauren Herbalist
-        # -- TODO: Refactor
-        print("In Add_Implant_Function")
-        stager_key= random.randint(10000,99999)
-        NewImplant = Implants(cid=cid,title=title,description=description,callback_url=url,stager_key=stager_key,file_hash="0",filename="0",
-                              port=port,
-                              beacon=beacon,
-                              initial_delay=initial_delay,
-                              comms_http=comms_http,
-                              comms_https=comms_https,
-                              comms_dns=comms_dns,
-                              comms_binary = comms_binary,
-                              obfuscation_level = obfuscation_level
-                              )
-        self.Session.add(NewImplant)
-        try:
-            self.Session.commit()
-            q=self.Session.query(Implants).first()
-            print(q)
-            return True
-        except Exception as e:
-            print("db.Add_Implant: ",e)
-            return e
+
     def Add_Implant(self, cid, config):
         # -- Configuration template
         # implant_configuration = {
@@ -273,36 +242,34 @@ class Database:
         new_implant = Implants(
             cid=cid,
             title=config['title'],
-            description = config['description'],
-            stager_key = stager_key,
-            callback_url = config['url'],
-            beacon = config['beacon'],
-            initial_delay = config['initial_delay'],
-            obfuscation_level = config['obfuscation_level'],
-            comms_http = config['protocol']['comms_http'],
-            comms_https = config['protocol']['comms_https'],
-            comms_binary = config['protocol']['comms_binary'],
-            comms_dns = config['protocol']['comms_dns']
+            description=config['description'],
+            stager_key=stager_key,
+            callback_url=config['url'],
+            beacon=config['beacon'],
+            initial_delay=config['initial_delay'],
+            obfuscation_level=config['obfuscation_level'],
+            comms_http=config['protocol']['comms_http'],
+            comms_https=config['protocol']['comms_https'],
+            comms_binary=config['protocol']['comms_binary'],
+            comms_dns=config['protocol']['comms_dns']
         )
         self.Session.add(new_implant)
         try:
             self.Session.commit()
-            q = self.Session.query(Implants).first()
-            print(q)
+            self.Session.query(Implants).first()
             return True
+
         except Exception as e:
             print("db.Add_Implant: ", e)
             return e
 
-
-
-    # -- LOGIN CONTENT --#
+# -- LOGIN CONTENT --#
     @L.log("User logged in.")
     def Get_UserObjectLogin(self, email, password):
         # Auths a user and returns user object
-        user = self.Session.query(Users).filter(Users.user_email==email).first()
-        if user != None:
-            #print(password.encode(), user.password.encode())
+        user = self.Session.query(Users).filter(Users.user_email == email).first()
+        if user is not None:
+            # print(password.encode(), user.password.encode())
             a = user.password
             if bcrypt.checkpw(password.encode(), a):
                 self.__update_last_logged_in__(email)
@@ -312,26 +279,26 @@ class Database:
         else:
             return False
 
-    def Get_CampaignNameFromCID(self,cid):
+    def Get_CampaignNameFromCID(self, cid):
         # -- Clean up --#
-        name=self.Session.query(Campaigns.title).filter(Campaigns.cid==cid).first()
-        if name == None:
+        name = self.Session.query(Campaigns.title).filter(Campaigns.cid == cid).first()
+        if name is None:
             return "Unknown"
         return name.title
 
     def Get_UserObject(self, email):
         # Auths a user and returns user object:
-        user = self.Session.query(Users).filter(Users.user_email==email).first()
-        #user = Users.query.filter_by(user_email==email).first()
-        #print(user.password)
+        user = self.Session.query(Users).filter(Users.user_email == email).first()
+        # user = Users.query.filter_by(user_email==email).first()
+        # print(user.password)
         return user
+
     def Get_AllCampaignImplants(self, cid):
-         # THIS IS THE OLD IMPLANT!
-        # implant= self.Session.query(Implants.iid, Implants.title, Implants.description, Implants.callback_url, Implants.stager_key).filter(Implants.cid==cid).all()
-        a = []
+        return
+    def get_all_campaign_implant_templates_from_cid(self, cid):
         implant = self.Session.query(GeneratedImplants, Implants).filter(GeneratedImplants.iid==Implants.iid, Implants.cid == cid).all()
-        if implant ==None:
-            print("Campaign has no implants.")
+        if implant == None:
+            return False
         results = self.__splice_implants_and_generated_implants__(implant)
         return results
 
@@ -532,41 +499,34 @@ class Database:
                 a['title']=b[0]
             ReturnList.append(a)
         return(ReturnList)
-
         # -- This may be a single or list: Check and convert to list implictly?
-
 
     # -- Campaign Settings Content -- #
     # ------------------------------- #
-    def Get_SettingsUsers(self, cid, user):
-        # TODO: Create a list of user dicts with name, uid, and read/write to be returned to a table with radio tabs.
-        # TODO: Clean up
-        User = self.Session.query(Users.user_email, Users.uid).group_by(Users.user_email)
-        final=[]
-        for x in User:
-            tmp={"user":x[0],"uid":x[1]}
-            entry = self.Session.query(CampaignUsers).filter(CampaignUsers.cid ==cid, CampaignUsers.uid== x[1]).first()
-            # print("::")
-            if entry != None:
+    def get_campaign_user_settings(self, cid):
+        # Returns list containing any number of dictionary elements containing the configuration of the users
+        #   in relation to the submitted campaign. Omits the the user which submits the
+        user_list = self.Session.query(Users.user_email, Users.uid).group_by(Users.user_email)
+        final = []
+        for x in user_list:
+            tmp = {"user": x[0], "uid": x[1]}
+            entry = self.Session.query(CampaignUsers).filter(CampaignUsers.cid == cid, CampaignUsers.uid == x[1]).first()
+            if entry is not None:
                 tmp['permissions'] = entry.permissions
             else:
                 tmp['permissions'] = 0
             final.append(tmp)
+        return final
 
-        x = [ i for i in final if i['user'] != user]
-        return x
-
-    def User_SetCampaignAccessRights(self,user,cid, rights):
-        '''
-        :param user: Int
-        :param cid: Int
-        :param rights: Int [0/1/2]
-        :return: bool
-        '''
-        print(user,cid, rights)
+    def User_SetCampaignAccessRights(self, user, cid, rights):
+        # :param user: Int
+        # :param cid: Int
+        # :param rights: Int [0/1/2]
+        # :return: bool
+        print(user, cid, rights)
         a = self.Session.query(CampaignUsers).filter(CampaignUsers.uid == user, CampaignUsers.cid == cid).first()
-        if a == None:
-            PermissionUpdate = CampaignUsers(cid=cid,uid=user,permissions=rights)
+        if a is None:
+            PermissionUpdate = CampaignUsers(cid=cid, uid=user, permissions=rights)
             self.Session.add(PermissionUpdate)
             try:
                 self.Session.commit()
@@ -575,20 +535,22 @@ class Database:
                 print(E)
                 return False
         else:
-            Result = self.Session.query(CampaignUsers).filter(CampaignUsers.cid==cid, CampaignUsers.uid==user).update({'cid':cid,'uid':user,'permissions':rights})
+            Result = self.Session.query(CampaignUsers).filter(CampaignUsers.cid == cid,
+                                                              CampaignUsers.uid == user
+                                                              ).update({'cid': cid, 'uid': user, 'permissions': rights})
             self.Session.commit()
         return
 
     # -- Access Control Checks
-    def Verify_UserCanAccessCampaign(self,Users,CID):
+    def Verify_UserCanAccessCampaign(self, users, cid):
         # -- TODO: Reduce line count, and if,elif, and else statment to a cleaner alternative.
-        User = self.__get_userid__(Users)
-        if User == None:
+        user = self.__get_userid__(users)
+        if user is None:
             return False
-        R = self.Session.query(CampaignUsers).filter(CampaignUsers.cid==CID, CampaignUsers.uid==User).first()
-        if R == None or R.permissions <=0:
+        r = self.Session.query(CampaignUsers).filter(CampaignUsers.cid == cid, CampaignUsers.uid == user).first()
+        if r is None or r.permissions <= 0:
             return False
-        elif R.permissions >=1:
+        elif r.permissions >= 1:
             return True
 
     def Verify_UserCanWriteCampaign(self, username,cid):
@@ -602,6 +564,7 @@ class Database:
         elif R.permissions >= 2:
             return True
     def Verify_UserCanReadCampaign(self, username, cid):
+        # Returns a boolean
         uid = self.__get_userid__(username)
         if uid == None:
             return False
