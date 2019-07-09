@@ -21,7 +21,6 @@ CL = CampaignLoggingDecorator()
 
 class Database:
     def __init__(self):
-
         engine = create_engine("sqlite:///Storage/{}?check_same_thread=False".format(Settings.database_name))
         # -- TODO: RefactorGet_AllCampaignImplants
         self.selectors = {
@@ -29,59 +28,52 @@ class Database:
             "email": Users.user_email
         }
         self.Session = scoped_session(sessionmaker(bind=engine, autocommit=False))
-        """:type: sqlalchemy.orm.Session""" # PyCharm type fix. Not required for execution.
+        """:type: sqlalchemy.orm.Session"""  # PyCharm type fix. Not required for execution.
 
         self.__does_admin_exist()
 
-
-    # def __enter__(self):
-    #     return self
-    #
-    # def __exit__(self, exc_type, exc_value, traceback):
-    #     self.Session.remove()
-    # def raw_query(self, sql_query_string, sqlinput=None):
-    #     return []
-
-    ## -- Queries from here on -- #
+    # -- Queries from here on -- #
     def test(self, email):
         query = self.Session.query(Users).filter(Users.user_email == email)
         for x in query:
-            print("-",x.password)
-        # rows = self.Session.query(Users).filter(extract('day', Account.created_at) == int(now.day),extract('month', Account.created_at) == now.month).all()
+            print("-", x.password)
         return query
-    def JoinTest(self,user):
+
+    def JoinTest(self, user):
         # --
-        q=self.Session.query(Campaigns.title,Users.user_email,CampaignUsers.permissions).filter(Users.user_email==user,CampaignUsers.uid==Users.uid).group_by(Campaigns.title).all()
-        #q = self.Session.query(Campaigns,CampaignUsers).join(CampaignUsers)
+        q = self.Session.query(Campaigns.title, Users.user_email, CampaignUsers.permissions).filter(
+            Users.user_email == user,
+            CampaignUsers.uid == Users.uid).group_by(Campaigns.title).all()
+        # q = self.Session.query(Campaigns,CampaignUsers).join(CampaignUsers)
         for x in q:
             print(x)
 
-
-    ## -- PRIVATE METHODS -- #
-
-    def __get_userid__(self,email):
+    # -- PRIVATE METHODS -- #
+    def __get_userid__(self, email):
         # -- Require further improvement i.e try:catch
         query = self.Session.query(Users.uid).filter(Users.user_email == email).first()
-        if query == None:
+        if query is None:
             return False
         else:
             return query[0]
         # TODO: Improve and avoid race conditions.
+
     def __get_user_object_from_email(self, email):
         return self.Session.query(Users).filter(Users.user_email == email).first()
 
-
-    def __update_last_logged_in__(self,email):
+    def __update_last_logged_in__(self, email):
         self.Session.query(Users).filter(Users.user_email == email).update({"last_login": (time.time())})
         self.Session.commit()
         return True
-    def __get_campaignid__(self,campaign):
+
+    def __get_campaignid__(self, campaign):
         #TODO: Improve the Try/Catch
-        q = self.Session.query(Campaigns.cid).filter(Campaigns.title==campaign).one()
+        q = self.Session.query(Campaigns.cid).filter(Campaigns.title == campaign).one()
         if q == None:
             return False
         else:
             print(q[0])
+
     def __splice_implants_and_generated_implants__(self, obj):
         # Hand a list of genrerated imaplnts and implabt list pairs and splice them togerther returning in a [{},{}] format
         CompletedList = []
@@ -103,7 +95,7 @@ class Database:
             CompletedList.append(ResultofSplice)
         return CompletedList
 
-    def __hash_cleartext_password__(self,password):
+    def __hash_cleartext_password__(self, password):
         # Hashed a clear text password ready for insertion into the database
         password_bytes = password.encode()
         hashedpassword = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
@@ -127,20 +119,22 @@ class Database:
         query = self.Session.query(Users.password, Users.uid).filter(Users.user_email==Username).all()
         for x in query:
             return False
-        users = Users(user_email=Username,password=self.__hash_cleartext_password__(Password),admin=Admin,last_login=time.time())
+        users = Users(user_email=Username,
+                      password=self.__hash_cleartext_password__(Password),
+                      admin=Admin,last_login=time.time())
         self.Session.add(users)
         self.Session.commit()
         return True
 
-
-    def User_HasCompletedFirstLogon(self,email):
+    def User_HasCompletedFirstLogon(self, email):
         # -- Return (true/false)
         HasLoggedOn = self.Session.query(Users).filter(Users.first_logon == 0,Users.user_email == email).all()
         if HasLoggedOn:
             return True
         else:
             return False
-    def User_ChangePasswordOnFirstLogon(self,guid, current_password,new_password):
+
+    def User_ChangePasswordOnFirstLogon(self, guid, current_password, new_password):
         UserObj = self.Session.query(Users).filter(Users.first_logon_guid==guid).first()
         if UserObj == None:
             return False
@@ -153,6 +147,7 @@ class Database:
                 return UpdatedUserObj
             else:
                 return False
+
     def User_IsUserAdminAccount(self, email):
         user_object  = self.__get_user_object_from_email(email)
         if user_object:
@@ -181,7 +176,7 @@ class Database:
         # Make campaign (check no dup name)
         # Add user to campaign users
         # commit or rollback.
-    def Add_CampaignUser(self,CampaignTitle,Email,Permission=1):
+    def Add_CampaignUser(self, CampaignTitle, Email, Permission=1):
         # a
         cid = self.Session.query(Campaigns.cid).filter(Campaigns.title==CampaignTitle).one()[0]
         uid = self.Session.query(Users.uid).filter(Users.user_email==Email).one()[0]
@@ -195,7 +190,7 @@ class Database:
             print("Func:Add_CampaignUser:",e)
             return False
 
-    def Get_CampaignInfo(self,campaign,email):
+    def Get_CampaignInfo(self, campaign, email):
         # -- Not used?
         q = self.Session.query(Campaigns).filter(Campaigns.title==campaign,Users.user_email==email).all()
         for x in q:

