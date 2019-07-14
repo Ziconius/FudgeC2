@@ -9,7 +9,7 @@ from FudgeC2.Listeners import ListenerManagement
 
 
 def check_tls_certificates(cert, key):
-    cert_result = os.path.isfile(os.getcwd()+"/Storage/"+cert)
+    cert_result = os.path.isfile(os.getcwd() + "/Storage/" + cert)
     key_result = os.path.isfile(os.getcwd() + "/Storage/" + key)
     if key_result is False or cert_result is False:
         print("Warning: Missing crypto keys for TLS listeners. These will fail to boot.")

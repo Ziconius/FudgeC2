@@ -5,10 +5,10 @@ Below is an high-level overview of the on-going development to increase function
 **Release 0.4 _(Tauren Herbalist)_**
 
 Review how data is captured from listeners and webapp
- - [ ] Improve logging across web application
- - [ ] Add user action logs
- - [ ] Review Database.py and create common format for readability and maintainability
- - [X] Add check to look for latest version of FudgeC2 - Notify user of updates.
+ - [x] Improve logging across web application
+ - [x] Add user action logs
+ - [x] Review Database.py and create common format for readability and maintainability
+ - [x] Add check to look for latest version of FudgeC2 - Notify user of updates.
 
 ---
 **Release 0.5 _(Goblin Sapper)_**
@@ -32,7 +32,7 @@ Review and improve all database content & create export functionality
 Web App
  - [ ] Export should allow user submitted password
  - [ ] Download should be a single file
- - [ ] Review if creating options for what should be downloaded is required
+ - [ ] Review possible options which maybe required when downloading? I.e data exclusion
  
  
 ---

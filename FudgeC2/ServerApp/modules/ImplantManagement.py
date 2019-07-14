@@ -1,7 +1,7 @@
 from FudgeC2.Data.Database import Database
 from FudgeC2.Implant.Implant import ImplantSingleton
 
-import time
+
 class ImplantManagement:
     # -- The implant management class is responsible for performing pre-checks and validation before sending data
     # --    to the Implant class
@@ -24,7 +24,6 @@ class ImplantManagement:
                 return None
         return None
 
-
     def _validate_command(self, command):
         # -- TODO: Check if type needs to be enforced.
         special_cmd = ["sys_info"]
@@ -36,12 +35,11 @@ class ImplantManagement:
             return command, {"cmd_reg":{"result":False, "reason":"Unknown inbuilt command, i.e. '::'"}}
         return command, True
 
-
     def ImplantCommandRegistration(self, cid , username, form):
         # -- This should be refactored at a later date to support read/write changes to
         # --    granular controls on templates, and later specific implants
         #print("CID: ",cid,"\nUSR: ",username,"\nCMD: ",form)
-        User = self.db.Verify_UserCanWriteCampaign(username,cid)
+        User = self.db.campaign.Verify_UserCanWriteCampaign(username,cid)
         if User == False:
             return {"cmd_reg":{"result":False,"reason":"You are not authorised to register commands in this campaign."}}
 
@@ -49,15 +47,17 @@ class ImplantManagement:
         # -- email, unique implant key, cmd
         if "cmd" in form and "ImplantSelect" in form:
             # -- before checking the database assess the cmd that was input.
+            if len(form['cmd']) == 0:
+                return {"cmd_reg":{"result":False,"reason":"No command submitted."}}
             processed_command, validated_command = self._validate_command(form['cmd'])
             if validated_command != True:
                 return validated_command
 
             # -- If validated_command is True then continue as it IS a valid command. N.b it may not be a legitimate command, but it is considered valid here.
             if form['ImplantSelect'] == "ALL":
-                ListOfImplants = self.db.Get_AllGeneratedImplantsFromCID(cid)
+                ListOfImplants = self.db.implant.Get_AllGeneratedImplantsFromCID(cid)
             else:
-                ListOfImplants= self.db.Get_AllImplantIDFromTitle(form['ImplantSelect'])
+                ListOfImplants= self.db.implant.Get_AllImplantIDFromTitle(form['ImplantSelect'])
             # -- Access if this can fail. If empty return error.
             if len(ListOfImplants) == 0:
                 return {"cmd_reg":{"result":False,"reason":"No implants listed."}}
@@ -66,7 +66,6 @@ class ImplantManagement:
                 self.Imp.AddCommand(username,cid,implant['unique_implant_id'], processed_command)
             return {"cmd_reg":{"result":True,"reason":"Command registered"}}
         return {"cmd_reg":{"result":False,"reason":"Incorrect implant given, or non-existent active implant."}}
-
 
     def CreateNewImplant(self,cid, form, user):
         # TODO: Create checks for conflicting ports.
@@ -85,10 +84,10 @@ class ImplantManagement:
             }
         }
         print(form)
-        User = self.db.Get_UserObject(user)
+        User = self.db.user.Get_UserObject(user)
         if User.admin == 0:
             return False, "Insufficient privileges."
-        CampPriv = self.db.Verify_UserCanWriteCampaign(user, cid)
+        CampPriv = self.db.campaign.Verify_UserCanWriteCampaign(user, cid)
         if CampPriv is False:
             return False, "User cannot write to this campaign."
 
@@ -154,7 +153,7 @@ class ImplantManagement:
                 # for element in implant_configuration.keys():
                 #     print(element,": ",implant_configuration[element])
 
-                a = self.db.Add_Implant(cid, implant_configuration)
+                a = self.db.implant.create_new_implant_template(user, cid, implant_configuration)
                 if a is True:
                     return True, "Implant created."
                 else:
@@ -165,11 +164,10 @@ class ImplantManagement:
 
         return
 
-
     def Get_RegisteredImplantCommands(self, username, cid=0):
         # -- Return list of dictionaries, not SQLAlchemy Objects.
-        if self.db.Verify_UserCanAccessCampaign(username, cid):
-            Commands = self.db.Get_RegisteredImplantCommandsFromCID(cid)
+        if self.db.campaign.Verify_UserCanAccessCampaign(username, cid):
+            Commands = self.db.implant.Get_RegisteredImplantCommandsFromCID(cid)
             toDict = []
             for x in Commands:
                 a = x.__dict__
@@ -180,9 +178,8 @@ class ImplantManagement:
         else:
             return False
 
-
     def Get_CampaignLogs(self, username, cid):
-        User = self.db.Verify_UserCanReadCampaign(username, cid)
+        User = self.db.campaign.Verify_UserCanReadCampaign(username, cid)
         if User == False:
             return {
                 "cmd_reg": {"result": False, "reason": "You are not authorised to view commands in this campaign."}}

@@ -10,8 +10,8 @@ class StagerGeneration:
 
     def GenerateStaticStagers(self, cid, user):
         ret_data = {}
-        if self.db.Verify_UserCanAccessCampaign(user, cid):
-            implant_info = self.db.Get_AllImplantBaseFromCid(cid)
+        if self.db.campaign.Verify_UserCanAccessCampaign(user, cid):
+            implant_info = self.db.implant.Get_AllImplantBaseFromCid(cid)
             if implant_info is not False:
                 for implant in implant_info:
                     ret_data[implant['title']] = {
@@ -28,7 +28,7 @@ class StagerGeneration:
     def GenerateSingleStagerFile(self, cid, user, stager_type):
         # TODO: Create docx file download from template.
         #   users can currently use the docx stager string as a replacement.
-        if self.db.Verify_UserCanAccessCampaign(user, cid):
+        if self.db.campaign.Verify_UserCanAccessCampaign(user, cid):
 
             if stager_type == "docx":
                 return self.__generate_docx_stager_file()

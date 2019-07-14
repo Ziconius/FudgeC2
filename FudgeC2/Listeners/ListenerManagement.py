@@ -66,7 +66,7 @@ class ListenerManagement():
     def listener_form_submission(self,user, form):
         # This will process the values submitted and decided what to call next
         #   these will require further management
-        if not self.db.User_IsUserAdminAccount(user):
+        if not self.db.user.User_IsUserAdminAccount(user):
             return (False, "Insufficient privileges")
         # else:
         #     return (True, "Temp success value.")

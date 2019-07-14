@@ -38,10 +38,10 @@ class AppManager:
 
     def campaign_create_campaign(self, user, form):
         # Responsible for validating admin account, and campaign title exists.
-        if self.db.User_IsUserAdminAccount(user) is True:
+        if self.db.user.User_IsUserAdminAccount(user) is True:
             if 'title' in form and 'description' in form:
                 if form['title'].strip() != "":
-                    if self.db.create_campaign(user, form['title'].strip(), form['description'].strip()) is True:
+                    if self.db.campaign.create_campaign(user, form['title'].strip(), form['description'].strip()) is True:
                         return True, "Campaign created successfully."
                     else:
                         return False, "Unknown error."
@@ -53,4 +53,12 @@ class AppManager:
             return False, "You do not have admin permissions to create a campaign."
 
     def campaign_get_campaign_name_from_cid(self, cid):
-        return self.db.Get_CampaignNameFromCID(cid)
+        return self.db.campaign.Get_CampaignNameFromCID(cid)
+
+    # TODO: Implement returning app logs to web app.
+    def get_application_logs(self, username):
+        # is user admin if not return false.
+        if self.db.user.User_IsUserAdminAccount(username):
+            return self.db.get_application_logs()
+        else:
+            return []

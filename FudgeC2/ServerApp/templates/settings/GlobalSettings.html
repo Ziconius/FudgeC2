@@ -27,7 +27,10 @@
 
 
 
-
+    <h3>Logs</h3>
+        {% for x in logs %}
+            {{ x.type }}:{{ x.data }}<br>
+        {% endfor %}
     </div>
 
     <!-- Modal -->

