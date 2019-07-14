@@ -2,15 +2,6 @@
 Below is an high-level overview of the on-going development to increase functionality, and reliability of Fudge. This is broken down into release cycles, which are focused around core functionality changes.
 
 ---
-**Release 0.4 _(Tauren Herbalist)_**
-
-Review how data is captured from listeners and webapp
- - [x] Improve logging across web application
- - [x] Add user action logs
- - [x] Review Database.py and create common format for readability and maintainability
- - [x] Add check to look for latest version of FudgeC2 - Notify user of updates.
-
----
 **Release 0.5 _(Goblin Sapper)_**
 
 Create further obfuscation and jinja templatework
@@ -65,6 +56,15 @@ Review and improve web application performance and output
 ---
 ## Released Versions
 Below is a list of all versions which are now tagged with release, and can be found:
+
+---
+**Release 0.4 _(Tauren Herbalist)_**
+
+Review how data is captured from listeners and webapp
+ - [x] Improve logging across web application
+ - [x] Add user action logs
+ - [x] Review Database.py and create common format for readability and maintainability
+ - [x] Add check to look for latest version of FudgeC2 - Notify user of updates.
 
 ---
 Release 0.3 _(Dwarven Blacksmith)_
