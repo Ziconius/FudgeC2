@@ -77,14 +77,6 @@ def page_not_found(e):
 # ------------------------------ #
 @app.route("/auth/login", methods=['GET', 'POST'])
 def login():
-    #!!
-    dbg = False
-    if dbg == True:
-        UserObject = UsrMgmt.user_login("admin", "letmein")
-        login_user(UserObject)
-        return redirect(url_for("BaseHomePage"))
-
-
     if request.method == "POST":
         if 'email' in request.form and 'password' in request.form and request.form['email'] != None and request.form['password'] != None:
             UserObject = UsrMgmt.user_login(request.form['email'],request.form['password'])

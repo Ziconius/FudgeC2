@@ -18,7 +18,7 @@ class UserManagementController:
             Result_Dict['reason'] = "Username too short"
             return Result_Dict
         U = self.db.user.Get_UserObject(submitting_user)
-        if U.admin:
+        if U.admin == 1:
             G = self.db.user.Get_UserObject(formdata['UserName'])
             admin = False
             if 'is_admin' in formdata:
