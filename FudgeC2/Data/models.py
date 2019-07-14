@@ -122,6 +122,15 @@ class CampaignLogs(Base):
     entry = Column(String(1024), nullable=False)
 
 
+class Listeners(Base):
+    __tablename__ = 'listeners'
+    auto_id = Column(INTEGER(), nullable=False, index=True, primary_key=True)
+    name = Column(String())
+    state = Column(INTEGER())
+    protocol = Column(INTEGER())
+    port = Column(INTEGER())
+
+
 # -- Generate an empty database if non-existent.
 engine = create_engine("sqlite:///Storage/{}?check_same_thread=False".format(Settings.database_name), echo=False)
 Base.metadata.create_all(engine)

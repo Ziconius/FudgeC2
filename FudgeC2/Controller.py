@@ -36,8 +36,8 @@ LM = ListenerManagement.ListenerManagement(Settings.tls_listener_cert, Settings.
 # --    functionality. Passing in the user "admin" which as a hardcoded value.
 # --
 # --    Note: If 'admin' if not a existing admin account this will fail.
-LM.create_listener("hardcoded http listener", "http", 5000, False)
-LM.create_listener("hardcoded https listener", "https", 8080, False)  # This requires TLS certs before starting.
+LM._create_listener("hardcoded http listener", "http", 5000, False)
+LM._create_listener("hardcoded https listener", "https", 8080, False)  # This requires TLS certs before starting.
 # LM.create_listener("hardcoded https listener 2", "http",1234, True)
 
 try:

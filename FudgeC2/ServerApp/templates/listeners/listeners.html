@@ -29,22 +29,24 @@
             Common Name: <code>{{ test_data[key_2].common_name }}</code><br>
             Proto: <code>{{ test_data[key_2].type }}</code><br>
             Port: <code>{{ test_data[key_2].port }}</code><br>
-            {% if test_data[key_2].state == 1 %}
+            {% if test_data[key_2].state == True %}
                 State: <span class="text-success">Running</span><br>
-                <form action="/listener/change" method="POST" role="form"><button name="state_change" value="{{ test_data[key_2].id }}">Stop</button></form>
-            {% elif test_data[key_2].state == 0 %}
+                <form action="/listener/change" method="POST" role="form"><button name="state_change" value="{{ test_data[key_2].common_name }}">Stop</button></form>
+            {% elif test_data[key_2].state == False %}
                 State: <span class="text-danger">Stopped</span><br>
-                <form action="/listener/change" method="POST" role="form"><button name="state_change" value="{{ test_data[key_2].id }}">Start</button></form>
+                <form action="/listener/change" method="POST" role="form"><button name="state_change" value="{{ test_data[key_2].common_name }}">Start</button></form>
             {% endif %}
 
             <hr>
             {% endfor %}
         </p><br>
-        <p>Due for release in v0.3 (Dwarven Blacksmith):</p>
+        <p>Due for release in v0.5.0 (Goblin Sapper):</p>
         <ul>
             <li>New listener button + model</li>
             <li>Add start/stop/rename listener functionality. Listeners cannot be deleted for historic integrity.</li>
             <li>Response based on failure/success</li>
+            <li>Peristent listeners</li>
+            <li>Alpha-state binary listener</li>
         </ul>
 
         <script>

@@ -59,3 +59,6 @@ def ImplantCommandResult():
         decoded_response = base64.b64decode(request.headers["X-Result"]).decode('utf-16').split("::", 1)
         Imp.CommandResponse(decoded_response[0], decoded_response[1], app.config['listener_type'])
     return "Page Not Found"
+
+def shutdown():
+    raise RuntimeError("Server going down")

@@ -15,6 +15,7 @@ from FudgeC2.Data.CampaignLogging import CampaignLoggingDecorator
 from FudgeC2.Data.DatabaseUser import DatabaseUser
 from FudgeC2.Data.DatabaseCampaign import DatabaseCampaign
 from FudgeC2.Data.DatabaseImplant import DatabaseImplant
+from FudgeC2.Data.DatabaseListeners import DatabaseListener
 
 CL = CampaignLoggingDecorator()
 
@@ -32,6 +33,7 @@ class Database:
         self.user = DatabaseUser(self, self.Session)
         self.campaign = DatabaseCampaign(self, self.Session)
         self.implant = DatabaseImplant(self, self.Session)
+        self.listener = DatabaseListener(self, self.Session)
 
         self.__does_admin_exist()
 
