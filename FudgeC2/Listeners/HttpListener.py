@@ -60,5 +60,16 @@ def ImplantCommandResult():
         Imp.CommandResponse(decoded_response[0], decoded_response[1], app.config['listener_type'])
     return "Page Not Found"
 
+
+# This should be randomised to avoid blueteams fingerprinting the server by querying this endpoint.
+@app.route("/nlaksnfaobcaowb", methods=['GET', 'POST'])
+def ShutdownListener():
+    if request.remote_addr == "127.0.0.1":
+        print ("blah")
+        shutdown_hook = request.environ.get('werkzeug.server.shutdown')
+        if shutdown_hook is not None:
+            shutdown_hook()
+        # raise RuntimeError("Server going down")
+
 def shutdown():
     raise RuntimeError("Server going down")

@@ -1,6 +1,7 @@
 import sys
 import threading
 import os
+import requests
 
 from Data.Database import Database
 
@@ -61,6 +62,10 @@ class HttpListener(Listener):
                                        args=(self.port, a, self.type,),
                                        daemon=True)
         self.thread.start()
+
+    def stop_listener(self):
+        requests.get("{}://127.0.0.1:{}/nlaksnfaobcaowb".format(self.type, self.port))
+        self.thread = None
 
 
 class BinaryListener(Listener):
