@@ -4,11 +4,11 @@ import uuid
 from flask import Flask, render_template, flash, request, jsonify, g, url_for, redirect, send_file  # ,make_response, session, current_app,
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user
 
-from FudgeC2.Implant.Implant import ImplantSingleton
-from FudgeC2.ServerApp.modules.UserManagement import UserManagementController
-from FudgeC2.ServerApp.modules.StagerGeneration import StagerGeneration
-from FudgeC2.ServerApp.modules.ImplantManagement import ImplantManagement
-from FudgeC2.ServerApp.modules.ApplicationManager import AppManager
+from Implant.Implant import ImplantSingleton
+from ServerApp.modules.UserManagement import UserManagementController
+from ServerApp.modules.StagerGeneration import StagerGeneration
+from ServerApp.modules.ImplantManagement import ImplantManagement
+from ServerApp.modules.ApplicationManager import AppManager
 
 Imp = ImplantSingleton.instance
 UsrMgmt = UserManagementController()

@@ -1,9 +1,9 @@
 from flask import Flask, request
-from FudgeC2.Implant.Implant import ImplantSingleton
-from FudgeC2.Data.Database import Database
+
+from Implant.Implant import ImplantSingleton
+from Data.Database import Database
+
 Imp=ImplantSingleton.instance
-
-
 
 db=Database()
 app = Flask(__name__)

@@ -1,4 +1,4 @@
-from FudgeC2.Data.Database import Database
+from Data.Database import Database
 
 
 # Shell for exporting a campaign for FudgeC2 Viewer application.

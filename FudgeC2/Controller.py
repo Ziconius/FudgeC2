@@ -3,9 +3,9 @@ import _thread
 import time
 import os
 
-from FudgeC2.Storage.settings import Settings
-from FudgeC2.ServerApp import ImplantManager
-from FudgeC2.Listeners import ListenerManagement
+from Storage.settings import Settings
+from ServerApp import ImplantManager
+from Listeners import ListenerManagement
 
 
 def check_tls_certificates(cert, key):

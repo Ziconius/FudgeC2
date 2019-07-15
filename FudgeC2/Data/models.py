@@ -1,8 +1,12 @@
 # coding: utf-8
+import os
+
 from sqlalchemy import Column, ForeignKey, String, text, create_engine  # , Table, Text, Index, Date, DateTime, Float,
 from sqlalchemy.dialects.mysql import INTEGER  # MEDIUMTEXT, TINYINT, VARCHAR, BIGINT
 from sqlalchemy.ext.declarative import declarative_base
-from FudgeC2.Storage.settings import Settings
+
+from Storage.settings import Settings
+
 Base = declarative_base()
 metadata = Base.metadata
 
@@ -132,5 +136,8 @@ class Listeners(Base):
 
 
 # -- Generate an empty database if non-existent.
-engine = create_engine("sqlite:///Storage/{}?check_same_thread=False".format(Settings.database_name), echo=False)
+# --    additional checks for file existance would be sensible first
+
+path = os.getcwd() + "/Storage/"
+engine = create_engine("sqlite:///{}/{}?check_same_thread=False".format(path, Settings.database_name), echo=False)
 Base.metadata.create_all(engine)

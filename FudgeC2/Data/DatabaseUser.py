@@ -1,8 +1,9 @@
 import time
 import uuid
 import bcrypt
-from FudgeC2.Data.models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs, CampaignLogs
-from FudgeC2.Data.CampaignLogging import CampaignLoggingDecorator
+
+from Data.models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs, CampaignLogs
+from Data.CampaignLogging import CampaignLoggingDecorator
 
 CL = CampaignLoggingDecorator()
 

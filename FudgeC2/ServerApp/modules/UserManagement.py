@@ -1,6 +1,8 @@
-from FudgeC2.Data.Database import Database
 import random
 import string
+
+from Data.Database import Database
+
 class UserManagementController:
     db = Database()
     def add_new_user(self, formdata=None, submitting_user=None):

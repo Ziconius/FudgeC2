@@ -2,6 +2,7 @@ import jinja2
 import string
 import random
 
+
 class ImplantGenerator:
     # ImplantGenerator has a single public method (generate_implant_from_template)
     #   which is used to generate a new active implant in the event of a stager

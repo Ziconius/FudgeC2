@@ -1,4 +1,4 @@
-from FudgeC2.Data.models import ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs, CampaignLogs, Users
+from Data.models import ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs, CampaignLogs, Users
 
 class DatabaseListener:
 
@@ -8,5 +8,5 @@ class DatabaseListener:
         self.db_methods = source_database
 
     def create_new_listener_record(self, a, b, c, d):
-        print("Now in DB: create_new_listener_record")
+        # print("Now in DB: create_new_listener_record")
         return

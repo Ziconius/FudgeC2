@@ -1,6 +1,6 @@
 import requests
 from distutils.version import LooseVersion
-from FudgeC2.Data.Database import Database
+from Data.Database import Database
 
 
 class AppManager:

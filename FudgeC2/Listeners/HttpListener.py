@@ -2,8 +2,8 @@ from flask import Flask, make_response, request
 import base64
 from uuid import uuid4
 
-from FudgeC2.Implant.Implant import ImplantSingleton
-from FudgeC2.Data.Database import Database
+from Implant.Implant import ImplantSingleton
+from Data.Database import Database
 
 Imp = ImplantSingleton.instance
 db = Database()

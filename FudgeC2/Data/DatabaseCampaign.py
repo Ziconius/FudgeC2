@@ -1,7 +1,7 @@
 import time
-from FudgeC2.Data.models import Users, Implants, Campaigns, CampaignUsers, GeneratedImplants
+from Data.models import Users, Implants, Campaigns, CampaignUsers, GeneratedImplants
 # AppLogs, CampaignLogs, ResponseLogs, ImplantLogs
-from FudgeC2.Data.CampaignLogging import CampaignLoggingDecorator
+from Data.CampaignLogging import CampaignLoggingDecorator
 
 CL = CampaignLoggingDecorator()
 

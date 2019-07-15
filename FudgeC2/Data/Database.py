@@ -1,5 +1,6 @@
 import bcrypt
 import ast
+import os
 
 # SQLAlchemy imports
 from sqlalchemy import create_engine
@@ -7,22 +8,24 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
 # FudgeC2 imports
-from FudgeC2.Data.models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs, CampaignLogs
-from FudgeC2.Storage.settings import Settings
-from FudgeC2.Data.CampaignLogging import CampaignLoggingDecorator
+from Data.models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs, CampaignLogs
+from Storage.settings import Settings
+from Data.CampaignLogging import CampaignLoggingDecorator
 
 # Extended database classes.
-from FudgeC2.Data.DatabaseUser import DatabaseUser
-from FudgeC2.Data.DatabaseCampaign import DatabaseCampaign
-from FudgeC2.Data.DatabaseImplant import DatabaseImplant
-from FudgeC2.Data.DatabaseListeners import DatabaseListener
+from Data.DatabaseUser import DatabaseUser
+from Data.DatabaseCampaign import DatabaseCampaign
+from Data.DatabaseImplant import DatabaseImplant
+from Data.DatabaseListeners import DatabaseListener
 
 CL = CampaignLoggingDecorator()
 
 
 class Database:
     def __init__(self):
-        engine = create_engine("sqlite:///Storage/{}?check_same_thread=False".format(Settings.database_name))
+        path = os.getcwd() + "/Storage/"
+        engine = create_engine("sqlite:///{}/{}?check_same_thread=False".format(path, Settings.database_name))
+
         self.selectors = {
             "uid": Users.uid,
             "email": Users.user_email

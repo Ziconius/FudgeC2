@@ -1,8 +1,8 @@
 import time
 import random
-from FudgeC2.Data.models import ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants
+from Data.models import ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants
 # AppLogs, CampaignLogs, Users
-from FudgeC2.Data.CampaignLogging import CampaignLoggingDecorator
+from Data.CampaignLogging import CampaignLoggingDecorator
 
 CL = CampaignLoggingDecorator()
 

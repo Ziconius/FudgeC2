@@ -2,11 +2,13 @@ import sys
 import threading
 import os
 
+from Data.Database import Database
+
 
 class Listener:
 
     def __init__(self, name, port, type):
-        print("In Listener")
+        # print("In Listener")
         self.name = name
         self.port = port
         self.type = type
@@ -31,21 +33,25 @@ class HttpListener(Listener):
     tls_key = "server.key"
     tls_cert = "server.crt"
     path = os.getcwd() + "/Storage/"
-    print(path)
+    # print(path)
 
     def create_app(self, listener_type):
-        import FudgeC2.Listeners.HttpListener
+        import Listeners.HttpListener
         del sys.modules["FudgeC2.Listeners.HttpListener"]
-        import FudgeC2.Listeners.HttpListener as HL
-        HL.app.config['listener_type'] = listener_type
-        return HL.app
+        import Listeners.HttpListener as http_listener_module
+        http_listener_module.app.config['listener_type'] = listener_type
+        return http_listener_module.app
 
-    def start_http_listener_thread(self, obj, App, type):
-        print(self.path + self.tls_cert)
-        if type == "http":
+    def start_http_listener_thread(self, obj, App, protocol_type):
+        # print(self.path + self.tls_cert)
+        if protocol_type == "http":
             App.run(debug=False, use_reloader=False, host='0.0.0.0', port=obj, threaded=True)
-        elif type == "https":
-            App.run(debug=False, use_reloader=False, host='0.0.0.0', port=obj, threaded=True,
+        elif protocol_type == "https":
+            App.run(debug=False,
+                    use_reloader=False,
+                    host='0.0.0.0',
+                    port=obj,
+                    threaded=True,
                     ssl_context=(self.path + self.tls_cert, self.path + self.tls_key))
 
     def start_listener(self):
@@ -65,18 +71,16 @@ class BinaryListener(Listener):
 
 
 
-from FudgeC2.Data.Database import Database
-
-
 class ListenerManagement:
     listeners = {}
     db = Database()
 
     def __init__(self, a, b):
-        print(a, b)
+        # print(a, b)
+        pass
 
     def _check_if_listener_is_unique(self, name, port, protocol):
-        print("DATABASE: NOW CHECKING LISTENER IS COMPLETE")
+        # print("DATABASE: NOW CHECKING LISTENER IS COMPLETE")
         # self.db.listener.get_all_listeners()
         return True
 
@@ -124,7 +128,7 @@ class ListenerManagement:
     def listener_form_submission(self, username, form):
         if self.db.user.User_IsUserAdminAccount(username) is False:
             return False
-        print(form)
+        # print(form)
 
         if "auto_start" in form:
             auto_start = False
@@ -134,7 +138,7 @@ class ListenerManagement:
 
 
         elif "state_change" in form:
-            print("we're now changing the state of a listener!!")
+            # print("we're now changing the state of a listener!!")
             if form['state_change'] in self.listeners.keys():
                 current_state = self.listeners[form['state_change']].query_state()
                 if current_state is True:

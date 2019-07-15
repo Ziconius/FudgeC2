@@ -1,5 +1,5 @@
-from FudgeC2.Data.Database import Database
-from FudgeC2.Implant.ImplantGenerator import ImplantGenerator
+from Data.Database import Database
+from Implant.ImplantGenerator import ImplantGenerator
 
 class ImplantSingleton:
     class __OnlyOne:
