@@ -37,7 +37,7 @@ class HttpListener(Listener):
 
     def create_app(self, listener_type):
         import Listeners.HttpListener
-        del sys.modules["FudgeC2.Listeners.HttpListener"]
+        del sys.modules["Listeners.HttpListener"]
         import Listeners.HttpListener as http_listener_module
         http_listener_module.app.config['listener_type'] = listener_type
         return http_listener_module.app
