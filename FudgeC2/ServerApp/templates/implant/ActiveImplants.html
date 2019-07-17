@@ -1,0 +1,45 @@
+{% extends "ImplantMain.html" %}
+{% block main2 %}
+
+<div class="m-0 p-3">
+    <h4>Active Implant Information: {{ campaign }}</h4>
+    <p class="text-warning">Dev note: This is an early work in process to allow users to review all data collected by an active implant.</p>
+
+    {% if imp %}
+
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Select Active Implant
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+
+      {% for x in imp %}
+        <a class="dropdown-item" href="/{{ cid }}/implant/active/{{ x.unique_implant_id }}" name="{{ x.unique_implant_id }}">{{ x.generated_title }}</a>
+      {% endfor %}
+
+  </div>
+</div>
+    {% else %}
+    <p> No active implants found. Phish harder.</p>
+    {% endif%}
+    {% if render %}
+    <ul>
+        <li>Generated Title: {{ render.generated_title }}</li>
+        <li>Description: {{ render.description }}</li>
+        <li>Callback URL: {{ render.callback_url }}</li>
+        <li>Initial callback delay: {{ render.initial_delay }}</li>
+        <li>Obfuscation level: {{ render.obfuscation_level }}</li>
+    </ul>
+    <pre class="pre-scrollable bg-dark text-light p-3">
+            <code>
+                {{ render.implant_copy }}
+            </code>
+    </pre>
+    <br>
+    implant code: text box:
+    <br>
+    Records for implant:
+    {% endif %}
+</div>
+{% endblock %}
+

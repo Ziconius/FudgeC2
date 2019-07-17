@@ -184,3 +184,9 @@ class ImplantManagement:
             return {
                 "cmd_reg": {"result": False, "reason": "You are not authorised to view commands in this campaign."}}
         return self.db.Log_GetCampaignActions(cid)
+
+    def get_active_campaign_implants(self,user, campaign_id):
+        if self.db.campaign.Verify_UserCanAccessCampaign(user, campaign_id):
+            return self.db.implant.Get_AllGeneratedImplantsFromCID(campaign_id)
+        else:
+            return False

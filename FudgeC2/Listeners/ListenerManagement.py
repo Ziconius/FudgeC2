@@ -89,15 +89,19 @@ class ListenerManagement:
         # self.db.listener.get_all_listeners()
         return True
 
-    def _create_listener(self, name, protocol, port, auto_start=False):
+    def _create_listener(self, name, raw_protocol, port, auto_start=False):
+        protocol = raw_protocol.lower()
         if self._check_if_listener_is_unique(name, port, protocol):
-            if protocol == "http" or protocol == "https":
+            if protocol.lower() == "http" or protocol.lower() == "https":
                 self.listeners[name] = HttpListener(name, port, protocol)
             elif protocol == "binary":
                 self.listeners['name'] = BinaryListener(name, port, protocol)
             else:
                 return False
             self.db.listener.create_new_listener_record(name, port, protocol, auto_start)
+        else:
+            print("name not unique.")
+            return False
 
 
 
@@ -120,11 +124,11 @@ class ListenerManagement:
         #     return {}
         for listener in self.listeners:
             # print(dir(self.listeners[listener]))
-            blah[self.listeners[listener].name] = {"type":self.listeners[listener].type,
-                                                   "port":self.listeners[listener].port,
-                                                   "state":self.listeners[listener].query_state(),
-                                                   "id":"who knows",
-                                                   "common_name":self.listeners[listener].name}
+            blah[self.listeners[listener].name] = {"type": self.listeners[listener].type,
+                                                   "port": self.listeners[listener].port,
+                                                   "state": self.listeners[listener].query_state(),
+                                                   "id": "who knows",
+                                                   "common_name": self.listeners[listener].name}
 
         return blah
 
@@ -132,15 +136,18 @@ class ListenerManagement:
     # def process_for_submission(self, username, form):
     def listener_form_submission(self, username, form):
         if self.db.user.User_IsUserAdminAccount(username) is False:
-            return False
+            return False, "You are not an admin."
         # print(form)
 
-        if "auto_start" in form:
+        if "listener_name" in form:
             auto_start = False
             if "auto_start" in form:
                 auto_start = True
-            self._create_listener(form['name'], form['protocol'], form['port'],auto_start)
-
+            listener_created = self._create_listener(form['listener_name'], form['listener_protocol'], form['listener_port'],auto_start)
+            if listener_created is True:
+                return True, "Listener created"
+            else:
+                return False, "Error in _create_listener()"
 
         elif "state_change" in form:
             # print("we're now changing the state of a listener!!")

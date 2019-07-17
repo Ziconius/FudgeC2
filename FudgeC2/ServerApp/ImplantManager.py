@@ -265,6 +265,24 @@ def ImplantStager(cid):
     return render_template("ImplantStagerPage.html", implantList=StagerGen.GenerateStaticStagers(cid, current_user.user_email))
 
 
+@app.route("/<cid>/implant/active/<uik>", methods=["GET", "POST"])
+@app.route("/<cid>/implant/active", methods=["GET", "POST"])
+@login_required
+def display_active_implant(cid, uik=None):
+    g.setdefault('cid', cid)
+    implants = ImpMgmt.get_active_campaign_implants(current_user.user_email, cid)
+    print("::",uik)
+    if uik is not None:
+        print("aa")
+        if type(implants) == list:
+            for x in implants:
+                print("! {}::{}",uik,x['unique_implant_id'])
+                if int(x['unique_implant_id']) == int(uik):
+                    print("aaaaa")
+                    return render_template("implant/ActiveImplants.html", imp=implants, render=x)
+    return render_template("implant/ActiveImplants.html", imp=implants)
+
+
 @app.route("/<cid>/implant/status", methods=['GET', 'POST'])
 @login_required
 def get_active_implant_status(cid):
@@ -297,8 +315,8 @@ def get_active_implant_status(cid):
 def CampaignGraph(cid):
     g.setdefault('cid', cid)
     # -- If we receive a POST request then we will populate the page, this will be called AFTER the page has loaded.
-    if request.method=="POST":
-        blah = {'a':"1",'b':"v"}
+    if request.method == "POST":
+        blah = {'a':"1", 'b':"v"}
         return jsonify(blah)
     return render_template("CampaignGraph.html")
 
