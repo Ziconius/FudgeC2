@@ -30,15 +30,7 @@ def start_controller(listener_management):
 
 Manager = ImplantManager.app
 LM = ListenerManagement.ListenerManagement(Settings.tls_listener_cert, Settings.tls_listener_key)
-
-# -- Hard coding a listener on port 5000 & 8080.
-# --    This will be held here until a further testing, and implementing database support + auto start on reboot
-# --    functionality. Passing in the user "admin" which as a hardcoded value.
-# --
-# --    Note: If 'admin' if not a existing admin account this will fail.
-LM._create_listener("hardcoded http listener", "http", 5000, False)
-LM._create_listener("hardcoded https listener", "https", 8080, False)  # This requires TLS certs before starting.
-# LM.create_listener("hardcoded https listener 2", "http",1234, True)
+LM.start_auto_run_listeners_at_boot()
 
 try:
     check_tls_certificates(Settings.tls_listener_cert, Settings.tls_listener_key)

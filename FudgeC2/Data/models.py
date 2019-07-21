@@ -133,6 +133,7 @@ class Listeners(Base):
     state = Column(INTEGER())
     protocol = Column(INTEGER())
     port = Column(INTEGER())
+    auto_run = Column(INTEGER())
 
 
 # -- Generate an empty database if non-existent.

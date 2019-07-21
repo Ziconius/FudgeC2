@@ -36,6 +36,7 @@ class HttpListener(Listener):
     path = os.getcwd() + "/Storage/"
     # print(path)
 
+    # Internal
     def create_app(self, listener_type):
         import Listeners.HttpListener
         del sys.modules["Listeners.HttpListener"]
@@ -43,6 +44,7 @@ class HttpListener(Listener):
         http_listener_module.app.config['listener_type'] = listener_type
         return http_listener_module.app
 
+    # Internal
     def start_http_listener_thread(self, obj, App, protocol_type):
         # print(self.path + self.tls_cert)
         if protocol_type == "http":
@@ -55,14 +57,18 @@ class HttpListener(Listener):
                     threaded=True,
                     ssl_context=(self.path + self.tls_cert, self.path + self.tls_key))
 
+    # External
     def start_listener(self):
+        print("name: {}, port: {}, proto: {}".format(self.name,self.port,self.type))
         print("Running HTTP Listener: {}".format(self.port))
-        a = self.create_app(self.type)
+        app = self.create_app(self.type)
         self.thread = threading.Thread(target=self.start_http_listener_thread,
-                                       args=(self.port, a, self.type,),
+                                       args=(self.port, app, self.type,),
                                        daemon=True)
         self.thread.start()
 
+    # External
+    # TODO: Randomise endpoint value.
     def stop_listener(self):
         requests.get("{}://127.0.0.1:{}/nlaksnfaobcaowb".format(self.type, self.port))
         self.thread = None
@@ -89,7 +95,7 @@ class ListenerManagement:
         # self.db.listener.get_all_listeners()
         return True
 
-    def _create_listener(self, name, raw_protocol, port, auto_start=False):
+    def _create_listener(self, name, raw_protocol, port, auto_start=False, reboot=False):
         protocol = raw_protocol.lower()
         if self._check_if_listener_is_unique(name, port, protocol):
             if protocol.lower() == "http" or protocol.lower() == "https":
@@ -98,11 +104,20 @@ class ListenerManagement:
                 self.listeners['name'] = BinaryListener(name, port, protocol)
             else:
                 return False
-            self.db.listener.create_new_listener_record(name, port, protocol, auto_start)
+
+            if reboot is not True:
+                if self.db.listener.create_new_listener_record(name, port, protocol, auto_start) is False:
+                    return False
+
+            if auto_start == True:
+                self.listeners[name].start_listener()
+
+
         else:
             print("name not unique.")
             return False
 
+        return True
 
 
     def _update_listener_state(self, listener, state):
@@ -162,3 +177,8 @@ class ListenerManagement:
             return False, ""
 
         return True, ""
+
+    def start_auto_run_listeners_at_boot(self):
+        auto_run_listeners = self.db.listener.get_all_listeners()
+        for listener in auto_run_listeners:
+            self._create_listener(listener.name, listener.protocol, listener.port, listener.auto_run, True)
