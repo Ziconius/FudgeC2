@@ -8,21 +8,21 @@ from Data.Database import Database
 
 class Listener:
 
-    def __init__(self, name, port, type):
-        # print("In Listener")
+    def __init__(self, name, port, protocol):
         self.name = name
         self.port = port
-        self.type = type
+        self.type = protocol
         self.thread = None
 
-    # def state_change(self, required_state):
-    #     return
     def query_state(self):
         try:
             a = self.thread.is_alive()
         except Exception as E:
             a = False
         return a
+
+    def start_listener(self):
+        return
 
     def stop_listener(self):
         self.thread = None
@@ -34,40 +34,33 @@ class HttpListener(Listener):
     tls_key = "server.key"
     tls_cert = "server.crt"
     path = os.getcwd() + "/Storage/"
-    # print(path)
 
-    # Internal
-    def create_app(self, listener_type):
+    def _create_app(self, listener_type):
         import Listeners.HttpListener
         del sys.modules["Listeners.HttpListener"]
         import Listeners.HttpListener as http_listener_module
         http_listener_module.app.config['listener_type'] = listener_type
         return http_listener_module.app
 
-    # Internal
-    def start_http_listener_thread(self, obj, App, protocol_type):
+    def _start_http_listener_thread(self, app, port, protocol_type):
         # print(self.path + self.tls_cert)
         if protocol_type == "http":
-            App.run(debug=False, use_reloader=False, host='0.0.0.0', port=obj, threaded=True)
+            app.run(debug=False, use_reloader=False, host='0.0.0.0', port=port, threaded=True)
         elif protocol_type == "https":
-            App.run(debug=False,
+            app.run(debug=False,
                     use_reloader=False,
                     host='0.0.0.0',
-                    port=obj,
+                    port=port,
                     threaded=True,
                     ssl_context=(self.path + self.tls_cert, self.path + self.tls_key))
 
-    # External
     def start_listener(self):
-        print("name: {}, port: {}, proto: {}".format(self.name,self.port,self.type))
-        print("Running HTTP Listener: {}".format(self.port))
-        app = self.create_app(self.type)
-        self.thread = threading.Thread(target=self.start_http_listener_thread,
-                                       args=(self.port, app, self.type,),
+        app = self._create_app(self.type)
+        self.thread = threading.Thread(target=self._start_http_listener_thread,
+                                       args=(app, self.port, self.type,),
                                        daemon=True)
         self.thread.start()
 
-    # External
     # TODO: Randomise endpoint value.
     def stop_listener(self):
         requests.get("{}://127.0.0.1:{}/nlaksnfaobcaowb".format(self.type, self.port))
@@ -77,9 +70,10 @@ class HttpListener(Listener):
 class BinaryListener(Listener):
     pass
 
-    def run(self):
+    def start_listener(self):
         return
-
+    def stop_listener(self):
+        return
 
 
 class ListenerManagement:
@@ -87,7 +81,6 @@ class ListenerManagement:
     db = Database()
 
     def __init__(self, a, b):
-        # print(a, b)
         pass
 
     def _check_if_listener_is_unique(self, name, port, protocol):
@@ -109,16 +102,14 @@ class ListenerManagement:
                 if self.db.listener.create_new_listener_record(name, port, protocol, auto_start) is False:
                     return False
 
-            if auto_start == True:
+            if auto_start is True or auto_start == 1:
                 self.listeners[name].start_listener()
-
 
         else:
             print("name not unique.")
             return False
 
         return True
-
 
     def _update_listener_state(self, listener, state):
         if listener in self.listeners.keys():
@@ -135,24 +126,17 @@ class ListenerManagement:
 
     def get_active_listeners(self):
         blah = {}
-        # if len(self.listeners) == 0:
-        #     return {}
         for listener in self.listeners:
-            # print(dir(self.listeners[listener]))
             blah[self.listeners[listener].name] = {"type": self.listeners[listener].type,
                                                    "port": self.listeners[listener].port,
                                                    "state": self.listeners[listener].query_state(),
                                                    "id": "who knows",
                                                    "common_name": self.listeners[listener].name}
-
         return blah
 
-
-    # def process_for_submission(self, username, form):
     def listener_form_submission(self, username, form):
         if self.db.user.User_IsUserAdminAccount(username) is False:
             return False, "You are not an admin."
-        # print(form)
 
         if "listener_name" in form:
             auto_start = False

