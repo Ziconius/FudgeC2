@@ -42,9 +42,12 @@
             <h2>Built in commands</h2>
             <p>Active implants have a number of builtin commands designed to perform common actions, and harvest host information.<br>
             below is the list of current implant commands:</p>
+            <code>:: enable_persistence</code>
+            <p>Enables persistence by embedding a stager payload into the following register key:<br>
+                HKCU:\Software\Microsoft\Windows\CurrentVersion\Run\</p>
             <code>:: sys_info</code>
-            <p> Sys_info: Collects username and hostname. (Not yet implemented)</p>
-            <code>:: network_info</code>
+            <p> Sys_info: Collects username and hostname. </p>
+            <code>:: network_info</code> (Not yet implemented)
             <p>Collects network information including domain, hostname, ip address, active network services.</p>
 
 

