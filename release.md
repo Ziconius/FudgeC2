@@ -6,12 +6,12 @@ Below is an high-level overview of the on-going development to increase function
 
 Create further obfuscation and jinja templatework
  C2 Server
- - [ ] Add function name randomisation for all functions
+ - [x] Add function name randomisation for all functions
  - [ ] Create protocol obfuscation
- - [ ] Add comments and contact details into unobfuscated implant
+ - [x] Add comments and contact details into unobfuscated implant
  Web App
  - [ ] Add text/comments for unobfuscated implant
-
+    
 ---
 **Release 0.6 _(Worgen Shaman)_**
 
