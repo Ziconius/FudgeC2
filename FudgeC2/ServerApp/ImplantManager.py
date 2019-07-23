@@ -9,12 +9,14 @@ from ServerApp.modules.UserManagement import UserManagementController
 from ServerApp.modules.StagerGeneration import StagerGeneration
 from ServerApp.modules.ImplantManagement import ImplantManagement
 from ServerApp.modules.ApplicationManager import AppManager
+from ServerApp.modules.ExportManager import CampaignExportManager
 
 Imp = ImplantSingleton.instance
 UsrMgmt = UserManagementController()
 ImpMgmt = ImplantManagement()
 StagerGen = StagerGeneration()
 AppManager = AppManager()
+ExpoManager = CampaignExportManager()
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -330,6 +332,18 @@ def CampaignLogs(cid):
         # Get_CampaignLogs
         return jsonify(ImpMgmt.Get_CampaignLogs(current_user.user_email, cid))
     return render_template("CampaignLogs.html")
+
+
+@app.route("/<cid>/export_campaign", methods=["GET"])
+@login_required
+def export_campaign_by_cid(cid):
+    g.setdefault('cid', cid)
+    download = request.args.get('download', default=False, type=bool)
+    file_dir = "../Storage/ExportedCampaigns/"
+    export_result = ExpoManager.export_campaign_database(current_user.user_email, cid)
+    if export_result is not False:
+        return send_file(file_dir + "blah.sql", attachment_filename='campaign.sqlite')
+    return url_for("BaseImplantPage", cid=cid)
 
 
 # -- Implant command execution -- #

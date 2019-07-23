@@ -130,7 +130,7 @@ class Listeners(Base):
     __tablename__ = 'listeners'
     auto_id = Column(INTEGER(), nullable=False, index=True, primary_key=True)
     name = Column(String())
-    state = Column(INTEGER()) # This can be removed.
+    state = Column(INTEGER())  # This can be removed.
     protocol = Column(INTEGER())
     port = Column(INTEGER())
     auto_run = Column(INTEGER())

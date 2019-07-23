@@ -7,6 +7,7 @@
 .__pycharm__/*
 __pycache__/*
 modules/__pycache__/*
+FudgeC2/Storage/ExportedCampaigns/*
 .idea/*
 scratch*
 *-journal

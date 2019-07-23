@@ -32,40 +32,40 @@ class ImplantManagement:
             if preprocessed_command in special_cmd:
                 postprocessed_command = ":: "+preprocessed_command
                 return postprocessed_command, True
-            return command, {"cmd_reg":{"result":False, "reason":"Unknown inbuilt command, i.e. '::'"}}
+            return command, {"cmd_reg": {"result": False, "reason": "Unknown inbuilt command, i.e. '::'"}}
         return command, True
 
-    def ImplantCommandRegistration(self, cid , username, form):
+    def ImplantCommandRegistration(self, cid, username, form):
         # -- This should be refactored at a later date to support read/write changes to
         # --    granular controls on templates, and later specific implants
-        #print("CID: ",cid,"\nUSR: ",username,"\nCMD: ",form)
-        User = self.db.campaign.Verify_UserCanWriteCampaign(username,cid)
-        if User == False:
-            return {"cmd_reg":{"result":False,"reason":"You are not authorised to register commands in this campaign."}}
+        # print("CID: ",cid,"\nUSR: ",username,"\nCMD: ",form)
+        User = self.db.campaign.Verify_UserCanWriteCampaign(username, cid)
+        if User is False:
+            return {"cmd_reg": {"result": False, "reason": "You are not authorised to register commands in this campaign."}}
 
         # -- Get All implants or implants by name then send to 'implant.py'
         # -- email, unique implant key, cmd
         if "cmd" in form and "ImplantSelect" in form:
             # -- before checking the database assess the cmd that was input.
             if len(form['cmd']) == 0:
-                return {"cmd_reg":{"result":False,"reason":"No command submitted."}}
+                return {"cmd_reg": {"result": False, "reason": "No command submitted."}}
             processed_command, validated_command = self._validate_command(form['cmd'])
-            if validated_command != True:
+            if validated_command is not True:
                 return validated_command
 
             # -- If validated_command is True then continue as it IS a valid command. N.b it may not be a legitimate command, but it is considered valid here.
             if form['ImplantSelect'] == "ALL":
-                ListOfImplants = self.db.implant.Get_AllGeneratedImplantsFromCID(cid)
+                list_of_implants = self.db.implant.Get_AllGeneratedImplantsFromCID(cid)
             else:
-                ListOfImplants= self.db.implant.Get_AllImplantIDFromTitle(form['ImplantSelect'])
+                list_of_implants = self.db.implant.Get_AllImplantIDFromTitle(form['ImplantSelect'])
             # -- Access if this can fail. If empty return error.
-            if len(ListOfImplants) == 0:
-                return {"cmd_reg":{"result":False,"reason":"No implants listed."}}
-            for implant in ListOfImplants:
+            if len(list_of_implants) == 0:
+                return {"cmd_reg": {"result": False, "reason": "No implants listed."}}
+            for implant in list_of_implants:
                 # -- Create return from the Implant.AddCommand() method.
-                self.Imp.AddCommand(username,cid,implant['unique_implant_id'], processed_command)
-            return {"cmd_reg":{"result":True,"reason":"Command registered"}}
-        return {"cmd_reg":{"result":False,"reason":"Incorrect implant given, or non-existent active implant."}}
+                self.Imp.AddCommand(username, cid, implant['unique_implant_id'], processed_command)
+            return {"cmd_reg": {"result": True, "reason": "Command registered"}}
+        return {"cmd_reg": {"result": False, "reason": "Incorrect implant given, or non-existent active implant."}}
 
     def CreateNewImplant(self,cid, form, user):
         # TODO: Create checks for conflicting ports.
@@ -160,7 +160,7 @@ class ImplantManagement:
                     raise ValueError("Error creating entry. Ensure implant title is unique.")
 
         except Exception as E:
-            return (False, E)
+            return False, E
 
         return
 
@@ -180,12 +180,12 @@ class ImplantManagement:
 
     def Get_CampaignLogs(self, username, cid):
         User = self.db.campaign.Verify_UserCanReadCampaign(username, cid)
-        if User == False:
+        if User is False:
             return {
                 "cmd_reg": {"result": False, "reason": "You are not authorised to view commands in this campaign."}}
         return self.db.Log_GetCampaignActions(cid)
 
-    def get_active_campaign_implants(self,user, campaign_id):
+    def get_active_campaign_implants(self, user, campaign_id):
         if self.db.campaign.Verify_UserCanAccessCampaign(user, campaign_id):
             return self.db.implant.Get_AllGeneratedImplantsFromCID(campaign_id)
         else:
