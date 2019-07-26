@@ -1,9 +1,14 @@
 import os
 import time
-from Data.Database import Database
+import base64
+import random
+import string
 
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
-from sqlalchemy import Column, ForeignKey, String, text, create_engine
+from sqlalchemy import Column, String, text, create_engine, ForeignKey
 from sqlalchemy.dialects.mysql import INTEGER
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -11,9 +16,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
+from Data.Database import Database
 
 Base = declarative_base()
 metadata = Base.metadata
+
+
 
 class ExportedCampaign(Base):
     __tablename__ = 'export_data'
@@ -22,23 +30,15 @@ class ExportedCampaign(Base):
     time = Column(String(255), nullable=False)
     log_type = Column(String(255), nullable=False)
     entry = Column(String(255), nullable=False)
-    # user_email = Column(String(255), nullable=False)
-    # password = Column(String(255), nullable=False)
-    # last_login = Column(String(255), nullable=False)
-    # authenticated = Column(String, server_default=text("False"))
-    # admin = Column(String(255), nullable=False)
-    # first_logon = Column(INTEGER(1), nullable=False, default=0)
-    # first_logon_guid = Column(String(32), nullable=False, default="0")
 
 
 class DbCreator:
     filename = ""
     Session = None
+
     def __init__(self, filename):
         filename = filename
-        print ("creating target file needs to be in init")
-
-        metadata = Base.metadata
+        print("creating target file needs to be in init")
 
         path = os.getcwd() + "/Storage/ExportedCampaigns/"
         database_name = filename
@@ -49,23 +49,20 @@ class DbCreator:
         """:type: sqlalchemy.orm.Session"""  # PyCharm type fix. Not required for execution.
 
 
-# TODO: Create a auth log table.
-
-
-
 # Shell for exporting a campaign for FudgeC2 Viewer application.
 class CampaignExportManager:
     export_db = None
     db = Database()
+    file_dir = "Storage/ExportedCampaigns/"
 
     def test(self, filename, file_dir):
         # check file name for uniqueness.
         self.export_db = DbCreator(filename)
-        a =self.export_db.Session.query(ExportedCampaign).all()
-        print(a.__repr__())
+        a = self.export_db.Session.query(ExportedCampaign).all()
+        # print(a.__repr__())
         return a
 
-    def test_put(self,a,b,c,d):
+    def test_put(self, a, b, c, d):
         logs = ExportedCampaign(
             user=str(a),
             time=str(b),
@@ -74,36 +71,51 @@ class CampaignExportManager:
         )
         self.export_db.Session.add(logs)
         self.export_db.Session.commit()
+    def _validate_user_(self, username, cid):
+        if self.db.user.User_IsUserAdminAccount(username) is not False:
+            if self.db.campaign.Verify_UserCanReadCampaign(username, cid) is not False:
+                return True
+        return False
+    def get_encrypted_file(self, username, cid, filename):
+        if self._validate_user_(username, cid) is False:
+            return False
+
+        a = os.listdir(self.file_dir)
+        if filename in a:
+            return filename
+        else:
+            return False
 
     def export_campaign_database(self, username, cid):
-        # check user is admin
-        if self.db.user.User_IsUserAdminAccount(username) is False:
+        if self._validate_user_(username, cid) is False:
             return False
-        # check campaign exists
-        if self.db.campaign.Verify_UserCanReadCampaign(username, cid) is False:
-            return False
-        # check user has read access to campaign
+
+
         db = self._generate_database_(cid)
         if db is False:
             return False
 
         # db contains(filename, file_path, password)
-        self.encrypt_file(db[0],db[1],db[2])
-        return "blah.sql", "encryption_password"
+        result = self.encrypt_file(db[0], db[1], db[2])
+        if result is False:
+            return
+        return result[0], result[1]
 
     def _generate_database_(self, cid):
         # DONE  get information (func)
         # check database export directory exists
         # DONE check file doesn't exist
         # DONE create campaign_name_unixtime
-        # create database
-        # encrypt
-        # return file, return password
-        password = "blahBlahBLAH!"
+        # DONE create database
+        # DONE encrypt
+        # DONE return file, return password
+
+        password = str(''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=12)))
+        print(type(password))
         raw_logs = self.db.Log_GetCampaignActions(cid)
 
         campaign_name = self.db.campaign.Get_CampaignNameFromCID(cid)
-        file_name = "{}_{}".format(campaign_name.replace(" ","_"),int(time.time()))
+        file_name = "{}_{}".format(campaign_name.replace(" ", "_"), int(time.time()))
         file_dir = "Storage/ExportedCampaigns/"
         a = os.listdir(file_dir)
         database = file_dir + file_name
@@ -113,10 +125,7 @@ class CampaignExportManager:
 
         b = self.test(file_name, file_dir)
         for x in raw_logs:
-            print(raw_logs[x])
-            self.test_put(raw_logs[x]['user'],raw_logs[x]['time'],raw_logs[x]['log_type'],raw_logs[x]['entry'])
-
-
+            self.test_put(raw_logs[x]['user'], raw_logs[x]['time'], raw_logs[x]['log_type'], raw_logs[x]['entry'])
 
         return file_name, file_dir, password
 
@@ -127,12 +136,6 @@ class CampaignExportManager:
         return
 
     def encrypt_file(self, filename, file_path, password):
-
-        import base64
-        import os
-        from cryptography.hazmat.backends import default_backend
-        from cryptography.hazmat.primitives import hashes
-        from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
         password_provided = password  # This is input in the form of a string
         password = password_provided.encode()  # Convert to type bytes
@@ -146,9 +149,8 @@ class CampaignExportManager:
         )
         key = base64.urlsafe_b64encode(kdf.derive(password))
 
-
         from cryptography.fernet import Fernet
-        #key = b''  # Use one of the methods to get a key (it must be the same when decrypting)
+        # key = b''  # Use one of the methods to get a key (it must be the same when decrypting)
         input_file = file_path+filename
         output_file = file_path+filename+".encrypted"
 
@@ -162,3 +164,4 @@ class CampaignExportManager:
         with open(output_file, 'wb') as f:
             f.write(encrypted)
 
+        return filename+".encrypted", password

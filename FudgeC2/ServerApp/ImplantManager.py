@@ -338,11 +338,31 @@ def CampaignLogs(cid):
 @login_required
 def export_campaign_by_cid(cid):
     g.setdefault('cid', cid)
+    #
     download = request.args.get('download', default=False, type=bool)
-    file_dir = "../Storage/ExportedCampaigns/"
-    export_result = ExpoManager.export_campaign_database(current_user.user_email, cid)
-    if export_result is not False:
-        return send_file(file_dir + "blah.sql", attachment_filename='campaign.sqlite')
+    # if download:
+    #     file_dir = "../Storage/ExportedCampaigns/"
+    #     export_result = ExpoManager.export_campaign_database(current_user.user_email, cid)
+    #     if export_result is not False:
+    #         print(export_result)
+    #         return send_file(file_dir + export_result[0],as_attachment=True, attachment_filename=str(export_result[0]))
+    download = request.args.get('download', default=False, type=str)
+    print("FILENAME IS: ", download)
+    if download is not False:
+        # STart download process.
+        filename = ExpoManager.get_encrypted_file(current_user.user_email, cid, download)
+
+        if filename is False:
+            return "False"
+        else:
+            return send_file("../Storage/ExportedCampaigns/"+filename, as_attachment=True, attachment_filename="filename")
+    else:
+        export_result = ExpoManager.export_campaign_database(current_user.user_email, cid)
+        if export_result is not False:
+            print(export_result)
+            return jsonify({"filename":export_result[0], "password":export_result[1]})
+
+
     return url_for("BaseImplantPage", cid=cid)
 
 

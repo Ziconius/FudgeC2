@@ -10,7 +10,7 @@
             <p><a href="/{{ cid }}/logs">Implant Logs</a></p>
             <p><a href="/{{ cid }}/graphs">Graphs</a></p>
             <p><a href="/{{ cid }}/settings">Campaign Settings</a></p>
-            <p><a href="/{{ cid }}/export_campaign">Export Campaign</a></p>
+            <p><a href="javascript:export_campaign({{ cid }})">Export Campaign</a></p>
         </div>
     </div>
     <div class="col-lg-10 m-0 pl-0 p-2 ">
@@ -20,4 +20,31 @@
         </div>
     </div>
 </div>
+<!-- Export campaign modal-->
+<div class="modal fade" id="FormSubmissionModal" tabindex="-1" role="dialog" aria-labelledby="FormSubmissionModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="FormModalTitle">Download encrypted campaign data</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="modal-result">aaa</div>
+          The password decrypt the campaign data is:
+        <div id="modal-password"></div>
+      </div>
+      <div class="modal-footer">
+          <form name="download" action="/1/export_campaign" method="get" >
+              <input hidden id="filename_input" type="text" name="download" value="">
+              <button type="submit" class="btn" >Download</button>
+          </form>
+
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End export modal-->
 {% endblock %}

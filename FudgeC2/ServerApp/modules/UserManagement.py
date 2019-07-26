@@ -20,14 +20,15 @@ class UserManagementController:
             Result_Dict['reason'] = "Username too short"
             return Result_Dict
         U = self.db.user.Get_UserObject(submitting_user)
-        if U.admin == 1:
+        print(U.admin)
+        if int(U.admin) == 1:
             G = self.db.user.Get_UserObject(formdata['UserName'])
             admin = False
             if 'is_admin' in formdata:
                 admin = True
             if G == None:
                 N=8
-                pw=''.join(random.choices(string.ascii_uppercase + string.digits, k=N))
+                pw=''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=N))
                 self.db.user.add_new_user(formdata['UserName'],pw,admin)
                 Result_Dict['result']=True
                 Result_Dict['reason']=str(formdata['UserName']+" now created. Password is: "+pw+" <br> Take note of this, it will not be visable again.")
@@ -35,7 +36,9 @@ class UserManagementController:
                 Result_Dict['result'] = False
                 Result_Dict['reason'] = "User already exists."
             # -- Validate
-
+        else:
+            print("Not Admin user")
+        print(Result_Dict)
         return Result_Dict
 
     def AddUserToCampaign(self, submitter, Users, Campaign, Rights=0):
