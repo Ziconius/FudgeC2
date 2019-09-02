@@ -1,4 +1,6 @@
 from random import randint
+
+
 class PSObfucate():
     ascii_letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     def __varString__(self):
@@ -8,6 +10,8 @@ class PSObfucate():
         c = self.ascii_letters[randint(0, 51)]
         d = a + b + c
         return d
+
+
     def variableObs(self, variableStr):
         go=[]
         op=""
@@ -28,8 +32,9 @@ class PSObfucate():
             if len(go) == 0:
                 break
             AssignVariableString=AssignVariableString+go.pop(randint(0,len(go)-1))+";"
-        print(AssignVariableString)
-        print(op)
+        # print(AssignVariableString)
+        # print(op)
+        return AssignVariableString, op
 
 
 

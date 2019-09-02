@@ -18,7 +18,7 @@ class ImplantSingleton:
                 # -- UIK is embedded into the implant via Jinja on delivery.
 
 
-
+                # BUG: If the X-Header is mangled this errors.
                 ImplantObj=db.implant.Get_GeneratedImplantDataFromUIK(UIK)
                 # Updates an implants last check-in time.
                 db.implant.Update_ImplantLastCheckIn(ImplantObj['cid'], UIK, c2_protocol)

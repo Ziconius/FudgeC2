@@ -68,10 +68,11 @@ class DatabaseImplant:
             return []
 
     def Get_AllGeneratedImplantsFromCID(self, campaign_id):
+        print(campaign_id)
         raw_implants = self.Session.query(GeneratedImplants,
                                           Implants).filter(GeneratedImplants.iid == Implants.iid,
                                                            Implants.cid == campaign_id).all()
-
+        print(raw_implants)
         generated_implants = self.db_methods.__splice_implants_and_generated_implants__(raw_implants)
         if generated_implants is not None:
             return generated_implants
