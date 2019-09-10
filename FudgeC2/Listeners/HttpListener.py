@@ -19,9 +19,9 @@ def before_request():
 
 
 @app.after_request
-def add_header(r):
-    # r.headers["X-Command"] = a
-    return r
+def alter_headers(response):
+    response.headers['Server'] = "Apache/2.4.1 (Unix)"
+    return response
 
 
 # -- TODO: extracted and added into a new stager specific listener(?)
