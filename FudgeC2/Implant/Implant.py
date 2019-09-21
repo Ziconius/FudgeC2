@@ -1,3 +1,5 @@
+import ast
+
 from Data.Database import Database
 from Implant.ImplantGenerator import ImplantGenerator
 
@@ -17,7 +19,6 @@ class ImplantSingleton:
                 # -- Issue command based on unique implant identifiers (UIK)
                 # -- UIK is embedded into the implant via Jinja on delivery.
 
-
                 # BUG: If the X-Header is mangled this errors.
                 ImplantObj=db.implant.Get_GeneratedImplantDataFromUIK(UIK)
                 # Updates an implants last check-in time.
@@ -32,7 +33,8 @@ class ImplantSingleton:
                     if len(tmpImpLogs) != 0:
                         Entry = min(tmpImpLogs, key=lambda x: x.time)
                         if db.implant.Register_ImplantCommandPickup(Entry, c2_protocol):
-                            return Entry.log_entry
+                            # Entry.log_entry is currently cast to a string at this stage.
+                            return ast.literal_eval(Entry.log_entry)
 
             # -- Create a suitable null response.
             # --    This may be a random value, depending on how the implant handles it.

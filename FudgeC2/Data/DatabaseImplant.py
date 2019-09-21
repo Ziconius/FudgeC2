@@ -181,7 +181,7 @@ class DatabaseImplant:
                 new_implant_log = ImplantLogs(cid=cid,
                                               uid=uid,
                                               time=time.time(),
-                                              log_entry=command,
+                                              log_entry=str(command),
                                               uik=uik,
                                               read_by_implant=0)
 
@@ -215,6 +215,7 @@ class DatabaseImplant:
 
     @CL.log_cmdpickup
     def Register_ImplantCommandPickup(self, record, protocol):
+        # DEV NOTES: DwarvenBlacksmith: This will require the command to be cast from string to dict.
         self.Session.query(ImplantLogs).filter(
             ImplantLogs.uik == record.uik,
             ImplantLogs.log_entry == record.log_entry,

