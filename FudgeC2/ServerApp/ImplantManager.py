@@ -90,7 +90,7 @@ def login():
             else:
                 guid = UsrMgmt.get_first_logon_guid(request.form['email'])
                 return render_template("auth/PasswordResetPage.html",guid=guid)
-    return render_template("auth/LoginPage.html")
+    return render_template("auth/LoginPage.html", fudge_version=AppManager.get_software_verision_number(), fudge_version_name=AppManager.get_software_verision_name())
 
 @app.route("/auth/logout")
 @login_required
@@ -371,7 +371,6 @@ def export_campaign_by_cid(cid):
 @login_required
 def ImplantCommandRegistration(cid):
     if request.method == "POST":
-        # print("\nCID: ", cid, "\nFRM: ",request.form)
         # -- This is the new format using ImpMgmt to handle validation of user and command.
         registration_response = ImpMgmt.ImplantCommandRegistration(cid, current_user.user_email, request.form)
         # -- Currently no return value is required. This should be defined.

@@ -1,6 +1,7 @@
 import requests
 from distutils.version import LooseVersion
 from Data.Database import Database
+from Storage.settings import Settings
 
 
 class AppManager:
@@ -14,14 +15,12 @@ class AppManager:
         # Returns "True" if the software is behind GitHubs master version file.
         url = "https://raw.githubusercontent.com/Ziconius/FudgeC2/master/version.txt"
         try:
-            request_result = requests.get(url, timeout=0.5)
+            request_result = requests.get(url, timeout=1)
             master = request_result.content.decode()
-            with open("../version.txt", 'r') as v_file:
-                local_version_number = str(v_file.read())
-                if LooseVersion(master) > LooseVersion(local_version_number):
-                    return True
-                else:
-                    return False
+            if LooseVersion(master) > LooseVersion(Settings.version):
+                return True
+            else:
+                return False
         except Exception as exception_text:
             print(exception_text)
             return False
@@ -29,12 +28,20 @@ class AppManager:
     @staticmethod
     def get_software_verision_number():
         try:
-            with open("../version.txt", 'r') as v_file:
-                local_version_number = str(v_file.read())
-                return local_version_number
+            version = Settings.version
+            return version
         except Exception as exception_text:
             print(exception_text)
             return "0.0.0"
+
+    @staticmethod
+    def get_software_verision_name():
+        try:
+            version = Settings.version_name
+            return version
+        except Exception as exception_text:
+            print(exception_text)
+            return "Unknown"
 
     def campaign_create_campaign(self, user, form):
         # Responsible for validating admin account, and campaign title exists.
