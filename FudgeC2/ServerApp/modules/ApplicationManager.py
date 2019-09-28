@@ -12,8 +12,8 @@ class AppManager:
 
     @staticmethod
     def check_software_version():
-        # Returns "True" if the software is behind GitHubs master version file.
-        url = "https://github.com/Ziconius/FudgeC2/tree/master/FudgeC2/Storage/version.txt"
+        # Returns "True" if the software is behind Git Hubs master version file.
+        url = "https://raw.githubusercontent.com/Ziconius/FudgeC2/master/FudgeC2/Storage/version.txt"
         try:
             request_result = requests.get(url, timeout=1)
             master = request_result.content.decode()
@@ -22,7 +22,7 @@ class AppManager:
             else:
                 return False
         except Exception as exception_text:
-            print(exception_text)
+            print("check_software_version(): ",exception_text)
             return False
 
     @staticmethod
