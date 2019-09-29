@@ -83,10 +83,12 @@ def login():
         if 'email' in request.form and 'password' in request.form and request.form['email'] != None and request.form['password'] != None:
             UserObject = UsrMgmt.user_login(request.form['email'],request.form['password'])
             if UserObject == False:
-                return render_template("auth/LoginPage.html", error="Incorrect Username/Password")
+                return redirect(url_for("BaseHomePage", error="Incorrect Username/Password"))
+
             if UserObject.first_logon == 1:
                 login_user(UserObject)
                 return redirect(url_for("BaseHomePage"))
+
             else:
                 guid = UsrMgmt.get_first_logon_guid(request.form['email'])
                 return render_template("auth/PasswordResetPage.html",guid=guid)
@@ -393,7 +395,3 @@ def HelpPage():
 #         #ImpMgmt.Demo_CreateNewImplant(1, request.form,current_user.user_email)
 #
 #     return render_template("Demo_CreateImplant.html")
-
-if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0', port=5001, threaded=True)
-    print("App running")

