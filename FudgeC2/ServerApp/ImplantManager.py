@@ -114,27 +114,6 @@ def PasswordReset():
     return redirect(url_for('login'))
 
 
-# -- JSON Response for command responses and waiting commands -- #
-# -------------------------------------------------------------- #
-# TODO: Replace JSON enpoints with websockets.
-
-
-@app.route("/<cid>/cmd_response", methods=['GET', 'POST'])
-@login_required
-def cmdreturn(cid):
-    # -- Javascript appears to not be printing out all entries
-    if UsrMgmt.campaign_get_user_access_right_cid(current_user.user_email, cid):
-        return jsonify(Imp.Get_CommandResult(cid))
-    else:
-        return str(0)
-
-
-@app.route("/<cid>/waiting_commands", methods=['GET', 'POST'])
-@login_required
-def waitingcommands(cid):
-    # -- Get JSON blob which contains all implant commands and then registration state
-    commands = ImpMgmt.Get_RegisteredImplantCommands(current_user.user_email, cid)
-    return jsonify(commands)
 
 
 # -- Main endpoints -- #
@@ -190,7 +169,7 @@ def Listener_Updates():
 # -- CAMPAIGN SPECIFIC PAGES -- #
 # ----------------------------- #
 
-@app.route("/<cid>/")
+@app.route("/<cid>/", methods=['GET'])
 @login_required
 def BaseImplantPage(cid):
     # Returns the implant interaction page if any implant templates exist.
@@ -381,11 +360,33 @@ def ImplantCommandRegistration(cid):
     return "000"
 
 
+# -- JSON Response for command responses and waiting commands -- #
+# -------------------------------------------------------------- #
+# TODO: Replace JSON enpoints with websockets.
+
+
+@app.route("/<cid>/cmd_response", methods=['GET', 'POST'])
+@login_required
+def cmdreturn(cid):
+    # -- Javascript appears to not be printing out all entries
+    if UsrMgmt.campaign_get_user_access_right_cid(current_user.user_email, cid):
+        return jsonify(Imp.Get_CommandResult(cid))
+    else:
+        return str(0)
+
+
+@app.route("/<cid>/waiting_commands", methods=['GET', 'POST'])
+@login_required
+def waitingcommands(cid):
+    # -- Get JSON blob which contains all implant commands and then registration state
+    commands = ImpMgmt.Get_RegisteredImplantCommands(current_user.user_email, cid)
+    return jsonify(commands)
+
+
 @app.route("/help", methods=["GET"])
 @login_required
 def HelpPage():
     return render_template("HelpPage.html")
-
 
 # TODO: Remove in production builds.
 # @app.route("/test", methods = ['GET','POST'])

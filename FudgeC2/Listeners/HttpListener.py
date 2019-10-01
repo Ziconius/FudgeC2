@@ -43,6 +43,10 @@ def craft_enable_persistence(value_dict):
 def craft_sys_info(value_dict):
     return str(value_dict['type'])
 
+def craft_export_clipboard(value_dict):
+    return str(value_dict['type'])
+
+
 #
 preprocessing = {
     "PS": craft_sound_file,
@@ -51,6 +55,7 @@ preprocessing = {
     "FD": craft_file_download,
     "EP": craft_enable_persistence,
     "SI": craft_sys_info,
+    "EC": craft_export_clipboard
     }
 
 

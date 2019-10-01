@@ -52,7 +52,7 @@ class ImplantManagement:
             },
             {
                 "type": "PS",
-                "args": "sound file    location (on Fudge)",
+                "args": "sound file location (on Fudge)",
                 "input":"play_audio"
             },
             {
@@ -64,8 +64,13 @@ class ImplantManagement:
                 "type": "SI",
                 "args": None,
                 "input":"sys_info"
+            },
+            {
+                "type": "EC",
+                "args": None,
+                "input": "export_clipboard"
             }
-        ] # FU,FD,PS,EP,SI
+        ] # FU,FD,PS,EP,SI, EC
 
         # Process command output into:
         if command.lstrip()[0:2] == "::":
