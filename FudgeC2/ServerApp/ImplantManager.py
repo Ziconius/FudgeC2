@@ -389,6 +389,21 @@ def HelpPage():
     return render_template("HelpPage.html")
 
 
+# -- Base for new endpoints.
+@app.route("/campaign/<cid>/implant/get_all", methods=['POST'])
+@login_required
+def get_all_active_implants(cid):
+    g.setdefault('cid', cid)
+    implant_list = UsrMgmt.campaign_get_all_implant_base_from_cid(current_user.user_email, cid)
+    if implant_list is not False:
+        if len(implant_list) > 0:
+            return render_template("implant_input.html", Implants=implant_list)
+
+    msg = "No implants have called back in association with this campaign - create an implant base and use the stager page."
+    return render_template("ImplantMain.html", cid=cid, Msg=msg)
+
+
+
 # TODO: Remove in production builds.
 # @app.route("/test", methods = ['GET','POST'])
 # def test_endpoint():
