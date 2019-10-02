@@ -24,20 +24,6 @@ class ImplantManagement:
                 return None
         return None
 
-    def _OLD_validate_command(self, command):
-        # -- TODO: Check if type needs to be enforced.
-        # This will be used to generate the diction to be added to the DB -This will use to the new Dwarven Blacksmith implant comms.
-        special_cmd = ["sys_info", "enable_persistence"]
-        if command[0:2] == "::":
-            preprocessed_command = command[2:].lower().strip()
-            if preprocessed_command in special_cmd:
-                postprocessed_command = ":: "+preprocessed_command
-                return postprocessed_command, True
-            return command, {"cmd_reg": {"result": False, "reason": "Unknown inbuilt command, i.e. '::'"}}
-        # Dwarven Blacksmith changes:
-        # Each new custom command will be created as a diction with command type and any args required
-        return command, True
-
     def _validate_command(self, command):
         command_listing = [
             {

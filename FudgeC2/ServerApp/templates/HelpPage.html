@@ -7,9 +7,9 @@
         </div>
     </div>
     <div class="col-md-10 m-0 p-2">
-        <div class="p-3 m-0 rounded iplm  ">
+        <div class="p-5 m-0 rounded iplm  ">
             <h1>FudgeC2 Documentation</h1>
-            <p class="text-warning">This documentation contain incomplete information, as well as documentation on unimplemented features.</p>
+            <p class="text-warning">This documentation may contain incomplete information, as well as documentation on unimplemented features.</p>
             <h3>Configuration</h3>
             <h4>User Account</h4>
             <h5>Add user</h5>
@@ -23,11 +23,48 @@
                 <a href="/settings">/settings</a>   </p>
 
             <br>
+
+
+            <hr>
+            <h2>Implant commands</h2>
+            <p>Active implants have a number of builtin commands designed to perform common actions, such as harvestings host information. These built in commands are invoked by pre-fixing <code>::</code> to the required command. If no pre-fix is used the implant will try to execute anything else using Powershell.<br>
+            :</p>
+            <div class="row p-1">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-9"></div>
+                <!-- copy above -->
+
+                <div class="col-sm-4 p-1 border-bottom bg-light"><code>:: sys_info</code></div>
+                <div class="col-sm-8 p-1 border-bottom bg-light">Collects username, hostname, domain, and local IP</div>
+
+                <div class="col-sm-4 p-1 border-bottom"><code>:: enable_persistence</code></div>
+                <div class="col-sm-8 p-1 border-bottom">Enables persistence by embedding a stager payload into the following autorun register key:<br>
+                <pre class="font-weight-bold">HKCU:\Software\Microsoft\Windows\CurrentVersion\Run\</pre>
+                </div>
+
+                <div class="col-sm-4 p-1 border-bottom bg-light"><code>:: export_clipboard</code></div>
+                <div class="col-sm-8 p-1 border-bottom bg-light">Attempts to collect any text data stored in the users clipboard.
+                </div>
+
+                <div class="col-sm-12 border-bottom"><pre>Under development:</pre></div>
+                <div class="col-sm-4 p-1 border-bottom"><code class="text-secondary">:: upload_file [filename] [target directory]</code></div>
+                <div class="col-sm-8 p-1 border-bottom">Uploads a target file to the supplied directory. All target upload files should be placed in:<br>
+                    <span class="">{installation dir}/FudgeC2/Storage/implant_resouces/</span></div>
+
+                <div class="col-sm-4 p-1 border-bottom bg-light"><code class="text-secondary">:: download_file [target file & path]</code></div>
+                <div class="col-sm-8 p-1 border-bottom bg-light">Downloads a file from the infected host. Downloads wil be placed in:<br>
+                    {installation dir}/FudgeC2/Storage/</div>
+
+                <div class="col-sm-4 p-1 border-bottom"><code class="text-secondary">:: play_audio [target audio file]</code></div>
+                <div class="col-sm-8 p-1 border-bottom">This will simply play audio on the target host, assuming the target has an audio device. Simply for PoC demonstrations.</div>
+            </div>
+            <br>
+<hr>
             <h4>Listeners</h4>
             <p>
                 Listeners are the device which catch communication from implants, and issue commands. Configuring listeners requires admin privileges.</p>
 
-            <p class="text-danger">Caution: When stopping a listener it will impact all implants, not just those from your own campaign. Communicate to your wider teams.</p>
+            <p class="text-danger">Caution: When stopping a listener it will impact all implants using the FudgeC2 server, not just those from your own campaign. Communicate to your wider teams.</p>
 
             <p>When configuring new implants you can configure them to run over a variety of protocols. Each of these protocols have an associated listener which will need to be created.</p>
 
@@ -37,20 +74,6 @@
             <p>When creating listeners you have the option to auto-start a listener, this will enable the listener upon creation.</p>
             <p>Listeners can be configured here:<br>
             <a href="/listener">/listeners</a></p>
-
-
-            <h2>Built in commands</h2>
-            <p>Active implants have a number of builtin commands designed to perform common actions, and harvest host information.<br>
-            below is the list of current implant commands:</p>
-            <code>:: enable_persistence</code>
-            <p>Enables persistence by embedding a stager payload into the following register key:<br>
-                HKCU:\Software\Microsoft\Windows\CurrentVersion\Run\</p>
-            <code>:: sys_info</code>
-            <p> Sys_info: Collects username and hostname. </p>
-            <code>:: network_info</code> (Not yet implemented)
-            <p>Collects network information including domain, hostname, ip address, active network services.</p>
-
-
 
         </div>
     </div>

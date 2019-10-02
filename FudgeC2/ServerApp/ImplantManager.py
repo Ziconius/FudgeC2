@@ -388,6 +388,7 @@ def waitingcommands(cid):
 def HelpPage():
     return render_template("HelpPage.html")
 
+
 # TODO: Remove in production builds.
 # @app.route("/test", methods = ['GET','POST'])
 # def test_endpoint():
