@@ -1,5 +1,6 @@
 import requests
 from distutils.version import LooseVersion
+
 from Data.Database import Database
 from Storage.settings import Settings
 

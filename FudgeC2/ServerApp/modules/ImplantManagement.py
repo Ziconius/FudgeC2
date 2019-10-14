@@ -55,6 +55,11 @@ class ImplantManagement:
                 "type": "EC",
                 "args": None,
                 "input": "export_clipboard"
+            },
+            {
+                "type":"LM",
+                "args":None,
+                "input": "load_module"
             }
         ] # FU,FD,PS,EP,SI, EC
 
@@ -64,7 +69,7 @@ class ImplantManagement:
             for x in command_listing:
                 if x['input'] in preprocessed_command:
                     a = preprocessed_command.partition(x['input'])
-                    r_command = { "type":x['type'], "args":a[2]}
+                    r_command = { "type":x['type'], "args":a[2].strip()}
                     return r_command, True
             return command, {"cmd_reg": {"result": False, "reason": "Unknown inbuilt command, i.e. '::'"}}
         else:

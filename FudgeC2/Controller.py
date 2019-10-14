@@ -16,6 +16,11 @@ def check_tls_certificates(cert, key):
     return
 
 
+def check_key_folders():
+    # Placeholder for initialisation checking.
+    return
+
+
 def start_controller(listener_management):
     # Server configuration can be found in Storage/settings.py
     Manager.config['listener_management'] = listener_management
@@ -34,6 +39,7 @@ LM.start_auto_run_listeners_at_boot()
 
 try:
     check_tls_certificates(Settings.tls_listener_cert, Settings.tls_listener_key)
+    check_key_folders()
     _thread.start_new_thread(start_controller, (LM,))
 except Exception as E:
     print("Error: Unable to start thread: ", E)

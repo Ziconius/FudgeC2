@@ -30,8 +30,8 @@
             <p>Active implants have a number of builtin commands designed to perform common actions, such as harvestings host information. These built in commands are invoked by pre-fixing <code>::</code> to the required command. If no pre-fix is used the implant will try to execute anything else using Powershell.<br>
             :</p>
             <div class="row p-1">
-                <div class="col-sm-3"></div>
-                <div class="col-sm-9"></div>
+                <div class="col-sm-3 border-bottom"><code></code></div>
+                <div class="col-sm-9 border-bottom"></div>
                 <!-- copy above -->
 
                 <div class="col-sm-4 p-1 border-bottom bg-light"><code>:: sys_info</code></div>
@@ -57,6 +57,9 @@
 
                 <div class="col-sm-4 p-1 border-bottom"><code class="text-secondary">:: play_audio [target audio file]</code></div>
                 <div class="col-sm-8 p-1 border-bottom">This will simply play audio on the target host, assuming the target has an audio device. Simply for PoC demonstrations.</div>
+
+                <div class="col-sm-3 border-bottom"><code>:: load_module [target script]</code></div>
+                <div class="col-sm-9 border-bottom">This will load external powershell modules, such as JAWS.</div>
             </div>
             <br>
 <hr>
