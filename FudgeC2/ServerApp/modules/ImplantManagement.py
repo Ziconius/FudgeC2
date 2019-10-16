@@ -60,6 +60,16 @@ class ImplantManagement:
                 "type":"LM",
                 "args":None,
                 "input": "load_module"
+            },
+            {
+                "type": "IM",
+                "args": None,
+                "input": "exec_module"
+            },
+            {
+                "type": "ML",
+                "args": None,
+                "input": "list_modules"
             }
         ] # FU,FD,PS,EP,SI, EC
 

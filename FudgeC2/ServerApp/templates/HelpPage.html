@@ -28,7 +28,7 @@
             <hr>
             <h2>Implant commands</h2>
             <p>Active implants have a number of builtin commands designed to perform common actions, such as harvestings host information. These built in commands are invoked by pre-fixing <code>::</code> to the required command. If no pre-fix is used the implant will try to execute anything else using Powershell.<br>
-            :</p>
+            </p>
             <div class="row p-1">
                 <div class="col-sm-3 border-bottom"><code></code></div>
                 <div class="col-sm-9 border-bottom"></div>
@@ -46,6 +46,14 @@
                 <div class="col-sm-8 p-1 border-bottom bg-light">Attempts to collect any text data stored in the users clipboard.
                 </div>
 
+                <div class="col-sm-4 p-1 border-bottom"><code>:: load_module [target script]</code></div>
+                <div class="col-sm-8 p-1 border-bottom">This will load external powershell modules, such as JAWS.
+                </div>
+
+                <div class="col-sm-4 p-1 border-bottom bg-light"><code>:: exec_module [loaded module name]</code></div>
+                <div class="col-sm-8 p-1 border-bottom bg-light">Executes a specific function of a loaded module.
+                </div>
+
                 <div class="col-sm-12 border-bottom"><pre>Under development:</pre></div>
                 <div class="col-sm-4 p-1 border-bottom"><code class="text-secondary">:: upload_file [filename] [target directory]</code></div>
                 <div class="col-sm-8 p-1 border-bottom">Uploads a target file to the supplied directory. All target upload files should be placed in:<br>
@@ -58,8 +66,9 @@
                 <div class="col-sm-4 p-1 border-bottom"><code class="text-secondary">:: play_audio [target audio file]</code></div>
                 <div class="col-sm-8 p-1 border-bottom">This will simply play audio on the target host, assuming the target has an audio device. Simply for PoC demonstrations.</div>
 
-                <div class="col-sm-3 border-bottom"><code>:: load_module [target script]</code></div>
-                <div class="col-sm-9 border-bottom">This will load external powershell modules, such as JAWS.</div>
+                <div class="col-sm-4 p-1 border-bottom"><code>:: list_modules</code></div>
+                <div class="col-sm-8 p-1 border-bottom">Lists all loaded modules by the implant.
+
             </div>
             <br>
 <hr>
