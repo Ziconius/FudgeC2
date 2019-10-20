@@ -9,15 +9,15 @@
     <div class="col-md-10 m-0 p-2">
         <div class="p-5 m-0 rounded iplm  ">
             <h1>FudgeC2 Documentation</h1>
-            <p class="text-warning">This documentation may contain incomplete information, as well as documentation on unimplemented features.</p>
+            <p class="text-warning font-weight-bold">This documentation may contain incomplete information, as well as partial documentation on unimplemented features.</p>
             <h3>Configuration</h3>
             <h4>User Account</h4>
             <h5>Add user</h5>
-            <p>Adding a user account can be done by any admin in the global settings:
+            <p>Adding a new user account can be done by any admin in the global settings, found here:
                 <a href="/settings">/settings</a>   </p>
 
             <h5>Configure campaign users</h5>
-            <p>This can be found within the campaign settings, under <code>/[campaign id]/settings</code> </p>
+            <p>Each campaign contains its own set of user permissions which control user interaction. User can have read-only or read/write permissions allowing them to send commands to active implants. These settings can be found within the campaign settings, under <code>/[campaign id]/settings</code> </p>
             <h5>Password Reset</h5>
             <p>Resetting a users password can be achieve in the global settings. This will generated a one-time password, which the user will change on first logon. (Not yet implemented)<br>
                 <a href="/settings">/settings</a>   </p>
@@ -54,6 +54,10 @@
                 <div class="col-sm-8 p-1 border-bottom bg-light">Executes a specific function of a loaded module.
                 </div>
 
+                <div class="col-sm-4 p-1 border-bottom"><code>:: list_modules</code></div>
+                <div class="col-sm-8 p-1 border-bottom">Lists all loaded modules by the implant.
+                </div>
+
                 <div class="col-sm-12 border-bottom"><pre>Under development:</pre></div>
                 <div class="col-sm-4 p-1 border-bottom"><code class="text-secondary">:: upload_file [filename] [target directory]</code></div>
                 <div class="col-sm-8 p-1 border-bottom">Uploads a target file to the supplied directory. All target upload files should be placed in:<br>
@@ -66,15 +70,14 @@
                 <div class="col-sm-4 p-1 border-bottom"><code class="text-secondary">:: play_audio [target audio file]</code></div>
                 <div class="col-sm-8 p-1 border-bottom">This will simply play audio on the target host, assuming the target has an audio device. Simply for PoC demonstrations.</div>
 
-                <div class="col-sm-4 p-1 border-bottom"><code>:: list_modules</code></div>
-                <div class="col-sm-8 p-1 border-bottom">Lists all loaded modules by the implant.
+
 
             </div>
             <br>
 <hr>
             <h4>Listeners</h4>
             <p>
-                Listeners are the device which catch communication from implants, and issue commands. Configuring listeners requires admin privileges.</p>
+                Listeners are the mechanisms by which active implants and the FudgeC2 server communicate, sending commands and responses between them. Configuring listeners requires admin privileges.</p>
 
             <p class="text-danger">Caution: When stopping a listener it will impact all implants using the FudgeC2 server, not just those from your own campaign. Communicate to your wider teams.</p>
 
@@ -86,6 +89,22 @@
             <p>When creating listeners you have the option to auto-start a listener, this will enable the listener upon creation.</p>
             <p>Listeners can be configured here:<br>
             <a href="/listener">/listeners</a></p>
+
+            <div>
+                <h4>Implants</h4>
+                <p>Implants are categorised into two types, implant templates, and active implants. Implant templates are a unique base configuration for implants, while active implants are generated upon a stager calling back.</p>
+
+
+
+                <h5>Implant templates</h5>
+                <p>An implant template is used to create a base configuration - Once a new implant template is created you can find it's unique stager inside the campaign stagers page.</p>
+                <p>Every time a stager is triggered it will callback to the C2 Server and a new active implant will be generated based on the implant templates configuration.</p>
+
+                <h5> Active implants</h5>
+                <p>Active implants are the result of a stager successfully calling home to the C2 server. Once an implant has been activated it will show up inside the main campaign page, allowing users with write permissions to register commands to be executed.</p>
+                <p>If a stager is triggered twice two different active implants will be generated - while they will similar properties (such as callback domain/IP, and comms channels) if they have any form of obfuscation enabled the implant generator will create uniquely obfuscated implants.</p>
+                <p>Active implants will be named according to their implant name, and will have a 6 digit number appended for uniqueness.</p>
+            </div>
 
         </div>
     </div>

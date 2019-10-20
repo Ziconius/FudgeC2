@@ -20,19 +20,20 @@
             </button>
         </div>
         {% endif %}
-        <div><h1>Listeners</h1><p>Listeners can be configured from here, please consider other campaigns before any listeners is terminated.</p></div>
-        <h5>Configured Listeners:</h5>
-
+        <div><h1>Listeners</h1>
+            <p>All listeners can be created, started, and stopped from here. </p>
+        </div>
+        <h5>Configured listeners:</h5>
         <p>
             {% for key_2 in test_data %}
-            Common Name: <code>{{ test_data[key_2].common_name }}</code><br>
-            Proto: <code>{{ test_data[key_2].type }}</code><br>
-            Port: <code>{{ test_data[key_2].port }}</code><br>
+            <span class="font-weight-bold">Name:</span> <code>{{ test_data[key_2].common_name }}</code><br>
+            <span class="font-weight-bold">Protocol:</span> <code>{{ test_data[key_2].type }}</code><br>
+            <span class="font-weight-bold">Port:</span> <code>{{ test_data[key_2].port }}</code><br>
             {% if test_data[key_2].state == True %}
-                State: <span class="text-success">Running</span><br>
+            <span class="font-weight-bold">State:</span> <span class="text-success">Running</span><br>
                 <form action="/listener/change" method="POST" role="form"><button name="state_change" value="{{ test_data[key_2].common_name }}">Stop</button></form>
             {% elif test_data[key_2].state == False %}
-                State: <span class="text-danger">Stopped</span><br>
+                <span class="font-weight-bold">State:</span> <span class="text-danger">Stopped</span><br>
                 <form action="/listener/change" method="POST" role="form"><button name="state_change" value="{{ test_data[key_2].common_name }}">Start</button></form>
             {% endif %}
 
@@ -70,7 +71,7 @@
             <!--<div id="modal-reason"></div>-->
                 <form action="{{ url_for('Listener_Updates') }}" method="POST" role="form" id="AnswerForm">
             <div class="form-group">
-                <label>Create New Listener</label>
+                <label>Listener Name</label>
                 <input onfocus="this.placeholder=''" type="text" name="listener_name" class="form-control" id="listener_name_id" placeholder="Listener Name">
             </div>
             <div class="form-group">

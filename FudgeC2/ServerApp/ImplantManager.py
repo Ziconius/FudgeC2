@@ -118,12 +118,15 @@ def PasswordReset():
 
 # -- Main endpoints -- #
 # -------------------- #
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 @login_required
 def BaseHomePage():
-    return render_template("Homepage.html",
+    if request.method == "GET":
+        return render_template("Homepage.html",
                            out_of_date=AppManager.check_software_version(),
                            version_number=AppManager.get_software_verision_number())
+    elif request.method == "POST":
+        return jsonify(AppManager.get_all_user_campaigns(current_user.user_email))
 
 
 @app.route("/CreateCampaign", methods=['GET', 'POST'])
@@ -403,12 +406,16 @@ def get_all_active_implants(cid):
     return render_template("ImplantMain.html", cid=cid, Msg=msg)
 
 
+# Early API redevelopment:
+@app.route("/api/campaign")
+@login_required
+def get_user_campaigns():
+    return jsonify(AppManager.get_all_user_campaigns(current_user.user_email))
 
-# TODO: Remove in production builds.
-# @app.route("/test", methods = ['GET','POST'])
-# def test_endpoint():
-#     if request.method == "POST":
-#         print(request.form)
-#         #ImpMgmt.Demo_CreateNewImplant(1, request.form,current_user.user_email)
-#
-#     return render_template("Demo_CreateImplant.html")
+
+@app.route("/api/campaign/<cid>/implants/active")
+@login_required
+def get_active_implants(cid):
+    a = ImpMgmt.get_active_campaign_implants_new(current_user.user_email, cid)
+    print("::",type(a), dir(a),a)
+    return jsonify(a)

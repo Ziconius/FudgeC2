@@ -11,7 +11,7 @@
 
 <!-- TODO: insert Implants into selectable. -->
             <div class="form-group">
-              <label for="sel1">Select implant:</label>
+              <label for="sel1">Select Implant:</label>
               <select class="form-control" id="sel1" name="ImplantSelect">
                   {% if Implants %}
                   <option name="a" id="b">ALL</option>
@@ -29,7 +29,7 @@
         </fieldset>
             <button type="submit" class="btn btn-default" id="AnswerBtn">Submit</button>
     </form>
-        <div><hr><p>Queued Commands</p></div>
+        <div><hr><p class="font-weight-bold">Queued Commands</p></div>
         <div id="awaiting">
 
         </div>
@@ -37,7 +37,7 @@
 
     <div class="col-lg-6" id="Response"></div>
     <div class="col-lg-3" id="ImplantStatus">
-        Implant Check in:
+        <span class="font-weight-bold">Implant Status</span>
         <div class="" id="ImplantStatusValues">
         {% if Implants %}
             {% for implant in Implants %}

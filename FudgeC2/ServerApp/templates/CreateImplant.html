@@ -4,13 +4,13 @@
     <div class="col-lg-4 rounded p-3">
 
     <form id="Login" method="POST" action="create" name="CI">
-        <div class="form-group"><div>Implant Title <span class="text-danger">*</span></div>
+        <div class="form-group"><div>Implant title <span class="text-danger">*</span></div>
             <input type="text" class="form-control" id="title" name="title" placeholder="Implant common name">
         </div>
         <div class="form-group"><div>Implant URL <span class="text-danger">*</span> [proto://]<b>[url]</b>[:port]</div>
             <input type="text" class="form-control" id="url" name="url" placeholder="Callback URL">
         </div>
-        <div class="form-group"><div>Implant Description <span class="text-danger">*</span></div>
+        <div class="form-group"><div>Implant description <span class="text-danger">*</span></div>
             <input type="text" class="form-control" name="description" id="description" placeholder="Description">
         </div>
         <div class="form-group">Initial callback delay (Seconds)
@@ -19,7 +19,7 @@
         <div class="form-group">Beacon delay (seconds)
             <input type="text" class="form-control" name="beacon_delay" id="beacon_delay" value="3600" placeholder="3600">
         </div>
-        <div class="form-group"><b>Implant obfuscation level</b>
+        <div class="form-group"><b>Implant obfuscation level:</b>
 
             <div class="form-check">
               <label class="form-check-label active">
@@ -47,7 +47,7 @@
               </label>
             </div>
         </div>
-        Commincation Channels
+        Commincation channels
         <div class="checkbox">
             <label><input type="checkbox" name="comms_http" > HTTP</label>
             <input type="text" class="form-control" id="http-port" name="http-port" placeholder="TCP Port for HTTP listener">

@@ -70,3 +70,6 @@ class AppManager:
             return self.db.get_application_logs()
         else:
             return []
+
+    def get_all_user_campaigns(self, username):
+        return self.db.campaign.get_all_user_campaigns(username)
