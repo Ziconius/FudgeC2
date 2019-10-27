@@ -2,9 +2,42 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function unix_to_human_time(unixtime){
+    var utcSeconds = unixtime;
+    var d = new Date(0);
+    d.setUTCSeconds(utcSeconds);
+    var date = new Date(unixtime*1000);
+    var year = date.getFullYear();
+    var month = date.getMonth();
+    var day = date.getDate();
+    var hours = "0" + date.getHours();
+    var minutes = "0" + date.getMinutes();
+    var seconds = "0" + date.getSeconds();
+    time_last_seen = hours.substr(-2)+":"+minutes.substr(-2)+':'+seconds.substr(-2)+' '+day+'/'+month+'/'+year
+    return time_last_seen
+}
+
+$(function() {
+    $('#AnswerBtn').on('click', function (e) {
+        e.preventDefault(); // disable the default form submit event
+        var $form = $('#AnswerForm');
+        $.ajax({
+            url: $form.attr("action"),
+            type: $form.attr("method"),
+            data: $form.serialize(),
+            success: function (response) {
+                document.getElementById('implantCmd').value="";
+                if (response['cmd_reg']['result']===false){alert(response['cmd_reg']['reason'])}
+            },
+            error: function (response) {
+                alert('ajax failed');
+            },
+
+        });
+    });
+});
 
 
-// Reorders the response data of Get_ImplantCallback
 function order_response_by_time ( response ){
     var a = 0;
     var ordered_list = [];
@@ -31,10 +64,30 @@ function order_response_by_time ( response ){
     return ordered_list
 }
 
-// Outputs the status of registered implants.
-async function Get_ImplantCallback (cid){
-    while(true){
-        $.ajax({
+///api/campaign/<cid>/implants/state
+
+async function get_active_implant_command_queue (cid){
+    $.ajax({
+        url:`/${cid}/waiting_commands`,
+        //url: `/api/campaign/${cid}/implants/active`,
+        type:"GET",
+        success: function (response) {
+            document.getElementById('awaiting').innerHTML = ""
+            for (element in response){
+                if (response[element].read_by_implant == 0){
+                    line="<p>Implant ID: "+response[element].uik+"</br>Command: "+response[element].log_entry+"</p>"
+                    document.getElementById('awaiting').innerHTML =  document.getElementById('awaiting').innerHTML + line
+                } else {
+                    //console.log(response[element].time)
+                }
+            }
+        }
+    })
+}
+
+
+async function get_active_implant_state (cid){
+$.ajax({
             url:`/${cid}/implant/status`,
             type:"GET",
             success: function (response) {
@@ -70,29 +123,64 @@ async function Get_ImplantCallback (cid){
             document.getElementById('ImplantStatusValues').innerHTML = implant_status_text
             }
         })
-    // Import the handling of this loop
-    await sleep(15000);
-    }
-};
+}
+var contained_list=[];
+c_state=0
+function get_command_responses(cid){
 
-// Output the commands which are registered and awaiting pickup by the implant.
-async function Get_Awaiting_Cmds (cid){
-    while(true){
-        $.ajax({
-            url:`/${cid}/waiting_commands`,
-            type:"GET",
-            success: function (response) {
-                document.getElementById('awaiting').innerHTML = ""
-                for (element in response){
-                    if (response[element].read_by_implant == 0){
-                        line="<p>Implant ID: "+response[element].uik+"</br>Command: "+response[element].log_entry+"</p>"
-                        document.getElementById('awaiting').innerHTML =  document.getElementById('awaiting').innerHTML + line
-                    } else {
-                        //console.log(response[element].time)
+    $.ajax({
+        url:`/${cid}/cmd_response`,
+        type:"GET",
+        success: function (response) {
+            // Get list of responses
+            var pageContainer = document.getElementById('Response');
+            for (element in response){
+                // Check for the log_id existing, if it doesn't add to list and write to top of page to remove weird loading page
+                if ( contained_list.includes(response[element].log_id) ) {
+                    //console.log('Entry found');
+                } else {
+
+                    contained_list.push(response[element].log_id);
+                    // pageContainer = response[element].log_id+ pageContainer;
+                    // alert(pageContainer)
+                    GG = response[element].log_id;
+                    var utcSeconds = response[element].time;
+                    var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
+                    d=unix_to_human_time(response[element].time)
+                    // console.log(response[element]);
+                    tmp_text = response[element].log_entry
+                    response_data = tmp_text.replace(new RegExp('\r?\n','g'), '<br />');
+                    if (c_state === 0){
+                        bgc = '<div class="p-1 bg-light">'
+                        c_state = 1
+                     } else {
+                        bgc = '<div class="p-2">'
+                        c_state  = 0
                     }
-                }
+
+                    GG = bgc+"<p>Name: "+response[element].title+"<br>Time: "+d+"<br>Response:<br> <code>"+response_data+"</code></p></div>";
+                    WP = document.getElementById('Response').innerHTML;
+                    // alert(WP);
+                    document.getElementById('Response').innerHTML = GG + WP;
+                 }
+               }
+            //console.log(contained_list)
             }
-        })
-    await sleep(15000);
+    })
+}
+
+
+async function implant_page_controller (cid){
+    delay = 0
+    while (true)
+    {
+        // console.log("Running:"+ cid)
+        get_active_implant_state(cid)
+        await sleep(delay)
+        get_active_implant_command_queue(cid)
+        await sleep(delay)
+        get_command_responses(cid)
+        await sleep(delay)
+        delay = 2000
     }
-};
+}

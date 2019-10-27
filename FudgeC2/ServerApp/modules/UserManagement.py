@@ -115,3 +115,5 @@ class UserManagementController:
         if self.db.campaign.Verify_UserCanReadCampaign(user, cid) is True:
             return self.db.campaign.get_all_campaign_implant_templates_from_cid(cid)
         return False
+
+

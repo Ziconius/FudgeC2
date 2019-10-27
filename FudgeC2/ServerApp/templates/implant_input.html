@@ -1,9 +1,16 @@
 {% extends "ImplantMain.html" %}
 {% block main2 %}
 <!-- TODO: Refactor and improve performance and readability -->
-<div class="row">
-    <div class="col-lg-3">
-    <form action="/{{ cid }}/implant/register_cmd" method="POST" role="form" class="form-horizontal" id="AnswerForm">
+<div class="row p-0">
+    <div class="col-md">
+
+        Execute: COMMAND BOX
+        Select Implant:
+        Filters:
+        Only show selected implant information.(JS)
+        <hr>
+        <!-- action="/{{ cid }}/implant/register_cmd" -->
+        <form action="/{{ cid }}/implant/register_cmd" method="POST" role="form" class="form-horizontal" id="AnswerForm">
         <!--<fieldset>-->
         <!--<legend>Command Input</legend>-->
             <!--&lt;!&ndash;<label for="comment">Implant Command:</label>&ndash;&gt;-->
@@ -29,109 +36,32 @@
         </fieldset>
             <button type="submit" class="btn btn-default" id="AnswerBtn">Submit</button>
     </form>
-        <div><hr><p class="font-weight-bold">Queued Commands</p></div>
-        <div id="awaiting">
-
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-3">
+        <div class="row">
+            <div class="col-md-12">
+                State
+                <div class="overflow-auto" id="ImplantStatusValues"></div>
+            </div>
+            <div class="col-md-12 overflow-auto">
+                Queue
+                <div class="overflow-auto" id="awaiting">
+                    No awaiting commands
+                </div>
+            </div>
         </div>
     </div>
-
-    <div class="col-lg-6" id="Response"></div>
-    <div class="col-lg-3" id="ImplantStatus">
-        <span class="font-weight-bold">Implant Status</span>
-        <div class="" id="ImplantStatusValues">
-        {% if Implants %}
-            {% for implant in Implants %}
-                <p>{{ implant.generated_title}}: {{ implant.last_check_in }}</p><br>
-            {% endfor %}
-        {% endif %}
-        </div>
+    <div class="col-md-9">
+        <div id="Response"></div>
+        main
     </div>
 </div>
 <script src="{{ url_for('static', filename='ImplantController.js') }}"></script>
 <script>
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-function unix_to_human_time(unixtime){
-    var utcSeconds = unixtime;
-    var d = new Date(0);
-    d.setUTCSeconds(utcSeconds);
-    var date = new Date(unixtime*1000);
-    var year = date.getFullYear();
-    var month = date.getMonth();
-    var day = date.getDate();
-    var hours = "0" + date.getHours();
-    var minutes = "0" + date.getMinutes();
-    var seconds = "0" + date.getSeconds();
-    time_last_seen = hours.substr(-2)+":"+minutes.substr(-2)+':'+seconds.substr(-2)+' '+day+'/'+month+'/'+year
-    return time_last_seen
-}
-// Gets command results and outputs to screen.
-var contained_list=[];
-async function get_command_response (){
-    while(true){
-    $.ajax({
-        url:"/{{ cid }}/cmd_response",
-        type:"GET",
-        success: function (response) {
-            // Get list of responses
-            var pageContainer = document.getElementById('Response');
-            for (element in response){
-                // Check for the log_id existing, if it doesn't add to list and write to top of page to remove weird loading page
-                if ( contained_list.includes(response[element].log_id) ) {
-                    //console.log('Entry found');
-                } else {
-
-                    contained_list.push(response[element].log_id);
-                    // pageContainer = response[element].log_id+ pageContainer;
-                    // alert(pageContainer)
-                    GG = response[element].log_id;
-                    var utcSeconds = response[element].time;
-                    var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
-                    d=unix_to_human_time(response[element].time)
-                    // console.log(response[element]);
-                    tmp_text = response[element].log_entry
-                    response_data = tmp_text.replace(new RegExp('\r?\n','g'), '<br />');
-                    GG = "<div><p>Name: "+response[element].title+"<br>Time: "+d+"<br>Response:<br> <code>"+response_data+"</code></p></div><hr>";
-                    WP = document.getElementById('Response').innerHTML;
-                    // alert(WP);
-                    document.getElementById('Response').innerHTML = GG + WP;
-                 }
-               }
-            //console.log(contained_list)
-            }
-    })
-    await sleep(10000);
-    }
-}
-
-get_command_response()
-
-// Submits the commands to the backend.
-$(function() {
-    $('#AnswerBtn').on('click', function (e) {
-        e.preventDefault(); // disable the default form submit event
-        var $form = $('#AnswerForm');
-        $.ajax({
-            url: $form.attr("action"),
-            type: $form.attr("method"),
-            data: $form.serialize(),
-            success: function (response) {
-                document.getElementById('implantCmd').value="";
-                if (response['cmd_reg']['result']===false){alert(response['cmd_reg']['reason'])}
-            },
-            error: function (response) {
-                alert('ajax failed');
-            },
-
-        });
-    });
-});
-
-
-Get_ImplantCallback ({{cid}})
-Get_Awaiting_Cmds ({{cid}})
+implant_page_controller({{cid}})
+console.log({{cid}})
 </script>
 {% endblock %}
 

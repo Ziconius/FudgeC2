@@ -71,11 +71,13 @@ class CampaignExportManager:
         )
         self.export_db.Session.add(logs)
         self.export_db.Session.commit()
+
     def _validate_user_(self, username, cid):
         if self.db.user.User_IsUserAdminAccount(username) is not False:
             if self.db.campaign.Verify_UserCanReadCampaign(username, cid) is not False:
                 return True
         return False
+
     def get_encrypted_file(self, username, cid, filename):
         if self._validate_user_(username, cid) is False:
             return False
@@ -89,7 +91,6 @@ class CampaignExportManager:
     def export_campaign_database(self, username, cid):
         if self._validate_user_(username, cid) is False:
             return False
-
 
         db = self._generate_database_(cid)
         if db is False:

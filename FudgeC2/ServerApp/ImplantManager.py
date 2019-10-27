@@ -3,6 +3,7 @@ import uuid
 
 from flask import Flask, render_template, flash, request, jsonify, g, url_for, redirect, send_file  # ,make_response, session, current_app,
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user
+from flask_socketio import SocketIO
 
 from Implant.Implant import ImplantSingleton
 from ServerApp.modules.UserManagement import UserManagementController
@@ -23,6 +24,7 @@ app.config.from_object(__name__)
 app.config['SECRET_KEY'] = str(uuid.uuid4())
 login = LoginManager(app)
 login.init_app(app)
+socketio = SocketIO(app)
 
 # TODO: Controller dev work.
 listener_management = None
@@ -419,3 +421,28 @@ def get_active_implants(cid):
     a = ImpMgmt.get_active_campaign_implants_new(current_user.user_email, cid)
     print("::",type(a), dir(a),a)
     return jsonify(a)
+
+@app.route("/api/campaign/<cid>/implants/state")
+@login_required
+def get_active_implantssss(cid):
+    active_implant_list = UsrMgmt.campaign_get_all_implant_base_from_cid(current_user.user_email, cid)
+    data = {}
+    count = 1
+    for implant in active_implant_list:
+        implant_status_obj = {"status": None,
+                              "title": implant['generated_title'],
+                              "last_checked_in": implant['last_check_in']
+                              }
+        beacon = implant['beacon']
+        time_from_last_check_in = time.time() - implant['last_check_in']
+
+        if time_from_last_check_in < beacon * 1.5:
+            implant_status_obj['status'] = "good"
+        elif time_from_last_check_in < beacon * 2.5:
+            implant_status_obj['status'] = "normal"
+        else:
+            implant_status_obj['status'] = "poor"
+
+        data[count] = implant_status_obj
+        count = count + 1
+    return jsonify(data)
