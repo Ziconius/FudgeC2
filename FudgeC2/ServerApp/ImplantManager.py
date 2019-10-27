@@ -93,7 +93,8 @@ def login():
 
             else:
                 guid = UsrMgmt.get_first_logon_guid(request.form['email'])
-                return render_template("auth/PasswordResetPage.html",guid=guid)
+                # return render_template("auth/PasswordResetPage.html",guid=guid)
+                return redirect(url_for("PasswordReset", guid=guid))
     return render_template("auth/LoginPage.html", fudge_version=AppManager.get_software_verision_number(), fudge_version_name=AppManager.get_software_verision_name())
 
 @app.route("/auth/logout")
@@ -109,10 +110,19 @@ def logout():
 def PasswordReset():
 
     if request.method =="POST":
+        print("In reset: {}".format(request.form))
         UserObject = UsrMgmt.change_password_first_logon(request.form)
         if UserObject is not False:
             login_user(UserObject)
             return redirect(url_for('BaseHomePage'))
+    if request.method == "GET":
+        print(request.args)
+        guid = "0000-0000-0000-0000"
+        if request.args.get('guid') != None:
+
+            print("We're now embedding: {}".format( request.args.get('guid')))
+            guid = request.args.get('guid')
+        return render_template("auth/PasswordResetPage.html", guid=guid)
     return redirect(url_for('login'))
 
 
@@ -139,7 +149,7 @@ def create_new_campaign():
         if success_bool is True:
             return redirect(url_for('BaseHomePage'))
         else:
-            return render_template('CreateCampaign.html', error=success_msg)
+            return render_template('CreateCampaign.html', error=success_msg), 409
     return render_template('CreateCampaign.html')
 
 
@@ -162,14 +172,23 @@ def GlobalListenerPage():
     return render_template("listeners/listeners.html", test_data=app.config['listener_management'].get_active_listeners())
 
 
-@app.route("/listener/change", methods=['GET', 'POST'])
+# UPDATED
+@app.route("/api/v1/listener/change", methods=['POST'])
 @login_required
 def Listener_Updates():
-    if request.method == "POST":
-        print(request.form)
-        form_response = app.config['listener_management'].listener_form_submission(current_user.user_email, request.form)
-        flash(form_response[1])
-        return redirect(url_for('GlobalListenerPage'))
+    form_response = app.config['listener_management'].update_listener_state(current_user.user_email, request.form)
+    flash(form_response[1])
+    return redirect(url_for('GlobalListenerPage'))
+
+# UPDATED
+@app.route("/api/v1/listener/create", methods=['POST'])
+@login_required
+def create_new_listener():
+    form_response = app.config['listener_management'].create_new_listener(current_user.user_email, request.form)
+    if form_response[0] is False:
+        return url_for('GlobalListenerPage'), 409
+    else:
+        return url_for('GlobalListenerPage'), 201
 
 # -- CAMPAIGN SPECIFIC PAGES -- #
 # ----------------------------- #
@@ -212,7 +231,7 @@ def NewImplant(cid):
         if result is True:
             return render_template('CreateImplant.html', success=result_text)
         else:
-            return render_template('CreateImplant.html', error=result_text)
+            return render_template('CreateImplant.html', error=result_text), 409
     return render_template('CreateImplant.html')
 
 
@@ -422,7 +441,15 @@ def get_active_implants(cid):
     print("::",type(a), dir(a),a)
     return jsonify(a)
 
-@app.route("/api/campaign/<cid>/implants/state")
+@app.route("/api/campaign/<cid>/implants/queued", methods=['GET', 'POST'])
+@login_required
+def get_implant_queued_commands(cid):
+    # -- Get JSON blob which contains all implant commands and then registration state
+    commands = ImpMgmt.Get_RegisteredImplantCommands(current_user.user_email, cid)
+    return jsonify(commands)
+
+
+@app.route("/api/v1/campaign/<cid>/implants/state")
 @login_required
 def get_active_implantssss(cid):
     active_implant_list = UsrMgmt.campaign_get_all_implant_base_from_cid(current_user.user_email, cid)

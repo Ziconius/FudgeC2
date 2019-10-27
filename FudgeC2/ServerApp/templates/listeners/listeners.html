@@ -31,10 +31,10 @@
             <span class="font-weight-bold">Port:</span> <code>{{ test_data[key_2].port }}</code><br>
             {% if test_data[key_2].state == True %}
             <span class="font-weight-bold">State:</span> <span class="text-success">Running</span><br>
-                <form action="/listener/change" method="POST" role="form"><button name="state_change" value="{{ test_data[key_2].common_name }}">Stop</button></form>
+                <form action="/api/v1/listener/change" method="POST" role="form"><button name="state_change" value="{{ test_data[key_2].common_name }}">Stop</button></form>
             {% elif test_data[key_2].state == False %}
                 <span class="font-weight-bold">State:</span> <span class="text-danger">Stopped</span><br>
-                <form action="/listener/change" method="POST" role="form"><button name="state_change" value="{{ test_data[key_2].common_name }}">Start</button></form>
+                <form action="/api/v1/listener/change" method="POST" role="form"><button name="state_change" value="{{ test_data[key_2].common_name }}">Start</button></form>
             {% endif %}
 
             <hr>
@@ -69,7 +69,7 @@
           <div class="modal-body">
             <!--<div id="modal-result"></div>-->
             <!--<div id="modal-reason"></div>-->
-                <form action="{{ url_for('Listener_Updates') }}" method="POST" role="form" id="AnswerForm">
+                <form action="{{ url_for('create_new_listener') }}" method="POST" role="form" id="AnswerForm">
             <div class="form-group">
                 <label>Listener Name</label>
                 <input onfocus="this.placeholder=''" type="text" name="listener_name" class="form-control" id="listener_name_id" placeholder="Listener Name">

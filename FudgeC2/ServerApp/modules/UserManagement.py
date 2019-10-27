@@ -91,6 +91,7 @@ class UserManagementController:
         guid = form['id']
         if pw_1 == pw_2:
             user_object = self.db.user.User_ChangePasswordOnFirstLogon(guid, pw_c, pw_1)
+            print("Result of password reset User_ChangePasswordOnFirstLogon: {}".format(user_object))
             return user_object
         else:
             return False

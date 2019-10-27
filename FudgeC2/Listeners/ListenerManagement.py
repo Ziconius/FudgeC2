@@ -72,6 +72,7 @@ class BinaryListener(Listener):
 
     def start_listener(self):
         return
+
     def stop_listener(self):
         return
 
@@ -83,19 +84,27 @@ class ListenerManagement:
     def __init__(self, a, b):
         pass
 
-    def _check_if_listener_is_unique(self, name, port, protocol):
+    def _check_if_listener_is_unique(self, name, port, protocol, reboot):
+        # Bypass the unique check when rebooting.
+        if reboot:
+            return True
+        a = self.db.listener.get_all_listeners()
+        for x in a:
+            if x.name == name:
+                return False
         # print("DATABASE: NOW CHECKING LISTENER IS COMPLETE")
         # self.db.listener.get_all_listeners()
         return True
 
     def _create_listener(self, name, raw_protocol, port, auto_start=False, reboot=False):
         protocol = raw_protocol.lower()
-        if self._check_if_listener_is_unique(name, port, protocol):
+        if self._check_if_listener_is_unique(name, port, protocol, reboot):
             if protocol.lower() == "http" or protocol.lower() == "https":
                 self.listeners[name] = HttpListener(name, port, protocol)
             elif protocol == "binary":
                 self.listeners['name'] = BinaryListener(name, port, protocol)
             else:
+                print("Protocol not listed")
                 return False
 
             if reboot is not True:
@@ -134,7 +143,24 @@ class ListenerManagement:
                                                    "common_name": self.listeners[listener].name}
         return blah
 
-    def listener_form_submission(self, username, form):
+    def update_listener_state(self, username, form):
+        if self.db.user.User_IsUserAdminAccount(username) is False:
+            return False, "You are not an admin."
+
+        if "state_change" in form:
+
+            if form['state_change'] in self.listeners.keys():
+                current_state = self.listeners[form['state_change']].query_state()
+                if current_state is True:
+                    self._update_listener_state(form['state_change'], "off")
+                else:
+                    self._update_listener_state(form['state_change'], "on")
+                return True, ""
+
+        else:
+            return False, ""
+
+    def create_new_listener(self, username, form):
         if self.db.user.User_IsUserAdminAccount(username) is False:
             return False, "You are not an admin."
 
@@ -142,25 +168,17 @@ class ListenerManagement:
             auto_start = False
             if "auto_start" in form:
                 auto_start = True
-            listener_created = self._create_listener(form['listener_name'], form['listener_protocol'], form['listener_port'],auto_start)
+            listener_created = self._create_listener(
+                form['listener_name'],
+                form['listener_protocol'],
+                form['listener_port'],
+                auto_start)
             if listener_created is True:
                 return True, "Listener created"
             else:
                 return False, "Error in _create_listener()"
-
-        elif "state_change" in form:
-            # print("we're now changing the state of a listener!!")
-            if form['state_change'] in self.listeners.keys():
-                current_state = self.listeners[form['state_change']].query_state()
-                if current_state is True:
-                    self._update_listener_state(form['state_change'], "off")
-                else:
-                    self._update_listener_state(form['state_change'], "on")
-
         else:
             return False, ""
-
-        return True, ""
 
     def start_auto_run_listeners_at_boot(self):
         auto_run_listeners = self.db.listener.get_all_listeners()

@@ -20,7 +20,6 @@ class ImplantManagement:
                 else:
                     return obfuscation_value
             except:
-                print("None integer submitted.")
                 return None
         return None
 
@@ -90,7 +89,6 @@ class ImplantManagement:
     def ImplantCommandRegistration(self, cid, username, form):
         # -- This should be refactored at a later date to support read/write changes to
         # --    granular controls on templates, and later specific implants
-        # print("CID: ",cid,"\nUSR: ",username,"\nCMD: ",form)
         User = self.db.campaign.Verify_UserCanWriteCampaign(username, cid)
         if User is False:
             return {"cmd_reg": {"result": False, "reason": "You are not authorised to register commands in this campaign."}}
@@ -138,7 +136,6 @@ class ImplantManagement:
                 "comms_dns": None
             }
         }
-        print(form)
         User = self.db.user.Get_UserObject(user)
         if User.admin == 0:
             return False, "Insufficient privileges."
@@ -184,17 +181,13 @@ class ImplantManagement:
                      "comms_dns": "dns-port",
                      "comms_binary": "binary-port"}
                 for element in a.keys():
-                    print("::", element)
                     if element in form:
-                        # print("@@", form[a[element]])
                         if int(form[a[element]]):
                             if int(form[a[element]]) > 0 or int(form[a[element]]) < 65536:
-                                # print(int(form[a[element]]))
                                 implant_configuration["protocol"][element] = int(form[a[element]])
                             else:
                                 raise ValueError("Submitted port for {} is out of range".format(a[element]))
                         else:
-                            # print(form[element])
                             raise ValueError("Ports must be submitted as an integer")
 
                 protocol_set = False
@@ -204,9 +197,6 @@ class ImplantManagement:
                 if protocol_set is False:
                     raise ValueError('No protocol selected, ensure a protocol and port are selected.')
 
-                # print("Final configuration:")
-                # for element in implant_configuration.keys():
-                #     print(element,": ",implant_configuration[element])
 
                 a = self.db.implant.create_new_implant_template(user, cid, implant_configuration)
                 if a is True:

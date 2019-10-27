@@ -68,8 +68,9 @@ function order_response_by_time ( response ){
 
 async function get_active_implant_command_queue (cid){
     $.ajax({
-        url:`/${cid}/waiting_commands`,
+        // url:`/${cid}/waiting_commands`,
         //url: `/api/campaign/${cid}/implants/active`,
+        url:`/api/campaign/${cid}/implants/queued`,
         type:"GET",
         success: function (response) {
             document.getElementById('awaiting').innerHTML = ""
@@ -88,7 +89,8 @@ async function get_active_implant_command_queue (cid){
 
 async function get_active_implant_state (cid){
 $.ajax({
-            url:`/${cid}/implant/status`,
+            // url:`/${cid}/implant/status`,
+            url: `/api/v1/campaign/${cid}/implants/state`,
             type:"GET",
             success: function (response) {
 

@@ -3,20 +3,13 @@
 <!-- TODO: Refactor and improve performance and readability -->
 <div class="row p-0">
     <div class="col-md">
-
-        Execute: COMMAND BOX
-        Select Implant:
-        Filters:
-        Only show selected implant information.(JS)
-        <hr>
-        <!-- action="/{{ cid }}/implant/register_cmd" -->
+        <!--Execute: COMMAND BOX-->
+        <!--Select Implant:-->
+        <!--Filters:-->
+        <!--Only show selected implant information.(JS)-->
+        <!--<hr>-->
         <form action="/{{ cid }}/implant/register_cmd" method="POST" role="form" class="form-horizontal" id="AnswerForm">
-        <!--<fieldset>-->
-        <!--<legend>Command Input</legend>-->
-            <!--&lt;!&ndash;<label for="comment">Implant Command:</label>&ndash;&gt;-->
-
-
-<!-- TODO: insert Implants into selectable. -->
+        <!-- TODO: insert Implants into selectable. -->
             <div class="form-group">
               <label for="sel1">Select Implant:</label>
               <select class="form-control" id="sel1" name="ImplantSelect">
@@ -33,20 +26,21 @@
                 <label class="control-label">Implant Command:</label>
                 <input onfocus="this.placeholder=''" type="text" name="cmd" class="form-control" id="implantCmd" placeholder="cmd">
             </div>
-        </fieldset>
+
             <button type="submit" class="btn btn-default" id="AnswerBtn">Submit</button>
-    </form>
+        </form>
     </div>
 </div>
 <div class="row">
     <div class="col-md-3">
         <div class="row">
             <div class="col-md-12">
-                State
+                <h6>Implant state</h6>
                 <div class="overflow-auto" id="ImplantStatusValues"></div>
             </div>
             <div class="col-md-12 overflow-auto">
-                Queue
+                <h6>Queued commands</h6>
+
                 <div class="overflow-auto" id="awaiting">
                     No awaiting commands
                 </div>

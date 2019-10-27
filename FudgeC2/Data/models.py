@@ -53,7 +53,7 @@ class Implants(Base):
     __tablename__ = 'implants'
     iid = Column(INTEGER(11), nullable=False, index=True, primary_key=True)
     stager_key = Column(String(255), nullable=False, unique=True)
-    title = Column(String(255), nullable=False)
+    title = Column(String(255), nullable=False, unique=True)
     cid = Column(INTEGER(11), nullable=False, index=True)
     # file_hash=Column(String(255), nullable=True)              # Removed: Files are stored in GeneratedImplants
     # filename=Column(String(255), nullable=True)               # Removed: No file hashes are stored
