@@ -278,43 +278,14 @@ def ImplantStager(cid):
 def display_active_implant(cid, uik=None):
     g.setdefault('cid', cid)
     implants = ImpMgmt.get_active_campaign_implants(current_user.user_email, cid)
-    print("::",uik)
     if uik is not None:
-        print("aa")
         if type(implants) == list:
             for x in implants:
-                print("! {}::{}",uik,x['unique_implant_id'])
                 if int(x['unique_implant_id']) == int(uik):
-                    print("aaaaa")
                     return render_template("implant/ActiveImplants.html", imp=implants, render=x)
     return render_template("implant/ActiveImplants.html", imp=implants)
 
 
-@app.route("/<cid>/implant/status", methods=['GET', 'POST'])
-@login_required
-def get_active_implant_status(cid):
-    # This creates a JSON object which contains all the status of every activated implant.
-    active_implant_list = UsrMgmt.campaign_get_all_implant_base_from_cid(current_user.user_email, cid)
-    data = {}
-    count = 1
-    for implant in active_implant_list:
-        implant_status_obj = {"status": None,
-                              "title": implant['generated_title'],
-                              "last_checked_in": implant['last_check_in']
-                              }
-        beacon = implant['beacon']
-        time_from_last_check_in = time.time() - implant['last_check_in']
-
-        if time_from_last_check_in < beacon * 1.5:
-            implant_status_obj['status'] = "good"
-        elif time_from_last_check_in < beacon * 2.5:
-            implant_status_obj['status'] = "normal"
-        else:
-            implant_status_obj['status'] = "poor"
-
-        data[count] = implant_status_obj
-        count = count + 1
-    return jsonify(data)
 
 
 @app.route("/<cid>/graphs", methods=['GET', 'POST'])
@@ -343,14 +314,7 @@ def CampaignLogs(cid):
 @login_required
 def export_campaign_by_cid(cid):
     g.setdefault('cid', cid)
-    #
-    download = request.args.get('download', default=False, type=bool)
-    # if download:
-    #     file_dir = "../Storage/ExportedCampaigns/"
-    #     export_result = ExpoManager.export_campaign_database(current_user.user_email, cid)
-    #     if export_result is not False:
-    #         print(export_result)
-    #         return send_file(file_dir + export_result[0],as_attachment=True, attachment_filename=str(export_result[0]))
+
     download = request.args.get('download', default=False, type=str)
     print("FILENAME IS: ", download)
     if download is not False:
@@ -428,20 +392,19 @@ def get_all_active_implants(cid):
 
 
 # Early API redevelopment:
-@app.route("/api/campaign")
+@app.route("/api/v1/campaigns")
 @login_required
 def get_user_campaigns():
     return jsonify(AppManager.get_all_user_campaigns(current_user.user_email))
 
 
-@app.route("/api/campaign/<cid>/implants/active")
+@app.route("/api/v1/campaign/<cid>/implants/active")
 @login_required
 def get_active_implants(cid):
-    a = ImpMgmt.get_active_campaign_implants_new(current_user.user_email, cid)
-    print("::",type(a), dir(a),a)
+    a = ImpMgmt.get_active_campaign_implants(current_user.user_email, cid)
     return jsonify(a)
 
-@app.route("/api/campaign/<cid>/implants/queued", methods=['GET', 'POST'])
+@app.route("/api/v1/campaign/<cid>/implants/queued", methods=['GET', 'POST'])
 @login_required
 def get_implant_queued_commands(cid):
     # -- Get JSON blob which contains all implant commands and then registration state
@@ -451,19 +414,20 @@ def get_implant_queued_commands(cid):
 
 @app.route("/api/v1/campaign/<cid>/implants/state")
 @login_required
-def get_active_implantssss(cid):
+def get_active_implants_state(cid):
     active_implant_list = UsrMgmt.campaign_get_all_implant_base_from_cid(current_user.user_email, cid)
     data = {}
     count = 1
     for implant in active_implant_list:
         implant_status_obj = {"status": None,
                               "title": implant['generated_title'],
+                              "implant_id": implant['unique_implant_id'],
                               "last_checked_in": implant['last_check_in']
                               }
         beacon = implant['beacon']
         time_from_last_check_in = time.time() - implant['last_check_in']
 
-        if time_from_last_check_in < beacon * 1.5:
+        if time_from_last_check_in < beacon * 1.6:
             implant_status_obj['status'] = "good"
         elif time_from_last_check_in < beacon * 2.5:
             implant_status_obj['status'] = "normal"

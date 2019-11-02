@@ -1,9 +1,5 @@
 body {
-    background-image:url("/static/bg.jpeg");
-    background-attachment:fixed;
-    background-repeat:no-repeat;
-    background-position:center;
-    background-size:cover;
+    background-color: #035371;
     padding:0px;
 }
 
@@ -19,5 +15,5 @@ h1, h2, h3, h4, h5, h6 {
 
 .iplm {
      background-color: #f5f3f3;
-
+     background-color: #FDFDFD;
 }

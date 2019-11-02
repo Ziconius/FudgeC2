@@ -2,33 +2,20 @@
 <head>
 <!-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> -->
     <title>FudgeC2</title>
-    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon-32x32.gif') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='login-style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon-32x32.gif') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/filter.js') }}"></script>
 
-    <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
-    <!--<script src="{{ url_for('static', filename='filter.js') }}"></script>-->
-    <script src="{{ url_for('static', filename='fudgec2.js') }}" defer></script>
-
-
-
-    <!-- Import Chart.js via CDN which building the chart pages.-->
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js"></script>-->
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='core-style.css') }}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Archivo:500|Open+Sans:300,700" rel="stylesheet">
 
+    <link rel="stylesheet" href="{{ url_for('static', filename='core-style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='login-style.css') }}">
+    <script src="{{ url_for('static', filename='fudgec2.js') }}" defer></script>
 </head>
 <body>
 {%  block NavbarBlock %}{% endblock %}
-<!--Make a local copy of these.-->
-<!--<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>-->
-<!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>-->
-<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>-->
-<!--<script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>-->
-<script src="{{ url_for('static', filename='bootstrap.bundle.min.js') }}" ></script>
-
-<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.bundle.min.js" integrity="sha256-E/V4cWE4qvAeO5MOhjtGtqDzPndRO1LBk8lJ/PR7CA4=" crossorigin="anonymous"></script>-->
 </body>
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}" ></script>
 </html>

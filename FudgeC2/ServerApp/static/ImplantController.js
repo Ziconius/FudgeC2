@@ -16,7 +16,7 @@ function unix_to_human_time(unixtime){
     time_last_seen = hours.substr(-2)+":"+minutes.substr(-2)+':'+seconds.substr(-2)+' '+day+'/'+month+'/'+year
     return time_last_seen
 }
-
+// OnClick for implant command submission found on http[s]://<ip>/<campaign-id>/
 $(function() {
     $('#AnswerBtn').on('click', function (e) {
         e.preventDefault(); // disable the default form submit event
@@ -37,8 +37,8 @@ $(function() {
     });
 });
 
-
-function order_response_by_time ( response ){
+// This order active implants by their most recent check in time.
+    function order_response_by_time ( response ){
     var a = 0;
     var ordered_list = [];
     var change = true;
@@ -64,13 +64,11 @@ function order_response_by_time ( response ){
     return ordered_list
 }
 
-///api/campaign/<cid>/implants/state
+
 
 async function get_active_implant_command_queue (cid){
     $.ajax({
-        // url:`/${cid}/waiting_commands`,
-        //url: `/api/campaign/${cid}/implants/active`,
-        url:`/api/campaign/${cid}/implants/queued`,
+        url:`/api/v1/campaign/${cid}/implants/queued`,
         type:"GET",
         success: function (response) {
             document.getElementById('awaiting').innerHTML = ""
@@ -79,7 +77,7 @@ async function get_active_implant_command_queue (cid){
                     line="<p>Implant ID: "+response[element].uik+"</br>Command: "+response[element].log_entry+"</p>"
                     document.getElementById('awaiting').innerHTML =  document.getElementById('awaiting').innerHTML + line
                 } else {
-                    //console.log(response[element].time)
+                    // console.log("Error:"+response[element].time)
                 }
             }
         }
@@ -89,7 +87,6 @@ async function get_active_implant_command_queue (cid){
 
 async function get_active_implant_state (cid){
 $.ajax({
-            // url:`/${cid}/implant/status`,
             url: `/api/v1/campaign/${cid}/implants/state`,
             type:"GET",
             success: function (response) {
@@ -118,7 +115,9 @@ $.ajax({
                     } else if (response[element].status=='good') {
                         var CodeColour="text-success"
                     }
-                    Entry = "<div class=''><p>Title: "+response[element].title+"<br>Time: "+time_last_seen+"<br>Status: <code class='"+CodeColour+"'>"+response[element].status+"</code></p></div><hr>"
+                    // Generate link to implant details page:
+                    title_and_link = 'Title: <a href="/' + cid + '/implant/active/' + response[element].implant_id + '">' + response[element].title + '</a>'
+                    Entry = "<div class=''>" + title_and_link + "<br>Time: " + time_last_seen+"<br>Status: <code class='"+CodeColour+"'>"+response[element].status+"</code></p></div><hr>"
                     implant_status_text += Entry;
                 }
             document.getElementById('ImplantStatusValues').innerHTML = "" // Clear current implants before writing updated values.
@@ -126,10 +125,10 @@ $.ajax({
             }
         })
 }
-var contained_list=[];
-c_state=0
-function get_command_responses(cid){
 
+var contained_list=[];
+var c_state=0
+function get_command_responses(cid){
     $.ajax({
         url:`/${cid}/cmd_response`,
         type:"GET",
@@ -176,11 +175,13 @@ async function implant_page_controller (cid){
     delay = 0
     while (true)
     {
-        // console.log("Running:"+ cid)
+        // Run each of the checks for new command responses, active implants, and queued commands with a delay between each of $delay
         get_active_implant_state(cid)
         await sleep(delay)
+
         get_active_implant_command_queue(cid)
         await sleep(delay)
+
         get_command_responses(cid)
         await sleep(delay)
         delay = 2000

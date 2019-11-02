@@ -48,6 +48,7 @@
         </div>
     </div>
     <div class="col-md-9">
+        <div><h6>Command results:</h6></div>
         <div id="Response"></div>
         main
     </div>
@@ -55,7 +56,6 @@
 <script src="{{ url_for('static', filename='ImplantController.js') }}"></script>
 <script>
 implant_page_controller({{cid}})
-console.log({{cid}})
 </script>
 {% endblock %}
 
