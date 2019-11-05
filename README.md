@@ -3,9 +3,11 @@
 </p>
 
 # FudgeC2
-FudgeC2 is a campaign orientated Powershell C2 framework built on Python3/Flask - Designed for team collaboration, client interaction, campaign timelining, and usage visibility. 
+FudgeC2 is a Powershell command and control framework designed to facilitate team collaboration and campaign timelining, which aims to help clients better understand red team activities.
 
-_Note: FudgeC2 is currently in alpha stage, and should be used with caution in non-test environments. Beta will be released later this year, at_ [BlackHat Arsenal](https://www.blackhat.com/us-19/arsenal/schedule/#fudge-a-collaborative-c2-framework-for-purple-teaming-16968). 
+Built on Python3 with a web frontend, FudgeC2 aims to provide red teamers a simple interface in which to manage active implants across their campaigns.
+
+_FudgeC2 is currently in beta, and should be used with caution in non-test environments. The beta was release at [BlackHat Arsenal USA 2019](https://www.blackhat.com/us-19/arsenal/schedule/#fudge-a-collaborative-c2-framework-for-purple-teaming-16968)._ 
 
 ## Setup
 ### Installation
@@ -19,7 +21,7 @@ sudo pip3 install -r requirements.txt
 sudo python3 Controller.py
 ```
 
-For those who wish to use FudgeC2 via Docker, a template Dockerfile exists within the repo as well.
+For those who wish to use FudgeC2 via Docker, you can find the Docker [here](/Dockerfile). 
 
 ##### Settings:
 
@@ -31,7 +33,6 @@ These settings include FudgeC2 server application port, SSL configuration, and d
 
 N.b. Depending on your network design/RT architecture deployment, you will likely need to configure a number of proxy and routing adjustments.
 
-For upcoming development notes and recent changes see the [release.md file](/release.md)
 
 #### First Login
 After the initial installation you can log in with the default admin account using the credentials: 
@@ -42,13 +43,11 @@ You will be prompted to the change the admin password after you login for the fi
 
 ### Server Settings
 
-< Reworking >
+Certificates for any TLS are placed in the Storage directory, with the names placed within the settings.py file.
 
-Certificate: How to deploy/Where to deploy
+Port: This is the port number which the FudgeC2 server will bind to. The default is 5001.
 
-Port - consider listeners
-
-DB name:
+DB name: The default name for the FudgeC2 database is ```fudge_c2.sql```. This can be altered if required.
 
 
 ## Users
@@ -107,7 +106,16 @@ Once an implant has been generated the stagers page will provide a number of bas
 * IEX method
 * Windows Words macro
 
+### Built in commands
+FudgeC2 has a variety of builtin functionality which can be invoked from the command input. The following commands can be executed on all FudgeC2 implants:
 
+ - ```:: sys_info``` Collects username, hostname, domain, and local IP
+ - ```:: enable_persistence``` Enables persistence by embedding a stager payload into the following autorun register key:
+    - HKCU:\Software\Microsoft\Windows\CurrentVersion\Run\
+ - ```:: export_clipboard``` Attempts to collect any text data stored in the users clipboard.
+ - ```:: load_module [target script]``` This will load external powershell modules, such as JAWS.
+ - ```:: exec_module [loaded module name]``` Executes a specific function of a loaded module.
+ - ```:: list_modules``` Lists all loaded modules by the implant.
 
 ### Active Implants
 

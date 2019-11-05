@@ -40,15 +40,6 @@ class Users(Base):
         return False
 
 
-class ResponseLogs(Base):
-    __tablename__ = 'response_logs'
-    log_id = Column(INTEGER(11), nullable=False, index=True, primary_key=True)
-    cid = Column(INTEGER(11), nullable=False, index=True)
-    uik = Column(INTEGER(11), nullable=False, index=True)
-    log_entry = Column(String(255), nullable=False)
-    time = Column(INTEGER(11), nullable=False, index=True)
-
-
 class Implants(Base):
     __tablename__ = 'implants'
     iid = Column(INTEGER(11), nullable=False, index=True, primary_key=True)
@@ -91,6 +82,17 @@ class ImplantLogs(Base):
     log_entry = Column(String(255), nullable=False)
     read_by_implant = Column(INTEGER(16), nullable=False, server_default=text("0"))
     c2_protocol = Column(String(128))
+    command_id = Column(String(128))
+
+
+class ResponseLogs(Base):
+    __tablename__ = 'response_logs'
+    log_id = Column(INTEGER(11), nullable=False, index=True, primary_key=True)
+    cid = Column(INTEGER(11), nullable=False, index=True)
+    uik = Column(INTEGER(11), nullable=False, index=True)
+    log_entry = Column(String(255), nullable=False)
+    time = Column(INTEGER(11), nullable=False, index=True)
+    command_id = Column(String(128))
 
 
 class Campaigns(Base):
@@ -136,7 +138,7 @@ class Listeners(Base):
     auto_run = Column(INTEGER())
 
 
-# -- Generate an empty database none exist.
+# -- Generate an empty database if no database is found.
 # --    additional checks for file existence would be sensible first
 
 path = os.getcwd() + "/Storage/"

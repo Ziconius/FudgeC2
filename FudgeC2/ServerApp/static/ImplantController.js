@@ -38,7 +38,7 @@ $(function() {
 });
 
 // This order active implants by their most recent check in time.
-    function order_response_by_time ( response ){
+function order_response_by_time ( response ){
     var a = 0;
     var ordered_list = [];
     var change = true;

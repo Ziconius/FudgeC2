@@ -1,7 +1,8 @@
 import time
 import random
+import secrets
+
 from Data.models import ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants
-# AppLogs, CampaignLogs, Users
 from Data.CampaignLogging import CampaignLoggingDecorator
 
 CL = CampaignLoggingDecorator()
@@ -154,6 +155,24 @@ class DatabaseImplant:
         self.Session.commit()
         return True
 
+    def test(self):
+        aaa = self.Session.query(ImplantLogs)
+        token = secrets.token_urlsafe(12)
+        # unique = True
+        # while unique:
+        #     for x in aaa:
+        #         if token == x.__dict__['command_id']:
+        #             break
+        a = []
+        for x in aaa:
+            print(x.__dict__['command_id'])
+            a.append(x.__dict__['command_id'])
+        while True:
+            b = secrets.token_urlsafe(12)
+            if b not in a:
+                break
+        print("UNIQUE!")
+
     @CL.log_cmdreg
     def Register_ImplantCommand(self, username, uik, command,  cid=0):
         # -- Requirements: username unique_implant_key, command
@@ -174,15 +193,28 @@ class DatabaseImplant:
         if len(result) == 0:
             print("No Implant <--> User association")
             return False
+
+        # Check existing command_id values to avoid collisions
+        existing_implant_logs = self.Session.query(ImplantLogs)
+        tmp_command_id = []
+        for log in existing_implant_logs:
+            tmp_command_id.append(log.__dict__['command_id'])
+        while True:
+            cmd_id = secrets.token_hex(12)
+            if cmd_id not in tmp_command_id:
+                break
+
         for line in result:
             if line[0].permissions == 2:
                 cid = line[0].cid
+                # Get all ImplantLog: check for command_id
                 new_implant_log = ImplantLogs(cid=cid,
                                               uid=uid,
                                               time=time.time(),
                                               log_entry=str(command),
                                               uik=uik,
-                                              read_by_implant=0)
+                                              read_by_implant=0,
+                                              command_id=cmd_id)
 
                 self.Session.add(new_implant_log)
                 try:
