@@ -1,39 +1,31 @@
 {% extends "BaseNavbar.html" %}
 {% block main %}
 <div class="row justify-content-md-center m-4">
-    <div class="col-md-6 bg-white m-4 p-4 rounded">
+    <div class="col-md-9 bg-white m-4 p-4 rounded">
         <h3>Welcome to FudgeC2</h3>
         <p>Start by creating a new campaign, and allocating access to any other team members.</p>
         <p>To generate an implant select the desired campaign and select 'New Implant', configuring the required fields.</p>
 
-        <h5>Further info</h5>
-        <p>
-            Campaigns are broken down into 3 functional areas, implants templates, and stagers, and active listeners.
-            An implant template is responsible for creating the base information such as:
-        </p>
-        <ul>
-            <li>Common name</li>
-            <li>Callback URL</li>
-            <li>Communication channels</li>
-            <li>Beacon and initial communication delays</li>
-        </ul>
-        <p>
-            After an implant template has been created FudgeC2 will automatically generate stagers which can be used to gain initial access.
-        </p>
-        <ul>
-            <li>A stager can be used numerous times, once a stager communicates with the C2 server a the full implant will be delivered.</li>
-            <li>Each implant that is delivered will generate it's own unique implant reference.</li>
-        </ul>
-        <p>
-            Once an implant call been deployed it will be given a unique common name based on the implant templates common name. It can now be interacted with as the full implant using the campaign main page. Once a common has been registered with FudgeC2 it will await pick up from the implant the next time it beacons back. Each new common will add to the queue.
-        </p>
-        <p>
-            When a common returns data to the C2 it will be timestamped based on the time C2 server receives the information.
-        </p>
-        <p>For full documentation see the README file, or visit the GitHub page: <a href="https://github.com/Ziconius/FudgeC2" target="_blank">https://github.com/Ziconius/FudgeC2</a></p>
-        <p>Gl;Hf.</p>
+        <h5>Active Campaigns</h5>
+        <table class="table table-dark table-striped">
+            <thead>
+            <tr><td>campaign name</td><td>implant name</td><td>time last checked in</td><td>callback URL</td>
+            </thead>
+            <tbody id="t_body">
+            </tbody>
+        </table>
+
+        <h5>Listeners</h5>
+        <table class="table table-dark table-striped">
+            <thead>
+            <tr><td>listener name</td><td>protocol</td><td>protocol</td><td>state</td>
+            </thead>
+            <tbody id="t_body_listener">
+            </tbody>
+        </table>
     </div>
 </div>
+
 {% if out_of_date %}
 <!-- The Modal -->
 <div class="modal" id="myModal">
@@ -60,10 +52,17 @@
     </div>
   </div>
 </div>
-<script type="text/javascript">
+{% endif %}
+
+
+<script src="{{ url_for('static', filename='ImplantController.js') }}"></script>
+<script>
+    get_overview_page_details();
     $(window).on('load',function(){
         $('#myModal').modal('show');
     });
 </script>
-{% endif %}
+
+
+
 {% endblock %}

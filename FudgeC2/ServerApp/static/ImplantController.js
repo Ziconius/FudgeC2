@@ -130,7 +130,7 @@ var contained_list=[];
 var c_state=0
 function get_command_responses(cid){
     $.ajax({
-        url:`/${cid}/cmd_response`,
+        url:`/api/v1/campaign/${cid}/implants/response`,
         type:"GET",
         success: function (response) {
             // Get list of responses
@@ -186,4 +186,67 @@ async function implant_page_controller (cid){
         await sleep(delay)
         delay = 2000
     }
+}
+
+function get_overview_page_details(){
+    $.ajax({
+        url:`/api/v1/campaign`,
+        type:"GET",
+        success: function (response) {
+
+            for (element in response){
+                console.log("aaaaa")
+                get_campaign_info_by_id(response, element)
+
+
+            }
+            document.getElementById('campaign-info').innerHTML = t_top
+        }
+    })
+}
+
+function get_campaign_info_by_id(rrr, cid){
+    $.ajax({
+        url:`/api/v1/campaign/${cid}/implants/active`,
+        type:"GET",
+        success: function (response) {
+            for (item in response){
+                console.log(response[item])
+                A = rrr[cid]
+                B = response[item]['generated_title']
+                C = response[item]['last_check_in']
+                D = response[item]['callback_url']
+    //            for (element in response){
+    //                console.log(response[element])
+    //            }
+                E = document.getElementById('t_body').innerHTML;
+
+                line = `<td>${A}</td><td>${B}</td><td>${C}</td><td>${D}</td>`
+                document.getElementById('t_body').innerHTML = E + line;
+                console.log("ret: "+response)
+
+            }
+
+
+            return response;
+        }
+    })
+}
+
+
+
+
+
+function print(data){
+    console.log(camp_implants)
+    for (x in camp_implants){
+        console.log("aaa: "+camp_implants[x])
+        campaign_name = camp_implants[x]['generated_title']
+        implant_name = "b"
+        checkin_time = "c"
+        a = `<tr><td>${campaign_name}</td><td>${implant_name}</td><td>${checkin_time}</td></tr>`
+        t_top = t_top + a
+    }
+
+
 }

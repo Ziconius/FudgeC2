@@ -352,7 +352,7 @@ def ImplantCommandRegistration(cid):
 # -------------------------------------------------------------- #
 # TODO: Replace JSON enpoints with websockets.
 
-
+# Dead
 @app.route("/<cid>/cmd_response", methods=['GET', 'POST'])
 @login_required
 def cmdreturn(cid):
@@ -392,24 +392,38 @@ def get_all_active_implants(cid):
 
 
 # Early API redevelopment:
-@app.route("/api/v1/campaigns")
-@login_required
+@app.route("/api/v1/campaign")
+#@login_required
 def get_user_campaigns():
+    current_user.user_email = "admin"
     return jsonify(AppManager.get_all_user_campaigns(current_user.user_email))
 
 
 @app.route("/api/v1/campaign/<cid>/implants/active")
-@login_required
+#@login_required
 def get_active_implants(cid):
+    current_user.user_email = "admin"
     a = ImpMgmt.get_active_campaign_implants(current_user.user_email, cid)
     return jsonify(a)
 
-@app.route("/api/v1/campaign/<cid>/implants/queued", methods=['GET', 'POST'])
+
+@app.route("/api/v1/campaign/<cid>/implants/queued", methods=['GET'])
 @login_required
 def get_implant_queued_commands(cid):
     # -- Get JSON blob which contains all implant commands and then registration state
     commands = ImpMgmt.Get_RegisteredImplantCommands(current_user.user_email, cid)
     return jsonify(commands)
+
+
+@app.route("/api/v1/campaign/<cid>/implants/response/<implant_id>", methods=['GET'])
+@app.route("/api/v1/campaign/<cid>/implants/response", methods=['GET'])
+@login_required
+def get_all_implant_responses(cid):
+    # -- Javascript appears to not be printing out all entries
+    if UsrMgmt.campaign_get_user_access_right_cid(current_user.user_email, cid):
+        return jsonify(Imp.Get_CommandResult(cid))
+    else:
+        return str(0)
 
 
 @app.route("/api/v1/campaign/<cid>/implants/state")
