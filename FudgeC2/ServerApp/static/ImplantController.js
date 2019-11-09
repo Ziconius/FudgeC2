@@ -213,9 +213,13 @@ function get_campaign_info_by_id(rrr, cid){
             for (item in response){
                 console.log(response[item])
                 A = rrr[cid]
+                A = `<a href="/${cid}">${A}</a>`
                 B = response[item]['generated_title']
+                b = response[item]['unique_implant_id']
+                B =`<a href="/${cid}/implant/active/${b}">${B}</a>`
                 C = response[item]['last_check_in']
                 D = response[item]['callback_url']
+
     //            for (element in response){
     //                console.log(response[element])
     //            }

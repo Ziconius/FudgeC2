@@ -78,12 +78,18 @@ class ImplantManagement:
             for x in command_listing:
                 if x['input'] in preprocessed_command:
                     a = preprocessed_command.partition(x['input'])
+                    print(a)
                     r_command = { "type":x['type'], "args":a[2].strip()}
                     return r_command, True
             return command, {"cmd_reg": {"result": False, "reason": "Unknown inbuilt command, i.e. '::'"}}
+        elif command.lstrip()[0:1] == ":":
+            preprocessed_command = command.lstrip()[1:].lower().strip()
+            for x in command_listing:
+                if x['input'] in preprocessed_command:
+                    return command, {"cmd_reg": {"result": False, "reason": "Potential typo found in command. A single colon was found, did you mean: :{}. If not please submit a GitHub ticket with the submitted command. ".format(command)}}
+
         else:
             r_command = {"type": "CM", "args": command}
-
         return r_command, True
 
     def ImplantCommandRegistration(self, cid, username, form):
