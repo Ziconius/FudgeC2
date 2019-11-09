@@ -189,6 +189,7 @@ async function implant_page_controller (cid){
 }
 
 function get_overview_page_details(){
+
     $.ajax({
         url:`/api/v1/campaign`,
         type:"GET",
@@ -198,12 +199,33 @@ function get_overview_page_details(){
                 console.log("aaaaa")
                 get_campaign_info_by_id(response, element)
 
-
             }
             document.getElementById('campaign-info').innerHTML = t_top
         }
     })
+    get_listener_info()
 }
+
+function get_listener_info(){
+    $.ajax({
+        url:`/api/v1/listener`,
+        type:"GET",
+        success: function (response) {
+            for (x in response){
+                console.log(response)
+                A=response[x]['common_name']
+                B = response[x]['port']
+                C= response[x]['type']
+                D =response[x]['state']
+
+                E = document.getElementById('t_body_listener').innerHTML;
+                line = `<td>${A}</td><td>${B}</td><td>${C}</td><td>${D}</td>`
+                document.getElementById('t_body_listener').innerHTML = E + line;
+            }
+        }
+    })
+}
+
 
 function get_campaign_info_by_id(rrr, cid){
     $.ajax({
@@ -211,7 +233,7 @@ function get_campaign_info_by_id(rrr, cid){
         type:"GET",
         success: function (response) {
             for (item in response){
-                console.log(response[item])
+//                console.log(response[item])
                 A = rrr[cid]
                 A = `<a href="/${cid}">${A}</a>`
                 B = response[item]['generated_title']
@@ -227,7 +249,7 @@ function get_campaign_info_by_id(rrr, cid){
 
                 line = `<td>${A}</td><td>${B}</td><td>${C}</td><td>${D}</td>`
                 document.getElementById('t_body').innerHTML = E + line;
-                console.log("ret: "+response)
+//                console.log("ret: "+response)
 
             }
 

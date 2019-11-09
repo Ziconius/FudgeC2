@@ -171,6 +171,10 @@ def GlobalListenerPage():
         flash('TLS certificates do not exist within the <install dir>/FudgeC2/Storage directory.')
     return render_template("listeners/listeners.html", test_data=app.config['listener_management'].get_active_listeners())
 
+@app.route("/api/v1/listener/")
+def get_listener_details():
+
+    return jsonify(app.config['listener_management'].get_active_listeners())
 
 # UPDATED
 @app.route("/api/v1/listener/change", methods=['POST'])
