@@ -76,8 +76,6 @@ async function get_active_implant_command_queue (cid){
                 if (response[element].read_by_implant == 0){
                     line="<p>Implant ID: "+response[element].uik+"</br>Command: "+response[element].log_entry+"</p>"
                     document.getElementById('awaiting').innerHTML =  document.getElementById('awaiting').innerHTML + line
-                } else {
-                    // console.log("Error:"+response[element].time)
                 }
             }
         }
@@ -108,11 +106,11 @@ $.ajax({
                     time_last_seen = hours+":"+minutes.substr(-2)+':'+seconds.substr(-2)+' '+day+'/'+month+'/'+year
 
                     var CodeColour = "text-primary"
-                    if (response[element].status=='poor'){
+                    if (response[element].status=='Unresponsive'){
                         var CodeColour="text-danger"
-                    } else if (response[element].status=='normal') {
+                    } else if (response[element].status=='Delayed') {
                         var CodeColour="text-warning"
-                    } else if (response[element].status=='good') {
+                    } else if (response[element].status=='Healthy') {
                         var CodeColour="text-success"
                     }
                     // Generate link to implant details page:
@@ -138,7 +136,6 @@ function get_command_responses(cid){
             for (element in response){
                 // Check for the log_id existing, if it doesn't add to list and write to top of page to remove weird loading page
                 if ( contained_list.includes(response[element].log_id) ) {
-                    //console.log('Entry found');
                 } else {
 
                     contained_list.push(response[element].log_id);
@@ -148,7 +145,6 @@ function get_command_responses(cid){
                     var utcSeconds = response[element].time;
                     var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
                     d=unix_to_human_time(response[element].time)
-                    // console.log(response[element]);
                     tmp_text = response[element].log_entry
                     response_data = tmp_text.replace(new RegExp('\r?\n','g'), '<br />');
                     if (c_state === 0){
@@ -161,11 +157,10 @@ function get_command_responses(cid){
 
                     GG = bgc+"<p>Name: "+response[element].title+"<br>Time: "+d+"<br>Response:<br> <code>"+response_data+"</code></p></div>";
                     WP = document.getElementById('Response').innerHTML;
-                    // alert(WP);
                     document.getElementById('Response').innerHTML = GG + WP;
                  }
                }
-            //console.log(contained_list)
+
             }
     })
 }
@@ -196,7 +191,6 @@ function get_overview_page_details(){
         success: function (response) {
 
             for (element in response){
-                console.log("aaaaa")
                 get_campaign_info_by_id(response, element)
 
             }
@@ -212,7 +206,6 @@ function get_listener_info(){
         type:"GET",
         success: function (response) {
             for (x in response){
-                console.log(response)
                 A=response[x]['common_name']
                 B = response[x]['port']
                 C= response[x]['type']
@@ -233,24 +226,19 @@ function get_campaign_info_by_id(rrr, cid){
         type:"GET",
         success: function (response) {
             for (item in response){
-//                console.log(response[item])
+
                 A = rrr[cid]
-                A = `<a href="/${cid}">${A}</a>`
+                A = `<a class="text-warning" href="/${cid}">${A}</a>`
                 B = response[item]['generated_title']
                 b = response[item]['unique_implant_id']
-                B =`<a href="/${cid}/implant/active/${b}">${B}</a>`
+                B =`<a class="text-warning" href="/${cid}/implant/active/${b}">${B}</a>`
                 C = response[item]['last_check_in']
                 D = response[item]['callback_url']
 
-    //            for (element in response){
-    //                console.log(response[element])
-    //            }
-                E = document.getElementById('t_body').innerHTML;
 
+                E = document.getElementById('t_body').innerHTML;
                 line = `<td>${A}</td><td>${B}</td><td>${C}</td><td>${D}</td>`
                 document.getElementById('t_body').innerHTML = E + line;
-//                console.log("ret: "+response)
-
             }
 
 
@@ -264,9 +252,7 @@ function get_campaign_info_by_id(rrr, cid){
 
 
 function print(data){
-    console.log(camp_implants)
     for (x in camp_implants){
-        console.log("aaa: "+camp_implants[x])
         campaign_name = camp_implants[x]['generated_title']
         implant_name = "b"
         checkin_time = "c"

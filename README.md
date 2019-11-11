@@ -16,9 +16,6 @@ Built on Python3 with a web frontend, FudgeC2 aims to provide red teamers a simp
 
 _FudgeC2 is currently in beta, and should be used with caution in non-test environments. The beta was release at [BlackHat Arsenal USA 2019](https://www.blackhat.com/us-19/arsenal/schedule/index.html#fudge-a-collaborative-c-framework-for-purple-teaming-16968)._
 
-### Table of Contents:
-< HERE >
-
 ### Installation
 
 To install &  configure FudgeC2 run the following:
@@ -29,7 +26,7 @@ cd FudgeC2/FudgeC2
 sudo pip3 install -r requirements.txt
 sudo python3 Controller.py
 ```
-This will generate a new database, and first time credentials. You will then be able to access the platform from 127.0.0.1:5001/. The logon credentials are:
+This will generate a new database, and first time credentials. You will then be able to access the platform from *http[s]://127.0.0.1:5001/*. The logon credentials are:
 
 `admin`:`letmein`
 
@@ -41,11 +38,12 @@ FudgeC2 breaks projects down into campaigns. Each campaign will have a their own
 
 Once you have generated a campaign and implant you will be able to interact with the any active implants from the campaign homepage. 
 
-<Homepage screenshot>
+
+![Homepage](https://user-images.githubusercontent.com/6460785/68624234-4b38a900-04ce-11ea-95dc-a2253dec4ace.png)
 
 An overview of functionality can be seen below, for more information see the implant functionality pages on FudgeC2s' wiki, [found here](https://github.com/Ziconius/FudgeC2/wiki).
 
-Builtin functionality
+**Implant functionality**
 - ```<command>``` If no builtin prefix  in used the submitted value will be directly executed by Powershell.
 - ```:: sys_info``` Collects username, hostname, domain, and local IP
 - ```:: enable_persistence``` Enables persistence by embedding a stager payload into the following autorun registry key

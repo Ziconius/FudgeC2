@@ -38,17 +38,17 @@ class ImplantManagement:
             {
                 "type": "PS",
                 "args": "sound file location (on Fudge)",
-                "input":"play_audio"
+                "input": "play_audio"
             },
             {
                 "type": "EP",
                 "args": None,
-                "input":"enable_persistence"
+                "input": "enable_persistence"
             },
             {
                 "type": "SI",
                 "args": None,
-                "input":"sys_info"
+                "input": "sys_info"
             },
             {
                 "type": "EC",
@@ -56,8 +56,8 @@ class ImplantManagement:
                 "input": "export_clipboard"
             },
             {
-                "type":"LM",
-                "args":None,
+                "type": "LM",
+                "args": None,
                 "input": "load_module"
             },
             {
@@ -70,7 +70,7 @@ class ImplantManagement:
                 "args": None,
                 "input": "list_modules"
             }
-        ] # FU,FD,PS,EP,SI, EC
+        ]
 
         # Process command output into:
         if command.lstrip()[0:2] == "::":
@@ -79,18 +79,20 @@ class ImplantManagement:
                 if x['input'] in preprocessed_command:
                     a = preprocessed_command.partition(x['input'])
                     print(a)
-                    r_command = { "type":x['type'], "args":a[2].strip()}
+                    r_command = {"type": x['type'], "args": a[2].strip()}
                     return r_command, True
             return command, {"cmd_reg": {"result": False, "reason": "Unknown inbuilt command, i.e. '::'"}}
         elif command.lstrip()[0:1] == ":":
             preprocessed_command = command.lstrip()[1:].lower().strip()
             for x in command_listing:
                 if x['input'] in preprocessed_command:
-                    return command, {"cmd_reg": {"result": False, "reason": "Potential typo found in command. A single colon was found, did you mean: :{}. If not please submit a GitHub ticket with the submitted command. ".format(command)}}
+                    return command, {"cmd_reg": {"result": False, "reason": "Potential typo found in \
+command.A single colon was found, did you mean: :{}. If not please submit a GitHub ticket with the \
+submitted command.".format(command)}}
 
         else:
             r_command = {"type": "CM", "args": command}
-        return r_command, True
+            return r_command, True
 
     def ImplantCommandRegistration(self, cid, username, form):
         # -- This should be refactored at a later date to support read/write changes to
@@ -126,7 +128,7 @@ class ImplantManagement:
             return {"cmd_reg": {"result": True, "reason": "Command registered"}}
         return {"cmd_reg": {"result": False, "reason": "Incorrect implant given, or non-existent active implant."}}
 
-    def CreateNewImplant(self,cid, form, user):
+    def CreateNewImplant(self, cid, form, user):
         # TODO: Create checks for conflicting ports.
         implant_configuration = {
             "title": None,
@@ -203,7 +205,6 @@ class ImplantManagement:
                 if protocol_set is False:
                     raise ValueError('No protocol selected, ensure a protocol and port are selected.')
 
-
                 a = self.db.implant.create_new_implant_template(user, cid, implant_configuration)
                 if a is True:
                     return True, "Implant created."
@@ -219,13 +220,13 @@ class ImplantManagement:
         # -- Return list of dictionaries, not SQLAlchemy Objects.
         if self.db.campaign.Verify_UserCanAccessCampaign(username, cid):
             Commands = self.db.implant.Get_RegisteredImplantCommandsFromCID(cid)
-            toDict = []
+            to_dict = []
             for x in Commands:
                 a = x.__dict__
                 if '_sa_instance_state' in a:
                     del a['_sa_instance_state']
-                toDict.append(a)
-            return toDict
+                to_dict.append(a)
+            return to_dict
         else:
             return False
 
@@ -235,7 +236,6 @@ class ImplantManagement:
             return {
                 "cmd_reg": {"result": False, "reason": "You are not authorised to view commands in this campaign."}}
         return self.db.Log_GetCampaignActions(cid)
-
 
     def get_active_campaign_implants(self, user, campaign_id):
         if self.db.campaign.Verify_UserCanAccessCampaign(user, campaign_id):

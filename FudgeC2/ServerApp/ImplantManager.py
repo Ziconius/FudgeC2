@@ -82,9 +82,9 @@ def page_not_found(e):
 @app.route("/auth/login", methods=['GET', 'POST'])
 def login():
     if request.method == "POST":
-        if 'email' in request.form and 'password' in request.form and request.form['email'] != None and request.form['password'] != None:
+        if 'email' in request.form and 'password' in request.form and request.form['email'] is not None and request.form['password'] is not None:
             UserObject = UsrMgmt.user_login(request.form['email'],request.form['password'])
-            if UserObject == False:
+            if UserObject is False:
                 return redirect(url_for("BaseHomePage", error="Incorrect Username/Password"))
 
             if UserObject.first_logon == 1:
@@ -97,6 +97,7 @@ def login():
                 return redirect(url_for("PasswordReset", guid=guid))
     return render_template("auth/LoginPage.html", fudge_version=AppManager.get_software_verision_number(), fudge_version_name=AppManager.get_software_verision_name())
 
+
 @app.route("/auth/logout")
 @login_required
 def logout():
@@ -106,10 +107,10 @@ def logout():
     else:
         return redirect(url_for("login"))
 
+
 @app.route("/auth/passwordreset", methods=['GET', 'POST'])
 def PasswordReset():
-
-    if request.method =="POST":
+    if request.method == "POST":
         print("In reset: {}".format(request.form))
         UserObject = UsrMgmt.change_password_first_logon(request.form)
         if UserObject is not False:
@@ -118,14 +119,12 @@ def PasswordReset():
     if request.method == "GET":
         print(request.args)
         guid = "0000-0000-0000-0000"
-        if request.args.get('guid') != None:
+        if request.args.get('guid') is not None:
 
             print("We're now embedding: {}".format( request.args.get('guid')))
             guid = request.args.get('guid')
         return render_template("auth/PasswordResetPage.html", guid=guid)
     return redirect(url_for('login'))
-
-
 
 
 # -- Main endpoints -- #
@@ -135,8 +134,8 @@ def PasswordReset():
 def BaseHomePage():
     if request.method == "GET":
         return render_template("Homepage.html",
-                           out_of_date=AppManager.check_software_version(),
-                           version_number=AppManager.get_software_verision_number())
+                               out_of_date=AppManager.check_software_version(),
+                               version_number=AppManager.get_software_verision_number())
     elif request.method == "POST":
         return jsonify(AppManager.get_all_user_campaigns(current_user.user_email))
 
@@ -171,10 +170,12 @@ def GlobalListenerPage():
         flash('TLS certificates do not exist within the <install dir>/FudgeC2/Storage directory.')
     return render_template("listeners/listeners.html", test_data=app.config['listener_management'].get_active_listeners())
 
+
 @app.route("/api/v1/listener/")
 def get_listener_details():
 
     return jsonify(app.config['listener_management'].get_active_listeners())
+
 
 # UPDATED
 @app.route("/api/v1/listener/change", methods=['POST'])
@@ -183,6 +184,7 @@ def Listener_Updates():
     form_response = app.config['listener_management'].update_listener_state(current_user.user_email, request.form)
     flash(form_response[1])
     return redirect(url_for('GlobalListenerPage'))
+
 
 # UPDATED
 @app.route("/api/v1/listener/create", methods=['POST'])
@@ -197,6 +199,7 @@ def create_new_listener():
 # -- CAMPAIGN SPECIFIC PAGES -- #
 # ----------------------------- #
 
+
 @app.route("/<cid>/", methods=['GET'])
 @login_required
 def BaseImplantPage(cid):
@@ -209,7 +212,6 @@ def BaseImplantPage(cid):
 
     msg = "No implants have called back in association with this campaign - create an implant base and use the stager page."
     return render_template("ImplantMain.html", cid=cid, Msg=msg)
-
 
 
 @app.route("/<cid>/settings", methods=['GET', 'POST'])
@@ -298,7 +300,7 @@ def CampaignGraph(cid):
     g.setdefault('cid', cid)
     # -- If we receive a POST request then we will populate the page, this will be called AFTER the page has loaded.
     if request.method == "POST":
-        blah = {'a':"1", 'b':"v"}
+        blah = {'a': "1", 'b': "v"}
         return jsonify(blah)
     return render_template("CampaignGraph.html")
 
@@ -306,7 +308,7 @@ def CampaignGraph(cid):
 @app.route("/<cid>/logs", methods=["GET", "POST"])
 @login_required
 def CampaignLogs(cid):
-    g.setdefault('cid',cid)
+    g.setdefault('cid', cid)
     if request.method == "POST":
         # -- Replace with pre-organised campaign logs - simplifies JS component.
         # Get_CampaignLogs
@@ -333,8 +335,7 @@ def export_campaign_by_cid(cid):
         export_result = ExpoManager.export_campaign_database(current_user.user_email, cid)
         if export_result is not False:
             print(export_result)
-            return jsonify({"filename":export_result[0], "password":export_result[1]})
-
+            return jsonify({"filename": export_result[0], "password": export_result[1]})
 
     return url_for("BaseImplantPage", cid=cid)
 
@@ -397,14 +398,14 @@ def get_all_active_implants(cid):
 
 # Early API redevelopment:
 @app.route("/api/v1/campaign")
-#@login_required
+@login_required
 def get_user_campaigns():
     current_user.user_email = "admin"
     return jsonify(AppManager.get_all_user_campaigns(current_user.user_email))
 
 
 @app.route("/api/v1/campaign/<cid>/implants/active")
-#@login_required
+@login_required
 def get_active_implants(cid):
     current_user.user_email = "admin"
     a = ImpMgmt.get_active_campaign_implants(current_user.user_email, cid)
@@ -445,12 +446,14 @@ def get_active_implants_state(cid):
         beacon = implant['beacon']
         time_from_last_check_in = time.time() - implant['last_check_in']
 
-        if time_from_last_check_in < beacon * 1.6:
-            implant_status_obj['status'] = "good"
-        elif time_from_last_check_in < beacon * 2.5:
-            implant_status_obj['status'] = "normal"
+        if time_from_last_check_in < beacon * 2.2:
+        # A beacon of 60 seconds has request response == 120 seconds + jitter
+        # meaning 132 seconds meaning a maximum of *2.2 delayed
+            implant_status_obj['status'] = "Healthy"
+        elif time_from_last_check_in < beacon * 3.5:
+            implant_status_obj['status'] = "Delayed"
         else:
-            implant_status_obj['status'] = "poor"
+            implant_status_obj['status'] = "Unresponsive"
 
         data[count] = implant_status_obj
         count = count + 1
