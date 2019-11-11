@@ -104,7 +104,8 @@ class DatabaseImplant:
         implant = self.Session.query(Implants).filter(Implants.stager_key == stager_key).first()
         if implant is not None:
             unique_implant_key = random.randint(000000, 999999)
-            new_title = str(implant.title) + "_" + str(unique_implant_key)
+            # new_title = str(implant.title) + "_" + str(unique_implant_key)
+            new_title = "{}_{}".format(implant.title, unique_implant_key)
             generated_implant = GeneratedImplants(unique_implant_id=unique_implant_key,
                                                   last_check_in=0,
                                                   current_beacon=implant.beacon,
@@ -125,7 +126,7 @@ class DatabaseImplant:
                 GeneratedImplants.unique_implant_id == unique_implant_key).first()
 
             active_implant_record = self.db_methods.__splice_implants_and_generated_implants__(active_implant_record)
-            print("Post splicechecl: ", active_implant_record)
+
             # -- Return Raw objects, and caller to manage them,
             return active_implant_record
         return False
@@ -154,24 +155,6 @@ class DatabaseImplant:
                  })
         self.Session.commit()
         return True
-
-    def test(self):
-        aaa = self.Session.query(ImplantLogs)
-        token = secrets.token_urlsafe(12)
-        # unique = True
-        # while unique:
-        #     for x in aaa:
-        #         if token == x.__dict__['command_id']:
-        #             break
-        a = []
-        for x in aaa:
-            print(x.__dict__['command_id'])
-            a.append(x.__dict__['command_id'])
-        while True:
-            b = secrets.token_urlsafe(12)
-            if b not in a:
-                break
-        print("UNIQUE!")
 
     @CL.log_cmdreg
     def Register_ImplantCommand(self, username, uik, command,  cid=0):

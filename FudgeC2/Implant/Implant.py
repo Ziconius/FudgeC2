@@ -47,7 +47,7 @@ class ImplantSingleton:
         # -- Used by Implant - Logs command responses from infected machines.
         def CommandResponse(self,unique_implant_key , cmd_result, c2_protocol=None):
             generated_implant_data = db.implant.Get_GeneratedImplantDataFromUIK(unique_implant_key)
-            db.implant.Register_ImplantResponse(generated_implant_data['cid'],unique_implant_key,cmd_result, c2_protocol)
+            db.implant.Register_ImplantResponse(generated_implant_data['cid'], unique_implant_key,cmd_result, c2_protocol)
 
 
         # -- Used by webapp.

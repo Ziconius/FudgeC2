@@ -2,6 +2,7 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+
 function unix_to_human_time(unixtime){
     var utcSeconds = unixtime;
     var d = new Date(0);
@@ -16,6 +17,8 @@ function unix_to_human_time(unixtime){
     time_last_seen = hours.substr(-2)+":"+minutes.substr(-2)+':'+seconds.substr(-2)+' '+day+'/'+month+'/'+year
     return time_last_seen
 }
+
+
 // OnClick for implant command submission found on http[s]://<ip>/<campaign-id>/
 $(function() {
     $('#AnswerBtn').on('click', function (e) {
@@ -36,6 +39,7 @@ $(function() {
         });
     });
 });
+
 
 // This order active implants by their most recent check in time.
 function order_response_by_time ( response ){
@@ -63,7 +67,6 @@ function order_response_by_time ( response ){
     }
     return ordered_list
 }
-
 
 
 async function get_active_implant_command_queue (cid){
@@ -124,6 +127,7 @@ $.ajax({
         })
 }
 
+
 var contained_list=[];
 var c_state=0
 function get_command_responses(cid){
@@ -183,22 +187,20 @@ async function implant_page_controller (cid){
     }
 }
 
-function get_overview_page_details(){
 
+function get_overview_page_details(){
     $.ajax({
         url:`/api/v1/campaign`,
         type:"GET",
         success: function (response) {
-
             for (element in response){
                 get_campaign_info_by_id(response, element)
-
             }
-            document.getElementById('campaign-info').innerHTML = t_top
         }
     })
     get_listener_info()
 }
+
 
 function get_listener_info(){
     $.ajax({
@@ -235,30 +237,11 @@ function get_campaign_info_by_id(rrr, cid){
                 C = response[item]['last_check_in']
                 D = response[item]['callback_url']
 
-
-                E = document.getElementById('t_body').innerHTML;
+                E = document.getElementById('t_body_implants').innerHTML;
                 line = `<td>${A}</td><td>${B}</td><td>${C}</td><td>${D}</td>`
-                document.getElementById('t_body').innerHTML = E + line;
+                document.getElementById('t_body_implants').innerHTML = E + line;
             }
-
-
             return response;
         }
     })
-}
-
-
-
-
-
-function print(data){
-    for (x in camp_implants){
-        campaign_name = camp_implants[x]['generated_title']
-        implant_name = "b"
-        checkin_time = "c"
-        a = `<tr><td>${campaign_name}</td><td>${implant_name}</td><td>${checkin_time}</td></tr>`
-        t_top = t_top + a
-    }
-
-
 }

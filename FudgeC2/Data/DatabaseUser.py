@@ -33,7 +33,7 @@ class DatabaseUser:
 
     # Test / Remove / Refactor
     def add_new_user(self, username, password, admin=False):
-        # -- TODO: This needs a more rebust response Try/Except.
+        # -- TODO: This needs a more robust response Try/Except.
         query = self.Session.query(Users.password, Users.uid).filter(Users.user_email == username).all()
         for x in query:
             return False

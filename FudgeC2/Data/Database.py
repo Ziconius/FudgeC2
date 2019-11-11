@@ -64,8 +64,8 @@ class Database:
 
     @staticmethod
     def __splice_implants_and_generated_implants__(obj):
-        # Hand a list of genrerated imaplnts and implabt list pairs and splice
-        #    them togerther returning in a [{},{}] format
+        # Hand a list of generated implants and implant list pairs and splice
+        #    them together returning in a [{},{}] format
         completed_list = []
         if type(obj) == list:
             for x in obj:

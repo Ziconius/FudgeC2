@@ -14,11 +14,11 @@ FudgeC2 is a Powershell command and control platform designed to facilitate team
 
 Built on Python3 with a web frontend, FudgeC2 aims to provide red teamers a simple interface in which to manage active implants across their campaigns.
 
-_FudgeC2 is currently in beta, and should be used with caution in non-test environments. The beta was release at [BlackHat Arsenal USA 2019](https://www.blackhat.com/us-19/arsenal/schedule/index.html#fudge-a-collaborative-c-framework-for-purple-teaming-16968)._
+_FudgeC2 is currently in beta, and should be used with caution in non-test environments. The beta was released at [BlackHat Arsenal USA 2019](https://www.blackhat.com/us-19/arsenal/schedule/index.html#fudge-a-collaborative-c-framework-for-purple-teaming-16968)._
 
 ### Installation
 
-To install &  configure FudgeC2 run the following:
+To install and configure FudgeC2 run the following:
 
 ```
 git clone https://github.com/Ziconius/FudgeC2
@@ -36,7 +36,7 @@ For more information on installation and configuration see the wiki, [here](http
 
 FudgeC2 breaks projects down into campaigns. Each campaign will have a their own implant templates, active implants, users, and targets.
 
-Once you have generated a campaign and implant you will be able to interact with the any active implants from the campaign homepage. 
+Once you have generated a campaign and implants you will be able to interact with any active implants from the campaign specific homepage. This can be reached by clicking on the campaign name in the Campaign column, or via the Campaigns dropdown in the top navigation menu.
 
 
 ![Homepage](https://user-images.githubusercontent.com/6460785/68624234-4b38a900-04ce-11ea-95dc-a2253dec4ace.png)
@@ -44,16 +44,19 @@ Once you have generated a campaign and implant you will be able to interact with
 An overview of functionality can be seen below, for more information see the implant functionality pages on FudgeC2s' wiki, [found here](https://github.com/Ziconius/FudgeC2/wiki).
 
 **Implant functionality**
-- ```<command>``` If no builtin prefix  in used the submitted value will be directly executed by Powershell.
-- ```:: sys_info``` Collects username, hostname, domain, and local IP
-- ```:: enable_persistence``` Enables persistence by embedding a stager payload into the following autorun registry key
-- ```:: export_clipboard``` Attempts to collect any text data stored in the users clipboard.
-- ```:: load_module [target script]``` This will load external powershell modules, such as JAWS.
-- ```:: exec_module [loaded module name]``` Executes a specific function of a loaded module.
-- ```:: list_modules``` Lists all loaded modules by the implant.
+
+|Command        | Info
+|-------        |-----
+| `<command>`               |If no builtin prefix  in used the submitted value will be directly executed by Powershell.|
+|`:: sys_info`              | Collects username, hostname, domain, and local IP
+|`:: enable_persistence`    | Enables persistence by embedding a stager payload into the following autorun registry key
+|`:: export_clipboard`      | Attempts to collect any text data stored in the users clipboard.
+|`:: load_module [target script]` |This will load external powershell modules, such as JAWS.
+|`:: exec_module [loaded module name]` |Executes a specific function of a loaded module.
+|`:: list_modules`          |Lists all loaded modules by the implant.
 
 ### Contributing
-All contributions, suggestions, and feature requests are welcome.
+All contributions, suggestions, and feature requests are welcome. Feel free to reach out over GitHub, or via [Twitter](https://twitter.com/Ziconius) with ideas, suggestions and questions.
 
 
 ### License

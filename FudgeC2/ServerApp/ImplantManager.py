@@ -177,7 +177,6 @@ def get_listener_details():
     return jsonify(app.config['listener_management'].get_active_listeners())
 
 
-# UPDATED
 @app.route("/api/v1/listener/change", methods=['POST'])
 @login_required
 def Listener_Updates():
@@ -186,7 +185,6 @@ def Listener_Updates():
     return redirect(url_for('GlobalListenerPage'))
 
 
-# UPDATED
 @app.route("/api/v1/listener/create", methods=['POST'])
 @login_required
 def create_new_listener():
@@ -199,19 +197,6 @@ def create_new_listener():
 # -- CAMPAIGN SPECIFIC PAGES -- #
 # ----------------------------- #
 
-
-@app.route("/<cid>/", methods=['GET'])
-@login_required
-def BaseImplantPage(cid):
-    # Returns the implant interaction page if any implant templates exist.
-    g.setdefault('cid', cid)
-    implant_list = UsrMgmt.campaign_get_all_implant_base_from_cid(current_user.user_email, cid)
-    if implant_list is not False:
-        if len(implant_list) > 0:
-            return render_template("implant_input.html", Implants=implant_list)
-
-    msg = "No implants have called back in association with this campaign - create an implant base and use the stager page."
-    return render_template("ImplantMain.html", cid=cid, Msg=msg)
 
 
 @app.route("/<cid>/settings", methods=['GET', 'POST'])
@@ -239,25 +224,6 @@ def NewImplant(cid):
         else:
             return render_template('CreateImplant.html', error=result_text), 409
     return render_template('CreateImplant.html')
-
-
-# -- This may no longer be required -- #
-@app.route("/<cid>/implant/generate", methods=["GET", "POST"])
-@login_required
-def ImplantGenerate():
-    # -- Get iid from the POST request
-    return "405"
-
-
-@app.route("/<cid>/implant/cmd", methods=["GET", "POST"])
-@login_required
-def ImplantCmdRegister(cid):
-    # -- GET FORM --#
-    # --    if ALL register on all implants wiht user write authority
-    # --    if <iid> check user write authority
-    # --     else RETURN 501 && log error.
-    print(request.form)
-    return "404"
 
 
 @app.route("/<cid>/implant/stagers", methods=["GET", "POST"])
@@ -348,32 +314,8 @@ def ImplantCommandRegistration(cid):
         # -- This is the new format using ImpMgmt to handle validation of user and command.
         registration_response = ImpMgmt.ImplantCommandRegistration(cid, current_user.user_email, request.form)
         # -- Currently no return value is required. This should be defined.
-        # print(registration_response)
         return jsonify(registration_response)
     return "000"
-
-
-# -- JSON Response for command responses and waiting commands -- #
-# -------------------------------------------------------------- #
-# TODO: Replace JSON enpoints with websockets.
-
-# Dead
-@app.route("/<cid>/cmd_response", methods=['GET', 'POST'])
-@login_required
-def cmdreturn(cid):
-    # -- Javascript appears to not be printing out all entries
-    if UsrMgmt.campaign_get_user_access_right_cid(current_user.user_email, cid):
-        return jsonify(Imp.Get_CommandResult(cid))
-    else:
-        return str(0)
-
-
-@app.route("/<cid>/waiting_commands", methods=['GET', 'POST'])
-@login_required
-def waitingcommands(cid):
-    # -- Get JSON blob which contains all implant commands and then registration state
-    commands = ImpMgmt.Get_RegisteredImplantCommands(current_user.user_email, cid)
-    return jsonify(commands)
 
 
 @app.route("/help", methods=["GET"])
@@ -384,6 +326,7 @@ def HelpPage():
 
 # -- Base for new endpoints.
 @app.route("/campaign/<cid>/implant/get_all", methods=['POST'])
+@app.route("/<cid>/", methods=['GET'])
 @login_required
 def get_all_active_implants(cid):
     g.setdefault('cid', cid)
@@ -447,8 +390,8 @@ def get_active_implants_state(cid):
         time_from_last_check_in = time.time() - implant['last_check_in']
 
         if time_from_last_check_in < beacon * 2.2:
-        # A beacon of 60 seconds has request response == 120 seconds + jitter
-        # meaning 132 seconds meaning a maximum of *2.2 delayed
+            # A beacon of 60 seconds has request response == 120 seconds + jitter
+            # meaning 132 seconds meaning a maximum of *2.2 delayed
             implant_status_obj['status'] = "Healthy"
         elif time_from_last_check_in < beacon * 3.5:
             implant_status_obj['status'] = "Delayed"

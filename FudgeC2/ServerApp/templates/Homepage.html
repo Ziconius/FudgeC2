@@ -3,8 +3,7 @@
 <div class="row justify-content-md-center m-4 mb-0">
     <div class="col-md-10 bg-white p-4 rounded">
         <h3>FudgeC2</h3>
-        <p>Start by creating a new campaign, and allocating access to any other team members, via the campaign settings.</p>
-        <p>To generate an implant select the desired campaign, and then 'New Implant', configuring the implants required fields.</p>
+        <p>Start by creating a new campaign, and allocating access to any other team members, via the campaign settings. To generate an implant select the desired campaign, and then 'New Implant', configuring the implants required fields.</p>
         <p>For full documentation see the <a href="https://github.com/Ziconius/FudgeC2/wiki">GitHub wiki</a>.</p>
 
         <h5>Active Campaigns</h5>
@@ -12,7 +11,7 @@
             <thead>
             <tr><td>Campaign</td><td>Implant</td><td>Last checked in</td><td>Callback URL</td>
             </thead>
-            <tbody id="t_body">
+            <tbody id="t_body_implants">
             </tbody>
         </table>
 
@@ -54,7 +53,6 @@
   </div>
 </div>
 {% endif %}
-
 
 <script src="{{ url_for('static', filename='ImplantController.js') }}"></script>
 <script>

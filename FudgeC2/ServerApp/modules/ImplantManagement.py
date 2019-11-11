@@ -144,14 +144,14 @@ submitted command.".format(command)}}
                 "comms_dns": None
             }
         }
-        User = self.db.user.Get_UserObject(user)
-        if User.admin == 0:
-            return False, "Insufficient privileges."
-        CampPriv = self.db.campaign.Verify_UserCanWriteCampaign(user, cid)
-        if CampPriv is False:
-            return False, "User cannot write to this campaign."
-
         try:
+            User = self.db.user.Get_UserObject(user)
+            if User.admin == 0:
+                return False, "Insufficient privileges."
+            campaign_priv = self.db.campaign.Verify_UserCanWriteCampaign(user, cid)
+            if campaign_priv is False:
+                raise ValueError('User cannot write to this campaign.')
+
             if "CreateImplant" in form:
                 obfuscation_level = self._form_validated_obfucation_level_(form)
                 if obfuscation_level is None:
@@ -214,14 +214,12 @@ submitted command.".format(command)}}
         except Exception as E:
             return False, E
 
-        return
-
     def Get_RegisteredImplantCommands(self, username, cid=0):
         # -- Return list of dictionaries, not SQLAlchemy Objects.
         if self.db.campaign.Verify_UserCanAccessCampaign(username, cid):
-            Commands = self.db.implant.Get_RegisteredImplantCommandsFromCID(cid)
+            commands = self.db.implant.Get_RegisteredImplantCommandsFromCID(cid)
             to_dict = []
-            for x in Commands:
+            for x in commands:
                 a = x.__dict__
                 if '_sa_instance_state' in a:
                     del a['_sa_instance_state']
