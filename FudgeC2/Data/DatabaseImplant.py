@@ -219,6 +219,10 @@ class DatabaseImplant:
         else:
             return []
 
+    def get_registered_implant_commands_by_command_id(self, command_id):
+        result = self.Session.query(ImplantLogs).filter(ImplantLogs.command_id == command_id).all()
+        return self.db_methods.__sa_to_dict__(result)
+
     def Get_RegisteredImplantCommandsFromCID(self, campaign_id):
         # Used by web app.
         logs = self.Session.query(ImplantLogs).filter(ImplantLogs.cid == campaign_id).all()
@@ -242,26 +246,31 @@ class DatabaseImplant:
             return False
 
     @CL.log_cmdresponse
-    def Register_ImplantResponse(self, cid, unique_implant_id, response, c2_protocol):
+    def Register_ImplantResponse(self, unique_implant_id, command_id, response, c2_protocol):
         # -- TODO: REBUILD
         # Pull back the first record which matches the UIK, contain both the Campaign the IID
         #   is associated from the implant the UIk is associated with.
         info = self.Session.query(Implants, Campaigns, GeneratedImplants).filter(
             Campaigns.cid == Implants.cid).filter(
-            Implants.iid == GeneratedImplants.iid).filter(GeneratedImplants.unique_implant_id == unique_implant_id).first()
+            Implants.iid == GeneratedImplants.iid).filter(
+            GeneratedImplants.unique_implant_id == unique_implant_id).first()
+
         iid = info[0].iid
         cid = info[1].cid
         uik = info[2].unique_implant_id
-        if response == "":
-            print("Registering empty response.")
-            return False
-        response_logs = ResponseLogs(cid=cid, uik=uik, log_entry=response, time=int(time.time()))
+        #if response == "":
+        #    print("Registering empty response.")
+        #    return False
+        response_logs = ResponseLogs(cid=cid, uik=uik, log_entry=response, time=int(time.time()), command_id=command_id)
         self.Session.add(response_logs)
         try:
             self.Session.commit()
             return True
         except Exception as E:
             print(E)
+    def update_host_data(self, unique_implant_key, host_data):
+        # This will update the data with the data from the ImplantResponseProcessor class.
+        return
 
     def Get_CampaignImplantResponses(self, cid):
         # Used by web app

@@ -163,6 +163,12 @@ def global_settings_page():
     return render_template("settings/GlobalSettings.html", logs=logs)
 
 
+@app.route("/help", methods=["GET"])
+@login_required
+def HelpPage():
+    return render_template("HelpPage.html")
+
+
 @app.route("/listener", methods=['GET', 'POST'])
 @login_required
 def GlobalListenerPage():
@@ -172,6 +178,7 @@ def GlobalListenerPage():
 
 
 @app.route("/api/v1/listener/")
+@login_required
 def get_listener_details():
 
     return jsonify(app.config['listener_management'].get_active_listeners())
@@ -316,12 +323,6 @@ def ImplantCommandRegistration(cid):
         # -- Currently no return value is required. This should be defined.
         return jsonify(registration_response)
     return "000"
-
-
-@app.route("/help", methods=["GET"])
-@login_required
-def HelpPage():
-    return render_template("HelpPage.html")
 
 
 # -- Base for new endpoints.

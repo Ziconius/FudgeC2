@@ -62,6 +62,14 @@ class Database:
         else:
             print(q[0])
 
+    def __sa_to_dict__(self, sa_obj):
+        if len(sa_obj) == 1:
+            a = sa_obj[0]
+            del a.__dict__['_sa_instance_state']
+            return a.__dict__
+        else:
+            return None
+
     @staticmethod
     def __splice_implants_and_generated_implants__(obj):
         # Hand a list of generated implants and implant list pairs and splice
