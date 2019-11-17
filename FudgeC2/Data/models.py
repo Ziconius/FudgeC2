@@ -40,16 +40,13 @@ class Users(Base):
         return False
 
 
-class Implants(Base):
-    __tablename__ = 'implants'
+class ImplantTemplate(Base):
+    __tablename__ = 'implant_template'
     iid = Column(INTEGER(11), nullable=False, index=True, primary_key=True)
     stager_key = Column(String(255), nullable=False, unique=True)
     title = Column(String(255), nullable=False, unique=True)
     cid = Column(INTEGER(11), nullable=False, index=True)
-    # file_hash=Column(String(255), nullable=True)              # Removed: Files are stored in GeneratedImplants
-    # filename=Column(String(255), nullable=True)               # Removed: No file hashes are stored
     callback_url = Column(String(255), nullable=False)
-    # port = Column(INTEGER(5), nullable=False, default=0)      # Removed: Ports are now stored on a per protocol basis
     description = Column(String(255))
     beacon = Column(INTEGER(10), nullable=False)
     initial_delay = Column(INTEGER(10))
@@ -66,14 +63,14 @@ class GeneratedImplants(Base):
     last_check_in = Column(INTEGER(16))
     last_check_in_protocol = Column(String())
     current_beacon = Column(INTEGER(16))
-    iid = Column(INTEGER(11), ForeignKey("implants.iid"), nullable=False, index=True)
+    iid = Column(INTEGER(11), ForeignKey("implant_template.iid"), nullable=False, index=True)
     generated_title = Column(String(255), nullable=False)
     time = Column(INTEGER(16), nullable=False)
     implant_copy = Column(String())
 
 
-class ImplantLogs(Base):
-    __tablename__ = 'implant_logs'
+class ImplantCommands(Base):
+    __tablename__ = 'implant_commands'
     log_id = Column(INTEGER(11), nullable=False, index=True, primary_key=True)
     cid = Column(INTEGER(11), nullable=False, index=True)
     uid = Column(INTEGER(11), nullable=False, index=True)
@@ -85,8 +82,8 @@ class ImplantLogs(Base):
     command_id = Column(String(128))
 
 
-class ResponseLogs(Base):
-    __tablename__ = 'response_logs'
+class ImplantResponse(Base):
+    __tablename__ = 'implant_response'
     log_id = Column(INTEGER(11), nullable=False, index=True, primary_key=True)
     cid = Column(INTEGER(11), nullable=False, index=True)
     uik = Column(INTEGER(11), nullable=False, index=True)
@@ -126,6 +123,13 @@ class CampaignLogs(Base):
     time = Column(INTEGER(32), nullable=False)
     log_type = Column(String(32), nullable=False)
     entry = Column(String(1024), nullable=False)
+
+
+class HostData(Base):
+    __tablename__ = "host_data"
+    auto_id = Column(INTEGER(11), nullable=False, index=True, primary_key=True)
+    unique_implant_key = Column(INTEGER(), ForeignKey(GeneratedImplants.unique_implant_id))
+    ip_address = Column(String())
 
 
 class Listeners(Base):

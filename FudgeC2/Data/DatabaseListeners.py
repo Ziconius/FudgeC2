@@ -1,5 +1,4 @@
 from Data.models import Listeners
-# ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs, CampaignLogs, Users,
 
 
 class DatabaseListener:

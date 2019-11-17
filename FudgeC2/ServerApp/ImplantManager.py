@@ -1,9 +1,9 @@
 import time
 import uuid
 
-from flask import Flask, render_template, flash, request, jsonify, g, url_for, redirect, send_file  # ,make_response, session, current_app,
+from flask import Flask, render_template, flash, request, jsonify, g, url_for, redirect, send_file
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user
-from flask_socketio import SocketIO
+# from flask_socketio import SocketIO
 
 from Implant.Implant import ImplantSingleton
 from ServerApp.modules.UserManagement import UserManagementController
@@ -24,7 +24,7 @@ app.config.from_object(__name__)
 app.config['SECRET_KEY'] = str(uuid.uuid4())
 login = LoginManager(app)
 login.init_app(app)
-socketio = SocketIO(app)
+# socketio = SocketIO(app)
 
 # TODO: Controller dev work.
 listener_management = None
@@ -83,25 +83,27 @@ def page_not_found(e):
 def login():
     if request.method == "POST":
         if 'email' in request.form and 'password' in request.form and request.form['email'] is not None and request.form['password'] is not None:
-            UserObject = UsrMgmt.user_login(request.form['email'],request.form['password'])
-            if UserObject is False:
+            user_object = UsrMgmt.user_login(request.form['email'], request.form['password'])
+            if user_object is False:
                 return redirect(url_for("BaseHomePage", error="Incorrect Username/Password"))
 
-            if UserObject.first_logon == 1:
-                login_user(UserObject)
+            if user_object.first_logon == 1:
+                login_user(user_object)
                 return redirect(url_for("BaseHomePage"))
 
             else:
                 guid = UsrMgmt.get_first_logon_guid(request.form['email'])
                 # return render_template("auth/PasswordResetPage.html",guid=guid)
                 return redirect(url_for("PasswordReset", guid=guid))
-    return render_template("auth/LoginPage.html", fudge_version=AppManager.get_software_verision_number(), fudge_version_name=AppManager.get_software_verision_name())
+    return render_template("auth/LoginPage.html",
+                           fudge_version=AppManager.get_software_verision_number(),
+                           fudge_version_name=AppManager.get_software_verision_name())
 
 
 @app.route("/auth/logout")
 @login_required
 def logout():
-    if (current_user.is_authenticated):
+    if current_user.is_authenticated:
         logout_user()
         return redirect(url_for("login"))
     else:
@@ -112,16 +114,16 @@ def logout():
 def PasswordReset():
     if request.method == "POST":
         print("In reset: {}".format(request.form))
-        UserObject = UsrMgmt.change_password_first_logon(request.form)
-        if UserObject is not False:
-            login_user(UserObject)
+        user_object = UsrMgmt.change_password_first_logon(request.form)
+        if user_object is not False:
+            login_user(user_object)
             return redirect(url_for('BaseHomePage'))
     if request.method == "GET":
         print(request.args)
         guid = "0000-0000-0000-0000"
         if request.args.get('guid') is not None:
 
-            print("We're now embedding: {}".format( request.args.get('guid')))
+            print("We're now embedding: {}".format(request.args.get('guid')))
             guid = request.args.get('guid')
         return render_template("auth/PasswordResetPage.html", guid=guid)
     return redirect(url_for('login'))
@@ -174,7 +176,8 @@ def HelpPage():
 def GlobalListenerPage():
     if app.config['listener_management'].check_tls_certificates() is False:
         flash('TLS certificates do not exist within the <install dir>/FudgeC2/Storage directory.')
-    return render_template("listeners/listeners.html", test_data=app.config['listener_management'].get_active_listeners())
+    return render_template("listeners/listeners.html",
+                           test_data=app.config['listener_management'].get_active_listeners())
 
 
 @app.route("/api/v1/listener/")
@@ -203,7 +206,6 @@ def create_new_listener():
 
 # -- CAMPAIGN SPECIFIC PAGES -- #
 # ----------------------------- #
-
 
 
 @app.route("/<cid>/settings", methods=['GET', 'POST'])
@@ -247,8 +249,10 @@ def ImplantStager(cid):
             except:
                 print("error")
         # TODO: Replace with content from webpage request.
-        return send_file(StagerGen.GenerateSingleStagerFile(cid, current_user.user_email,"docx"), attachment_filename='file.docx')
-    return render_template("ImplantStagerPage.html", implantList=StagerGen.GenerateStaticStagers(cid, current_user.user_email))
+        return send_file(StagerGen.GenerateSingleStagerFile(cid, current_user.user_email, "docx"),
+                         attachment_filename='file.docx')
+    return render_template("ImplantStagerPage.html",
+                           implantList=StagerGen.GenerateStaticStagers(cid, current_user.user_email))
 
 
 @app.route("/<cid>/implant/active/<uik>", methods=["GET", "POST"])
@@ -263,8 +267,6 @@ def display_active_implant(cid, uik=None):
                 if int(x['unique_implant_id']) == int(uik):
                     return render_template("implant/ActiveImplants.html", imp=implants, render=x)
     return render_template("implant/ActiveImplants.html", imp=implants)
-
-
 
 
 @app.route("/<cid>/graphs", methods=['GET', 'POST'])

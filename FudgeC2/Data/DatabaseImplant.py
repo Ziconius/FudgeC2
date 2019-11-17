@@ -2,7 +2,7 @@ import time
 import random
 import secrets
 
-from Data.models import ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants
+from Data.models import ImplantResponse, ImplantTemplate, ImplantCommands, Campaigns, CampaignUsers, GeneratedImplants
 from Data.CampaignLogging import CampaignLoggingDecorator
 
 CL = CampaignLoggingDecorator()
@@ -18,7 +18,7 @@ class DatabaseImplant:
     def Get_AllImplantIDFromTitle(self, implant_title):
         # -- Return list containing generated implant dictionaries.
         implant_object = self.Session.query(GeneratedImplants,
-                                            Implants).filter(Implants.iid == GeneratedImplants.iid,
+                                            ImplantTemplate).filter(ImplantTemplate.iid == GeneratedImplants.iid,
                                                              GeneratedImplants.generated_title == implant_title).all()
 
         implant_object = self.db_methods.__splice_implants_and_generated_implants__(implant_object)
@@ -29,7 +29,7 @@ class DatabaseImplant:
     def create_new_implant_template(self, user, cid, config):
 
         stager_key = random.randint(10000, 99999)
-        new_implant = Implants(
+        new_implant = ImplantTemplate(
             cid=cid,
             title=config['title'],
             description=config['description'],
@@ -46,7 +46,7 @@ class DatabaseImplant:
         self.Session.add(new_implant)
         try:
             self.Session.commit()
-            self.Session.query(Implants).first()
+            self.Session.query(ImplantTemplate).first()
             return True
 
         except Exception as e:
@@ -55,7 +55,7 @@ class DatabaseImplant:
 
     def Get_AllImplantBaseFromCid(self, cid):
         # -- THIS NEED TO BE REBUILT
-        all_implants = self.Session.query(Implants).filter(Implants.cid == cid).all()
+        all_implants = self.Session.query(ImplantTemplate).filter(ImplantTemplate.cid == cid).all()
         processed_implants = []
         for implant in all_implants:
             b = implant.__dict__
@@ -70,8 +70,8 @@ class DatabaseImplant:
 
     def Get_AllGeneratedImplantsFromCID(self, campaign_id):
         raw_implants = self.Session.query(GeneratedImplants,
-                                          Implants).filter(GeneratedImplants.iid == Implants.iid,
-                                                           Implants.cid == campaign_id).all()
+                                          ImplantTemplate).filter(GeneratedImplants.iid == ImplantTemplate.iid,
+                                                                  ImplantTemplate.cid == campaign_id).all()
 
         generated_implants = self.db_methods.__splice_implants_and_generated_implants__(raw_implants)
         if generated_implants is not None:
@@ -82,7 +82,7 @@ class DatabaseImplant:
     def Get_GeneratedImplantDataFromUIK(self, UIK):
         # -- Pulls all configuration data for a generated implant based on UIK.
         # --    Used when implants checks in.
-        result = self.Session.query(GeneratedImplants, Implants).filter(Implants.iid == GeneratedImplants.iid,
+        result = self.Session.query(GeneratedImplants, ImplantTemplate).filter(ImplantTemplate.iid == GeneratedImplants.iid,
                                                                         GeneratedImplants.unique_implant_id == UIK
                                                                         ).first()
 
@@ -101,7 +101,7 @@ class DatabaseImplant:
         # -- We are registering a NEW implant and generating a unique_stager_key (or UIK)
         # -- Moving forward all reference to ImplantKey/UII should be changed to StagerID
 
-        implant = self.Session.query(Implants).filter(Implants.stager_key == stager_key).first()
+        implant = self.Session.query(ImplantTemplate).filter(ImplantTemplate.stager_key == stager_key).first()
         if implant is not None:
             unique_implant_key = random.randint(000000, 999999)
             # new_title = str(implant.title) + "_" + str(unique_implant_key)
@@ -121,8 +121,8 @@ class DatabaseImplant:
                 print("db.Add_Implant: ", e)
                 return False
 
-            active_implant_record = self.Session.query(GeneratedImplants, Implants).filter(
-                Implants.iid == GeneratedImplants.iid,
+            active_implant_record = self.Session.query(GeneratedImplants, ImplantTemplate).filter(
+                ImplantTemplate.iid == GeneratedImplants.iid,
                 GeneratedImplants.unique_implant_id == unique_implant_key).first()
 
             active_implant_record = self.db_methods.__splice_implants_and_generated_implants__(active_implant_record)
@@ -164,13 +164,13 @@ class DatabaseImplant:
         uid = self.db_methods.__get_userid__(username)
 
         result = self.Session.query(CampaignUsers,
-                                    Implants,
+                                    ImplantTemplate,
                                     GeneratedImplants
                                     ).filter(
                             CampaignUsers.uid == uid,
                             Campaigns.cid == CampaignUsers.cid,
-                            Implants.cid == Campaigns.cid,
-                            Implants.iid == GeneratedImplants.iid,
+                            ImplantTemplate.cid == Campaigns.cid,
+                            ImplantTemplate.iid == GeneratedImplants.iid,
                             GeneratedImplants.unique_implant_id == uik).all()
 
         if len(result) == 0:
@@ -178,7 +178,7 @@ class DatabaseImplant:
             return False
 
         # Check existing command_id values to avoid collisions
-        existing_implant_logs = self.Session.query(ImplantLogs)
+        existing_implant_logs = self.Session.query(ImplantCommands)
         tmp_command_id = []
         for log in existing_implant_logs:
             tmp_command_id.append(log.__dict__['command_id'])
@@ -191,18 +191,18 @@ class DatabaseImplant:
             if line[0].permissions == 2:
                 cid = line[0].cid
                 # Get all ImplantLog: check for command_id
-                new_implant_log = ImplantLogs(cid=cid,
-                                              uid=uid,
-                                              time=time.time(),
-                                              log_entry=str(command),
-                                              uik=uik,
-                                              read_by_implant=0,
-                                              command_id=cmd_id)
+                new_implant_log = ImplantCommands(cid=cid,
+                                                  uid=uid,
+                                                  time=time.time(),
+                                                  log_entry=str(command),
+                                                  uik=uik,
+                                                  read_by_implant=0,
+                                                  command_id=cmd_id)
 
                 self.Session.add(new_implant_log)
                 try:
                     self.Session.commit()
-                    self.Session.query(ImplantLogs).first()
+                    self.Session.query(ImplantCommands).first()
                     return True
                 except Exception as e:
                     print("db.Register_ImplantCommand: ", e)
@@ -213,19 +213,19 @@ class DatabaseImplant:
 
     def Get_RegisteredImplantCommandsFromUIK(self, unique_implant_key):
         # -- Return List
-        logs = self.Session.query(ImplantLogs).filter(ImplantLogs.uik == unique_implant_key).all()
+        logs = self.Session.query(ImplantCommands).filter(ImplantCommands.uik == unique_implant_key).all()
         if logs is not None:
             return logs
         else:
             return []
 
     def get_registered_implant_commands_by_command_id(self, command_id):
-        result = self.Session.query(ImplantLogs).filter(ImplantLogs.command_id == command_id).all()
+        result = self.Session.query(ImplantCommands).filter(ImplantCommands.command_id == command_id).all()
         return self.db_methods.__sa_to_dict__(result)
 
     def Get_RegisteredImplantCommandsFromCID(self, campaign_id):
         # Used by web app.
-        logs = self.Session.query(ImplantLogs).filter(ImplantLogs.cid == campaign_id).all()
+        logs = self.Session.query(ImplantCommands).filter(ImplantCommands.cid == campaign_id).all()
         if len(logs) > 0:
             return logs
         else:
@@ -234,10 +234,10 @@ class DatabaseImplant:
     @CL.log_cmdpickup
     def Register_ImplantCommandPickup(self, record, protocol):
         # DEV NOTES: DwarvenBlacksmith: This will require the command to be cast from string to dict.
-        self.Session.query(ImplantLogs).filter(
-            ImplantLogs.uik == record.uik,
-            ImplantLogs.log_entry == record.log_entry,
-            ImplantLogs.time == record.time).update({'read_by_implant': int(time.time()), 'c2_protocol': str(protocol)})
+        self.Session.query(ImplantCommands).filter(
+            ImplantCommands.uik == record.uik,
+            ImplantCommands.log_entry == record.log_entry,
+            ImplantCommands.time == record.time).update({'read_by_implant': int(time.time()), 'c2_protocol': str(protocol)})
         try:
             self.Session.commit()
             return True
@@ -250,9 +250,9 @@ class DatabaseImplant:
         # -- TODO: REBUILD
         # Pull back the first record which matches the UIK, contain both the Campaign the IID
         #   is associated from the implant the UIk is associated with.
-        info = self.Session.query(Implants, Campaigns, GeneratedImplants).filter(
-            Campaigns.cid == Implants.cid).filter(
-            Implants.iid == GeneratedImplants.iid).filter(
+        info = self.Session.query(ImplantTemplate, Campaigns, GeneratedImplants).filter(
+            Campaigns.cid == ImplantTemplate.cid).filter(
+            ImplantTemplate.iid == GeneratedImplants.iid).filter(
             GeneratedImplants.unique_implant_id == unique_implant_id).first()
 
         iid = info[0].iid
@@ -261,7 +261,7 @@ class DatabaseImplant:
         #if response == "":
         #    print("Registering empty response.")
         #    return False
-        response_logs = ResponseLogs(cid=cid, uik=uik, log_entry=response, time=int(time.time()), command_id=command_id)
+        response_logs = ImplantResponse(cid=cid, uik=uik, log_entry=response, time=int(time.time()), command_id=command_id)
         self.Session.add(response_logs)
         try:
             self.Session.commit()
@@ -275,7 +275,7 @@ class DatabaseImplant:
     def Get_CampaignImplantResponses(self, cid):
         # Used by web app
         # -- TODO: Refactor
-        a = self.Session.query(ResponseLogs).filter(ResponseLogs.cid == cid).all()
+        a = self.Session.query(ImplantResponse).filter(ImplantResponse.cid == cid).all()
         return_list = []
         for x in a:
             a = x.__dict__

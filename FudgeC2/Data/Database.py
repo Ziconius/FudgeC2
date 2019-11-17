@@ -8,7 +8,7 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
 # FudgeC2 imports
-from Data.models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs, CampaignLogs
+from Data.models import Users, Campaigns, AppLogs, CampaignLogs
 from Storage.settings import Settings
 from Data.CampaignLogging import CampaignLoggingDecorator
 

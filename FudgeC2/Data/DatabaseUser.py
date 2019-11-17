@@ -2,7 +2,7 @@ import time
 import uuid
 import bcrypt
 
-from Data.models import Users, ResponseLogs, Implants, ImplantLogs, Campaigns, CampaignUsers, GeneratedImplants, AppLogs, CampaignLogs
+from Data.models import Users
 from Data.CampaignLogging import CampaignLoggingDecorator
 
 CL = CampaignLoggingDecorator()
