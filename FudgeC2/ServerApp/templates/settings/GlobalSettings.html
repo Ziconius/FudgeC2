@@ -18,19 +18,40 @@
             <button type="submit" class="btn btn-default" id="AddUserBtn">Submit</button>
         </form>
 
-        <br><br><br>
-        <h5>Disable User</h5>
-        <p>Generate a list of with enable/disabled check boxes for any admin users. Ensure "self-disabling" cannot happen.</p>
+        <br>
+        <h5 class="text-danger">Disable User</h5><hr>
+        <p>TODO: Generate a list of with enable/disabled check boxes for any admin users. Ensure "self-disabling" cannot happen.</p>
 
-        <h5 class="text-danger">Danger Area</h5>
-        Delete User
+        <br>
+        <h5>Logs</h5><hr>
+        <div class="row">
+            <div class="col-md-6 ">Number of records:<span class="counter pull-right">0 items</span></div>
+            <div class="col-md-6">
+                <label>
+                    <input type="search" class="form form-control form-control-sm search" placeholder="Search logs" aria-controls="dtBasicExample">
+                </label>
+            </div>
+        </div>
 
+        <table class="table table-striped table-bordered table-sm results table-hover" id="dtBasicExample" cellspacing="0" width="100%">
 
-
-    <h3>Logs</h3>
-        {% for x in logs %}
-            {{ x.type }}:{{ x.data }}<br>
-        {% endfor %}
+            <thead>
+                <tr>
+                    <th scope="col">Time</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Record</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for x in logs %}
+            <tr>
+              <td >{{x.time}}</td>
+              <td>{{ x.type }}</td>
+              <td>{{ x.data }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 
     <!-- Modal -->
@@ -55,5 +76,4 @@
     </div>
 
 </div>
-<!--<script src="{{ url_for('static', filename='Settings.js') }}"></script>-->
 {% endblock %}

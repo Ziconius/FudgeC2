@@ -30,7 +30,7 @@ This will generate a new database, and first time credentials. You will then be 
 
 `admin`:`letmein`
 
-For more information on installation and configuration see the wiki, [here](https://github.com/Ziconius/FudgeC2/wiki). If 
+For more information on installation and configuration see the wiki, [here](https://github.com/Ziconius/FudgeC2/wiki/Installation-and-Setup). If 
 
 ### Usage
 
@@ -41,7 +41,7 @@ Once you have generated a campaign and implants you will be able to interact wit
 
 ![Homepage](https://user-images.githubusercontent.com/6460785/68624234-4b38a900-04ce-11ea-95dc-a2253dec4ace.png)
 
-An overview of functionality can be seen below, for more information see the implant functionality pages on FudgeC2s' wiki, [found here](https://github.com/Ziconius/FudgeC2/wiki).
+An overview of functionality can be seen below, for more information see the implant functionality pages on FudgeC2s' wiki, [found here](https://github.com/Ziconius/FudgeC2/wiki/Implant-Functionality).
 
 **Implant functionality**
 
@@ -51,7 +51,7 @@ An overview of functionality can be seen below, for more information see the imp
 |`:: sys_info`              | Collects username, hostname, domain, and local IP
 |`:: enable_persistence`    | Enables persistence by embedding a stager payload into the following autorun registry key
 |`:: export_clipboard`      | Attempts to collect any text data stored in the users clipboard.
-|`:: load_module [target script]` |This will load external powershell modules, such as JAWS.
+|`:: load_module [target script]` |This will load external Powershell modules, such as JAWS, or PowerUp.
 |`:: exec_module [loaded module name]` |Executes a specific function of a loaded module.
 |`:: list_modules`          |Lists all loaded modules by the implant.
 

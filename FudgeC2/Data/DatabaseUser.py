@@ -76,18 +76,17 @@ class DatabaseUser:
         self.Session.commit()
         return pre_guid
 
-    # Test / Remove / Refactor
     def user_login(self, email, password):
         # Auths a user and returns user object
         user = self.Session.query(Users).filter(Users.user_email == email).first()
         if user is not None:
-            a = user.password
-            if bcrypt.checkpw(password.encode(), a):
+            if bcrypt.checkpw(password.encode(), user.password):
                 self.__update_last_logged_in__(email)
-                self.db_methods.app_logging("auth", "Sucessful login for user: {}".format(email))
+                self.db_methods.app_logging("auth", "Successful login for user: {}".format(email))
+
                 return user
             else:
-                self.db_methods.app_logging("auth", "Failed login attempt for user: {}".format(email))
+                self.db_methods.app_logging("auth", "Failed login attempt for user {} ".format(email))
                 return False
         else:
             return False

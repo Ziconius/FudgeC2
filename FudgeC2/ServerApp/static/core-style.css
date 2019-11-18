@@ -17,3 +17,10 @@ h1, h2, h3, h4, h5, h6 {
      background-color: #f5f3f3;
      background-color: #FDFDFD;
 }
+
+/*
+Search filters CSS
+*/
+.results tr[visible='false'],
+.no-result{ display:none; }
+.results tr[visible='true']{ display:table-row; }

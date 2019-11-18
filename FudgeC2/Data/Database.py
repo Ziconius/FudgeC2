@@ -1,6 +1,7 @@
 import bcrypt
 import ast
 import os
+import time
 
 # SQLAlchemy imports
 from sqlalchemy import create_engine
@@ -155,7 +156,8 @@ class Database:
 
     def app_logging(self, log_type, message):
         # -- place holder function for application level logging.
-        log = AppLogs(type=log_type, data=message)
+        current_time = time.ctime(time.time())
+        log = AppLogs(time=current_time, type=log_type, data=message)
         self.Session.add(log)
         self.Session.commit()
         return

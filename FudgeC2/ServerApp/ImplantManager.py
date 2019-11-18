@@ -162,12 +162,13 @@ def global_settings_page():
         result = UsrMgmt.add_new_user(request.form, current_user.user_email)
         return jsonify(result)
     logs = AppManager.get_application_logs(current_user.user_email)
+    logs.reverse()
     return render_template("settings/GlobalSettings.html", logs=logs)
 
 
 @app.route("/help", methods=["GET"])
 @login_required
-def HelpPage():
+def help_page():
     return render_template("HelpPage.html")
 
 
