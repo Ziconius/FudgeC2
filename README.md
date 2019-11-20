@@ -10,7 +10,7 @@
 [![Stars](https://img.shields.io/github/stars/ziconius/fudgec2)](https://github.com/Ziconius/FudgeC2/stargazers)
 
 
-FudgeC2 is a Powershell command and control platform designed to facilitate team collaboration and campaign timelining, which aims to help clients better understand red team activities.
+FudgeC2 is a Powershell command and control platform designed to facilitate team collaboration and campaign timelining. This aims to help clients better understand red team activities by presenting them with more granular detail of adversarial techniques.
 
 Built on Python3 with a web frontend, FudgeC2 aims to provide red teamers a simple interface in which to manage active implants across their campaigns.
 
@@ -30,7 +30,7 @@ This will generate a new database, and first time credentials. You will then be 
 
 `admin`:`letmein`
 
-For more information on installation and configuration see the wiki, [here](https://github.com/Ziconius/FudgeC2/wiki/Installation-and-Setup). If 
+For more information on installation and configuration see the wiki, [here](https://github.com/Ziconius/FudgeC2/wiki/Installation-and-Setup).
 
 ### Usage
 

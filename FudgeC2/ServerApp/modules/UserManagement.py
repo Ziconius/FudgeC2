@@ -84,6 +84,15 @@ class UserManagementController:
     def get_user_object(self, user):
         return self.db.user.Get_UserObject(user)
 
+    def update_active_account_state(self, user, form):
+        if self.db.user.User_IsUserAdminAccount(user):
+            target_user = form['user']
+            target_state = form['to_state']
+            if self.db.user.change_account_active_state(target_user, target_state):
+                return True
+            return False
+        else:
+            return False
     def change_password_first_logon(self, form):
         pw_1 = form['password_one']
         pw_2 = form['password_two']

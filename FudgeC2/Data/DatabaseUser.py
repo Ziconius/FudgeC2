@@ -81,6 +81,11 @@ class DatabaseUser:
         user = self.Session.query(Users).filter(Users.user_email == email).first()
         if user is not None:
             if bcrypt.checkpw(password.encode(), user.password):
+                print(user)
+                if user.active_account == "False":
+                    self.db_methods.app_logging("auth", "Failed login attempt for disabled account: {} ".format(email))
+                    return False
+
                 self.__update_last_logged_in__(email)
                 self.db_methods.app_logging("auth", "Successful login for user: {}".format(email))
 
@@ -89,6 +94,19 @@ class DatabaseUser:
                 self.db_methods.app_logging("auth", "Failed login attempt for user {} ".format(email))
                 return False
         else:
+            return False
+    def change_account_active_state(self, user, state):
+        '''
+        :param user: Account of the user whos state is to be changes
+        :param state: True or False boolean.
+        :return: Boolean return depending on the sucess of the DB update.
+        '''
+        try:
+            self.Session.query(Users).filter(Users.user_email == user).update({"active_account": state})
+            self.Session.commit()
+            return True
+        except Exception as e:
+            print("Error: account not found, or state not chnaged.")
             return False
 
     def Get_UserObject(self, email):
