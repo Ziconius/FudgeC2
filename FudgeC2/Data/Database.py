@@ -25,7 +25,7 @@ CL = CampaignLoggingDecorator()
 class Database:
     def __init__(self):
         path = os.getcwd() + "/Storage/"
-        engine = create_engine("sqlite:///{}/{}?check_same_thread=False".format(path, Settings.database_name))
+        engine = create_engine(f"sqlite:///{path}/{Settings.database_name}?check_same_thread=False")
 
         self.selectors = {
             "uid": Users.uid,
@@ -55,13 +55,13 @@ class Database:
         return self.Session.query(Users).filter(Users.user_email == email).first()
 
     # TODO: Remove method.
-    def __get_campaignid__(self, campaign):
-        # TODO: Improve the Try/Catch
-        q = self.Session.query(Campaigns.cid).filter(Campaigns.title == campaign).first()
-        if q is None:
-            return False
-        else:
-            print(q[0])
+    # def __get_campaignid__(self, campaign):
+    #     # TODO: Improve the Try/Catch
+    #     q = self.Session.query(Campaigns.cid).filter(Campaigns.title == campaign).first()
+    #     if q is None:
+    #         return False
+    #     else:
+    #         print(q[0])
 
     def __sa_to_dict__(self, sa_obj):
         if len(sa_obj) == 1:
@@ -137,7 +137,6 @@ class Database:
             )
             self.Session.add(logs)
             self.Session.commit()
-            # print("Log: Log_CampaignAction::"+dict_of_stuff['log_type']+" success.")
             return True
         except Exception as e:
             print(e)

@@ -49,12 +49,6 @@ class ImplantSingleton:
         # -- Used by Implant - Logs command responses from infected machines.
         def command_response(self, unique_implant_key, command_id, raw_command_result, c2_protocol=None):
             # -- This is where the command response should be processes
-            print("---Command Response---\ncmmd_id: {}\nimp_key: {}\nc2_prto: {}\n: result: {}\n".format(
-                unique_implant_key,
-                command_id,
-                raw_command_result,
-                c2_protocol
-            ))
             # IN DEV: Currently this returns the exact data that is submitted.
             command_result, host_data = self.IRP.process_command_response(command_id, raw_command_result)
 

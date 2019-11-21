@@ -86,7 +86,6 @@ class CampaignLoggingDecorator:
                 b['entry'] = {"uik": args[2],
                               "response": args[3],
                               "c2_protocol": args[4]}
-                # print(*args)
                 args[0].db_methods.Log_CampaignAction(b)
             return a
         return decor_cmd_response
@@ -98,7 +97,6 @@ class CampaignLoggingDecorator:
     def campaign_add_user(self, decorated_function):
         def decor_campaign_add_user(*args, **kwargs):
             a = decorated_function(*args, **kwargs)
-            print(args)
             if a:
                 b = self.wireframe
                 b['user'] = args[2]
@@ -107,7 +105,6 @@ class CampaignLoggingDecorator:
                 b['log_type'] = "cmd_response"
                 b['entry'] = {"campaign_title": args[1],
                               "permissions": args[3]}
-                # print(*args)
                 args[0].db_methods.Log_CampaignAction(b)
             return a
         return decor_campaign_add_user
@@ -123,7 +120,6 @@ class CampaignLoggingDecorator:
                 b['time'] = time.time()
                 b['log_type'] = "campaign_user_modification"
                 b['entry'] = {"permissions": args[2]}
-                # print(*args)
                 args[0].db_methods.Log_CampaignAction(b)
             return a
         return decor_campaign_modify_user_rights
@@ -140,7 +136,6 @@ class CampaignLoggingDecorator:
                 b['log_type'] = "new_implant_template"
                 b['entry'] = {}
                 for config_element in args[3]:
-                    print(config_element)
                     b['entry'][config_element] = args[3][config_element]
                 # print(*args)
                 args[0].db_methods.Log_CampaignAction(b)
@@ -159,10 +154,7 @@ class CampaignLoggingDecorator:
                 b['log_type'] = "implant_check_in"
                 b['entry'] = {"unique_implant_id": args[2],
                               "c2_protocol": args[3]}
-                # for config_element in args[3]:
-                #     print(config_element)
-                #     b['entry'][config_element] = args[3][config_element]
-                # print(*args)
+
                 args[0].db_methods.Log_CampaignAction(b)
             return a
         return decor_update_implant_check_in

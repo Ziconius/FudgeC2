@@ -38,12 +38,11 @@ class DbCreator:
 
     def __init__(self, filename):
         filename = filename
-        print("creating target file needs to be in init")
 
         path = os.getcwd() + "/Storage/ExportedCampaigns/"
         database_name = filename
 
-        engine = create_engine("sqlite:///{}/{}?check_same_thread=False".format(path, database_name), echo=False)
+        engine = create_engine(f"sqlite:///{path}/{database_name}?check_same_thread=False", echo=False)
         Base.metadata.create_all(engine)
         self.Session = scoped_session(sessionmaker(bind=engine, autocommit=False))
         """:type: sqlalchemy.orm.Session"""  # PyCharm type fix. Not required for execution.
@@ -59,7 +58,6 @@ class CampaignExportManager:
         # check file name for uniqueness.
         self.export_db = DbCreator(filename)
         a = self.export_db.Session.query(ExportedCampaign).all()
-        # print(a.__repr__())
         return a
 
     def test_put(self, a, b, c, d):
@@ -112,7 +110,6 @@ class CampaignExportManager:
         # DONE return file, return password
 
         password = str(''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=12)))
-        print(type(password))
         raw_logs = self.db.Log_GetCampaignActions(cid)
 
         campaign_name = self.db.campaign.Get_CampaignNameFromCID(cid)
@@ -122,7 +119,6 @@ class CampaignExportManager:
         database = file_dir + file_name
         if file_name in a:
             return False
-        print(database)
 
         b = self.test(file_name, file_dir)
         for x in raw_logs:

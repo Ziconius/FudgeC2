@@ -105,7 +105,7 @@ class DatabaseImplant:
         if implant is not None:
             unique_implant_key = random.randint(000000, 999999)
             # new_title = str(implant.title) + "_" + str(unique_implant_key)
-            new_title = "{}_{}".format(implant.title, unique_implant_key)
+            new_title = f"{implant.title}_{unique_implant_key}"
             generated_implant = GeneratedImplants(unique_implant_id=unique_implant_key,
                                                   last_check_in=0,
                                                   current_beacon=implant.beacon,
@@ -174,7 +174,6 @@ class DatabaseImplant:
                             GeneratedImplants.unique_implant_id == uik).all()
 
         if len(result) == 0:
-            print("No Implant <--> User association")
             return False
 
         # Check existing command_id values to avoid collisions
@@ -258,9 +257,6 @@ class DatabaseImplant:
         iid = info[0].iid
         cid = info[1].cid
         uik = info[2].unique_implant_id
-        #if response == "":
-        #    print("Registering empty response.")
-        #    return False
         response_logs = ImplantResponse(cid=cid, uik=uik, log_entry=response, time=int(time.time()), command_id=command_id)
         self.Session.add(response_logs)
         try:

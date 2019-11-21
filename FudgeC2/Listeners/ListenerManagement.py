@@ -43,7 +43,6 @@ class HttpListener(Listener):
         return http_listener_module.app
 
     def _start_http_listener_thread(self, app, port, protocol_type):
-        # print(self.path + self.tls_cert)
         if protocol_type == "http":
             app.run(debug=False, use_reloader=False, host='0.0.0.0', port=port, threaded=True)
         elif protocol_type == "https":
@@ -63,7 +62,7 @@ class HttpListener(Listener):
 
     # TODO: Randomise endpoint value.
     def stop_listener(self):
-        requests.get("{}://127.0.0.1:{}/nlaksnfaobcaowb".format(self.type, self.port))
+        requests.get(f"{self.type}://127.0.0.1:{self.port}/nlaksnfaobcaowb")
         self.thread = None
 
 
@@ -92,8 +91,6 @@ class ListenerManagement:
         for x in a:
             if x.name == name:
                 return False
-        # print("DATABASE: NOW CHECKING LISTENER IS COMPLETE")
-        # self.db.listener.get_all_listeners()
         return True
 
     def _create_listener(self, name, raw_protocol, port, auto_start=False, reboot=False):
@@ -104,7 +101,6 @@ class ListenerManagement:
             elif protocol == "binary":
                 self.listeners['name'] = BinaryListener(name, port, protocol)
             else:
-                print("Protocol not listed")
                 return False
 
             if reboot is not True:
@@ -113,9 +109,7 @@ class ListenerManagement:
 
             if auto_start is True or auto_start == 1:
                 self.listeners[name].start_listener()
-
         else:
-            print("name not unique.")
             return False
 
         return True
@@ -123,10 +117,8 @@ class ListenerManagement:
     def _update_listener_state(self, listener, state):
         if listener in self.listeners.keys():
             if state == "off":
-                print("turning listener off!")
                 self.listeners[listener].stop_listener()
             elif state == "on":
-                print("turning listener on!")
                 self.listeners[listener].start_listener()
         return
 

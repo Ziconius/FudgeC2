@@ -43,7 +43,7 @@ class DatabaseUser:
                       last_login=time.time())
         self.Session.add(users)
         self.Session.commit()
-        self.db_methods.app_logging("auth", "New user created: {}".format(username))
+        self.db_methods.app_logging("auth", f"New user created: {username}")
         return True
 
     # Test / Remove / Refactor
@@ -81,17 +81,16 @@ class DatabaseUser:
         user = self.Session.query(Users).filter(Users.user_email == email).first()
         if user is not None:
             if bcrypt.checkpw(password.encode(), user.password):
-                print(user)
                 if user.active_account == "False":
-                    self.db_methods.app_logging("auth", "Failed login attempt for disabled account: {} ".format(email))
+                    self.db_methods.app_logging("auth", f"Failed login attempt for disabled account: {email} ")
                     return False
 
                 self.__update_last_logged_in__(email)
-                self.db_methods.app_logging("auth", "Successful login for user: {}".format(email))
+                self.db_methods.app_logging("auth", f"Successful login for user: {email}")
 
                 return user
             else:
-                self.db_methods.app_logging("auth", "Failed login attempt for user {} ".format(email))
+                self.db_methods.app_logging("auth", f"Failed login attempt for user {email} ")
                 return False
         else:
             return False
@@ -106,7 +105,7 @@ class DatabaseUser:
             self.Session.commit()
             return True
         except Exception as e:
-            print("Error: account not found, or state not chnaged.")
+            print("Error: account not found, or state not changed.")
             return False
 
     def Get_UserObject(self, email):

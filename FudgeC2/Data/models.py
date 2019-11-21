@@ -148,5 +148,5 @@ class Listeners(Base):
 # --    additional checks for file existence would be sensible first
 
 path = os.getcwd() + "/Storage/"
-engine = create_engine("sqlite:///{}/{}?check_same_thread=False".format(path, Settings.database_name), echo=False)
+engine = create_engine(f"sqlite:///{path}/{Settings.database_name}?check_same_thread=False", echo=False)
 Base.metadata.create_all(engine)

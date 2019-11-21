@@ -113,17 +113,13 @@ def logout():
 @app.route("/auth/passwordreset", methods=['GET', 'POST'])
 def PasswordReset():
     if request.method == "POST":
-        print("In reset: {}".format(request.form))
         user_object = UsrMgmt.change_password_first_logon(request.form)
         if user_object is not False:
             login_user(user_object)
             return redirect(url_for('BaseHomePage'))
     if request.method == "GET":
-        print(request.args)
         guid = "0000-0000-0000-0000"
         if request.args.get('guid') is not None:
-
-            print("We're now embedding: {}".format(request.args.get('guid')))
             guid = request.args.get('guid')
         return render_template("auth/PasswordResetPage.html", guid=guid)
     return redirect(url_for('login'))
@@ -248,12 +244,12 @@ def ImplantStager(cid):
                 if int(request.args['id']):
                     print("this is int")
             except:
-                print("error")
+                pass
         # TODO: Replace with content from webpage request.
         return send_file(StagerGen.GenerateSingleStagerFile(cid, current_user.user_email, "docx"),
                          attachment_filename='file.docx')
     return render_template("ImplantStagerPage.html",
-                           implantList=StagerGen.GenerateStaticStagers(cid, current_user.user_email))
+                           implantList=StagerGen.generate_static_stagers(cid, current_user.user_email))
 
 
 @app.route("/<cid>/implant/active/<uik>", methods=["GET", "POST"])
@@ -264,9 +260,9 @@ def display_active_implant(cid, uik=None):
     implants = ImpMgmt.get_active_campaign_implants(current_user.user_email, cid)
     if uik is not None:
         if type(implants) == list:
-            for x in implants:
-                if int(x['unique_implant_id']) == int(uik):
-                    return render_template("implant/ActiveImplants.html", imp=implants, render=x)
+            for implant in implants:
+                if int(implant['unique_implant_id']) == int(uik):
+                    return render_template("implant/ActiveImplants.html", imp=implants, render=implant)
     return render_template("implant/ActiveImplants.html", imp=implants)
 
 
@@ -288,7 +284,8 @@ def CampaignLogs(cid):
     if request.method == "POST":
         # -- Replace with pre-organised campaign logs - simplifies JS component.
         # Get_CampaignLogs
-        return jsonify(ImpMgmt.Get_CampaignLogs(current_user.user_email, cid))
+        full_campaign_logs = ImpMgmt.Get_CampaignLogs(current_user.user_email, cid)
+        return jsonify(full_campaign_logs)
     return render_template("CampaignLogs.html")
 
 
@@ -298,7 +295,6 @@ def export_campaign_by_cid(cid):
     g.setdefault('cid', cid)
 
     download = request.args.get('download', default=False, type=str)
-    print("FILENAME IS: ", download)
     if download is not False:
         # STart download process.
         filename = ExpoManager.get_encrypted_file(current_user.user_email, cid, download)
@@ -310,7 +306,6 @@ def export_campaign_by_cid(cid):
     else:
         export_result = ExpoManager.export_campaign_database(current_user.user_email, cid)
         if export_result is not False:
-            print(export_result)
             return jsonify({"filename": export_result[0], "password": export_result[1]})
 
     return url_for("BaseImplantPage", cid=cid)

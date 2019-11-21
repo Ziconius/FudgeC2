@@ -78,7 +78,6 @@ class ImplantManagement:
             for x in command_listing:
                 if x['input'] in preprocessed_command:
                     a = preprocessed_command.partition(x['input'])
-                    print(a)
                     r_command = {"type": x['type'], "args": a[2].strip()}
                     return r_command, True
             return command, {"cmd_reg": {"result": False, "reason": "Unknown inbuilt command, i.e. '::'"}}
@@ -86,9 +85,9 @@ class ImplantManagement:
             preprocessed_command = command.lstrip()[1:].lower().strip()
             for x in command_listing:
                 if x['input'] in preprocessed_command:
-                    return command, {"cmd_reg": {"result": False, "reason": "Potential typo found in \
-command.A single colon was found, did you mean: :{}. If not please submit a GitHub ticket with the \
-submitted command.".format(command)}}
+                    return command, {"cmd_reg": {"result": False, "reason": f"Potential typo found in \
+command.A single colon was found, did you mean: :{command}. If not please submit a GitHub ticket with the \
+submitted command."}}
 
         else:
             r_command = {"type": "CM", "args": command}
@@ -194,7 +193,7 @@ submitted command.".format(command)}}
                             if int(form[a[element]]) > 0 or int(form[a[element]]) < 65536:
                                 implant_configuration["protocol"][element] = int(form[a[element]])
                             else:
-                                raise ValueError("Submitted port for {} is out of range".format(a[element]))
+                                raise ValueError(f"Submitted port for {a[element]} is out of range")
                         else:
                             raise ValueError("Ports must be submitted as an integer")
 

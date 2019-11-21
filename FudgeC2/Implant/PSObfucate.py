@@ -19,21 +19,17 @@ class PSObfucate():
             d=self.__varString__()
             go.append('$'+d+'="'+variableStr[i]+'"')
             op=op+"$"+d.strip()
-        #print(op[:-1])
+
         finalStr=""
-        # Generate 10 junk entries
-        #print("TOKEN ARRAY LENGHT: ", len(go))
         for gg in range(0,10):
             fakechar=self.ascii_letters[randint(0, 51)]
             go.append('$' + self.__varString__() + '="' + fakechar + '"')
-        #print("TOKEN ARRAY LENGHT: ",len(go))
         AssignVariableString=""
         while True:
             if len(go) == 0:
                 break
             AssignVariableString=AssignVariableString+go.pop(randint(0,len(go)-1))+";"
-        # print(AssignVariableString)
-        # print(op)
+
         return AssignVariableString, op
 
 

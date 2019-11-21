@@ -12,17 +12,18 @@
     Select Active Implant
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-
       {% for x in imp %}
         <a class="dropdown-item" href="/{{ cid }}/implant/active/{{ x.unique_implant_id }}" name="{{ x.unique_implant_id }}">{{ x.generated_title }}</a>
       {% endfor %}
-
   </div>
 </div>
+
     {% else %}
     <p> No active implants found. Phish harder.</p>
     {% endif%}
+
     {% if render %}
+    <br>
     <ul>
         <li>Generated Title: {{ render.generated_title }}</li>
         <li>Description: {{ render.description }}</li>
@@ -30,13 +31,9 @@
         <li>Initial callback delay: {{ render.initial_delay }}</li>
         <li>Obfuscation level: {{ render.obfuscation_level }}</li>
     </ul>
-    <pre class="pre-scrollable bg-dark text-light p-3">
-            <code>
-                {{ render.implant_copy }}
-            </code>
-    </pre>
-    <br>
-    implant code: text box:
+    <b>Implant code</b>
+    <pre class="pre-scrollable bg-dark text-light p-3"><code>{{ render.implant_copy }}</code></pre>
+
     <br>
     Records for implant:
     {% endif %}

@@ -1,13 +1,26 @@
 {% extends "ImplantMain.html" %}
 {% block main2 %}
 <div class="row">
+    <div class="col-md-12">
+        <h3>Campaign Logs</h3>
+        <p class="text-warning">Dev note: The campaign logging is currently under active development and will be released as a working beta in v0.5.0.</p>
+        <table class="table table-striped table-bordered table-sm results table-hover" id="dtBasicExample" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th scope="col">Type</th>
+                    <th scope="col">Content</th>
+                </tr>
+            </thead>
+            <tbody id="test_2">
+            </tbody>
+        </table>
+    </div>
     <div class="col-md-6">
-        <div><h3>Campaign Logs</h3></div>
         <div id="campaign_logs"></div>
     </div>
 </div>
-<script>
 
+<script>
 function unix_to_human_time(unixtime){
     var utcSeconds = unixtime;
     var d = new Date(0);
@@ -28,7 +41,6 @@ function render_campaign_data_list(){
         url:"/{{ cid }}/logs",
         type:"POST",
         success: function (response) {
-
             for (item in response){
                 ToWrite = ""
                 if (response[item]['log_type'] === "new_imp") {
@@ -40,7 +52,6 @@ function render_campaign_data_list(){
                 } else if (response[item]['log_type'] === "cmd_reg") {
                     ToWrite = "<br>New command reg<br>Implant: "+response[item]['entry']['uik']+"<br>CMD: "+response[item]['entry']['cmd']+"<br>Time: "+unix_to_human_time(response[item]['time'])+"<hr>"
                 } else if (response[item]['log_type'] === "cmd_pickup") {
-                    //console.log("a")
                     ToWrite = "<br>Command read by Implant<br>Implant: "+response[item]['entry']['uik']+"<br>CMD: "+response[item]['entry']['cmd']+"<br>Time: "+unix_to_human_time(response[item]['time'])+"<hr>"
                 } else if (response[item]['log_type'] === "cmd_response"){
                     ToWrite = "<br>Command Response<br>Implant: "+response[item]['entry']['uik']+"<br>Response: "+response[item].entry.response+"<br>Time: "+unix_to_human_time(response[item].time)+"<hr>"
@@ -50,8 +61,25 @@ function render_campaign_data_list(){
         }
     })
 }
-
 render_campaign_data_list()
+
+function render_2(){
+    $.ajax({
+        url:"/{{ cid }}/logs",
+        type:"POST",
+        success: function (response) {
+            for (item in response){
+                if (response[item]['log_type'] != "implant_check_in"){
+                    tag = `<tr><td>${response[item]['log_type']}</td><td>${response[item]['entry']}</td></tr>`
+                    base = document.getElementById('test_2').innerHTML;
+                    document.getElementById('test_2').innerHTML = base + tag;
+                }
+            }
+        }
+    })
+}
+render_2()
+
 </script>
 {% endblock %}
 

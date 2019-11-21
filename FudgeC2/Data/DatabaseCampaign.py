@@ -38,13 +38,6 @@ class DatabaseCampaign:
             print(e)
             return False
 
-    # Not used?
-    def Get_CampaignInfo(self, campaign, email):
-        # -- Not used?
-        q = self.Session.query(Campaigns).filter(Campaigns.title == campaign, Users.user_email == email).all()
-        for x in q:
-            print("User:", email, x.title, x.description, x.created)
-
     def get_all_user_campaigns(self, email):
         campaigns_by_title = self.Session.query(Campaigns.cid, Campaigns.title).filter(
             Users.user_email == email,
@@ -87,7 +80,6 @@ class DatabaseCampaign:
         # :param cid: Int
         # :param rights: Int [0/1/2]
         # :return: bool
-        # print(user, cid, rights)
         a = self.Session.query(CampaignUsers).filter(CampaignUsers.uid == user_id, CampaignUsers.cid == cid).first()
         if a is None:
             permission_update = CampaignUsers(cid=cid, uid=user_id, permissions=rights)
