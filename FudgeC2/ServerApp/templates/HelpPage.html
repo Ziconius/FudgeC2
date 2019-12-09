@@ -21,9 +21,7 @@
             <h5>Password Reset</h5>
             <p>Resetting a users password can be achieve in the global settings. This will generated a one-time password, which the user will change on first logon. (Not yet implemented)<br>
                 <a href="/settings">/settings</a>   </p>
-
             <br>
-
 
             <hr>
             <h2>Implant commands</h2>
@@ -56,6 +54,10 @@
 
                 <div class="col-sm-4 p-1 border-bottom"><code>:: list_modules</code></div>
                 <div class="col-sm-8 p-1 border-bottom">Lists all loaded modules by the implant.
+                </div>
+
+                <div class="col-sm-4 p-1 border-bottom bg-light"><code>:: download_file [[ path ] target ]</code></div>
+                <div class="col-sm-8 p-1 border-bottom bg-light">Downloads a file from the infected host. Downloads wil be placed in the directory set in the settings file.
                 </div>
 
                 <div class="col-sm-12 border-bottom"><pre>Under development:</pre></div>

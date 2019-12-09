@@ -74,6 +74,8 @@ class CampaignLoggingDecorator:
             return a
         return decor_cmd_pickup
 
+
+    # Due to changes this is now obsolete.
     def log_cmdresponse(self, decorated_function):
         def decor_cmd_response(*args, **kwargs):
             a = decorated_function(*args, **kwargs)
@@ -83,9 +85,9 @@ class CampaignLoggingDecorator:
                 b['campaign'] = args[1]
                 b['time'] = time.time()
                 b['log_type'] = "cmd_response"
-                b['entry'] = {"uik": args[2],
-                              "response": args[3],
-                              "c2_protocol": args[4]}
+                b['entry'] = {"uik": args[1],
+                              "response": args[2],
+                              "c2_protocol": args[3]}
                 args[0].db_methods.Log_CampaignAction(b)
             return a
         return decor_cmd_response

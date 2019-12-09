@@ -13,3 +13,5 @@ class Settings:
     #   Files will be stored in: '<install dir>/FudgeC2/Storage'.
     tls_listener_cert = "server.crt"
     tls_listener_key = "server.key"
+    # This is the folder in which all implant file download will be sent to.
+    file_download_folder = "./Storage/campaign_downloads/"

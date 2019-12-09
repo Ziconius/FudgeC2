@@ -113,7 +113,7 @@ class CampaignExportManager:
         raw_logs = self.db.Log_GetCampaignActions(cid)
 
         campaign_name = self.db.campaign.Get_CampaignNameFromCID(cid)
-        file_name = "{}_{}".format(campaign_name.replace(" ", "_"), int(time.time()))
+        file_name = f"{campaign_name.replace(' ', '_')}_{time.time()}"
         file_dir = "Storage/ExportedCampaigns/"
         a = os.listdir(file_dir)
         database = file_dir + file_name

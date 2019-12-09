@@ -2,7 +2,7 @@ import time
 import random
 import secrets
 
-from Data.models import ImplantResponse, ImplantTemplate, ImplantCommands, Campaigns, CampaignUsers, GeneratedImplants
+from Data.models import ImplantResponse, ImplantTemplate, ImplantCommands, Campaigns, CampaignUsers, GeneratedImplants, HostData
 from Data.CampaignLogging import CampaignLoggingDecorator
 
 CL = CampaignLoggingDecorator()
@@ -245,16 +245,17 @@ class DatabaseImplant:
             return False
 
     @CL.log_cmdresponse
-    def Register_ImplantResponse(self, unique_implant_id, command_id, response, c2_protocol):
+    def Register_ImplantResponse(self, command_id, response, c2_protocol):
         # -- TODO: REBUILD
         # Pull back the first record which matches the UIK, contain both the Campaign the IID
         #   is associated from the implant the UIk is associated with.
         info = self.Session.query(ImplantTemplate, Campaigns, GeneratedImplants).filter(
             Campaigns.cid == ImplantTemplate.cid).filter(
             ImplantTemplate.iid == GeneratedImplants.iid).filter(
-            GeneratedImplants.unique_implant_id == unique_implant_id).first()
+            GeneratedImplants.unique_implant_id == ImplantCommands.uik,
+            ImplantCommands.command_id == command_id).first()
 
-        iid = info[0].iid
+        # iid = info[0].iid
         cid = info[1].cid
         uik = info[2].unique_implant_id
         response_logs = ImplantResponse(cid=cid, uik=uik, log_entry=response, time=int(time.time()), command_id=command_id)
@@ -264,8 +265,29 @@ class DatabaseImplant:
             return True
         except Exception as E:
             print(E)
+
     def update_host_data(self, unique_implant_key, host_data):
-        # This will update the data with the data from the ImplantResponseProcessor class.
+        # This will update the table with the data from the ImplantResponseProcessor class.
+        # Data will be a list of columns, and their data.
+
+        # self.Session.query(ImplantCommands).filter(
+        #     ImplantCommands.uik == record.uik,
+        #     ImplantCommands.log_entry == record.log_entry,
+        #     ImplantCommands.time == record.time).update(
+        #     {'read_by_implant': int(time.time()), 'c2_protocol': str(protocol)})
+
+
+        for item in host_data:
+            for key in item.keys():
+                print(f"Updating host data with: {key}:{item[key]}")
+                try:
+                    self.Session.query(HostData).filer(HostData.unique_implant_key == unique_implant_key).update(
+                        {key:item[key]}
+                    )
+                except Exception as E:
+                    print(E)
+
+
         return
 
     def Get_CampaignImplantResponses(self, cid):

@@ -1,5 +1,6 @@
 from Data.Database import Database
 from Implant.Implant import ImplantSingleton
+from Implant.ImplantFunctionality import ImplantFunctionality
 
 
 class ImplantManagement:
@@ -7,6 +8,7 @@ class ImplantManagement:
     # --    to the Implant class
     db = Database()
     Imp = ImplantSingleton.instance
+    ImpFunc = ImplantFunctionality()
 
     def _form_validated_obfucation_level_(self, form):
         if "obfuscation" in form:
@@ -24,55 +26,11 @@ class ImplantManagement:
         return None
 
     def _validate_command(self, command):
-        command_listing = [
-            {
-                "type": "FU",
-                "args": "base64-file::filelocation",
-                "input": "upload_file"
-            },
-            {
-                "type": "FD",
-                "args": "base64 target file",
-                "input": "download_file"
-            },
-            {
-                "type": "PS",
-                "args": "sound file location (on Fudge)",
-                "input": "play_audio"
-            },
-            {
-                "type": "EP",
-                "args": None,
-                "input": "enable_persistence"
-            },
-            {
-                "type": "SI",
-                "args": None,
-                "input": "sys_info"
-            },
-            {
-                "type": "EC",
-                "args": None,
-                "input": "export_clipboard"
-            },
-            {
-                "type": "LM",
-                "args": None,
-                "input": "load_module"
-            },
-            {
-                "type": "IM",
-                "args": None,
-                "input": "exec_module"
-            },
-            {
-                "type": "ML",
-                "args": None,
-                "input": "list_modules"
-            }
-        ]
+
+        command_listing = self.ImpFunc.command_listing()
 
         # Process command output into:
+        # :: load_module powerup
         if command.lstrip()[0:2] == "::":
             preprocessed_command = command.lstrip()[2:].lower().strip()
             for x in command_listing:

