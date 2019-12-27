@@ -1,5 +1,5 @@
 class UploadFile:
-    type = "FU"
+    type = "UF"
     args = "base64-file::filelocation"
     input = "upload_file"
 
@@ -9,6 +9,9 @@ class UploadFile:
     def implant_text(self):
         var = '''
 # Uploading files to client - Not yet implemented
-function {{ ron.obf_upload_file }} () {}
+function {{ ron.obf_upload_file }} ($b) {
+    Write-host $b
+    
+}
 '''
         return var
