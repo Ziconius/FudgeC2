@@ -50,22 +50,14 @@ class ImplantFunctionality:
 
     def process_command_response(self, command_entry, raw_command_result):
         # Takes a module type value, and the result and passes the raw result to the module process_implant_response
-        # Considerationf for the process_implant_response functionality should be takes to understand if there are a variable number of returned objects.
-
         db = Database()
         a = db.implant.get_registered_implant_commands_by_command_id(command_entry)
         command_entry = ast.literal_eval(a['log_entry'])
         host_data = None
         response_string = raw_command_result
-        print(f"IN process command response {raw_command_result}")
-        # if command_entry['type'] == "FD":
-        #     object = self._get_module_object_by_type_("FD")
-        #     response_string, host_data = object.process_implant_response(raw_command_result, command_entry['args'])
-        # elif command_entry['type'] == "UF":
 
         implant_module= self._get_module_object_by_type_(command_entry['type'])
         if implant_module is not None:
-            print("")
             response_string, host_data = implant_module.process_implant_response(
                 raw_command_result, command_entry['args'])
 

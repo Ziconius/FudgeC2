@@ -48,12 +48,7 @@ class ImplantSingleton:
 
         # -- Used by Implant - Logs command responses from infected machines.
         def command_response(self, command_id, raw_command_result, c2_protocol=None):
-            # TEMP NONE WHILE changes occur
             unique_implant_key = None
-            # -- This is where the command response should be processes
-            # IN DEV: Currently this returns the exact data that is submitted.
-            #   This entire piece of work will be replaced by the implant functionality class
-
             command_result, host_data = self.ImpFunc.process_command_response(command_id, raw_command_result)
 
             # -- End command response processing.

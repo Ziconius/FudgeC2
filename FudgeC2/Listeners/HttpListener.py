@@ -15,13 +15,9 @@ app.config['SECRET_KEY'] = str(uuid4())
 
 # Adding the functions which manage encoding built in commands for transfer
 def craft_sound_file(value_dict, command_id):
-    print("Crafting audio file")
     path = f"{os.getcwd()}/Storage/implant_resources/{value_dict['args']}"
-    print(f"Opening: {path}")
     with open(path, 'rb') as file:
-        # audio = base64.b64encode(file.read()).decode()
         audio = base64.standard_b64encode(file.read()).decode()
-        print(audio)
         final_audio = f"{value_dict['type']}{command_id}{audio}"
     return final_audio
 
