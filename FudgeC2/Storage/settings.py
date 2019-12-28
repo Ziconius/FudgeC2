@@ -1,6 +1,6 @@
 class Settings:
-    version = "0.4.8"
-    version_name = "Tauren Herbalist"
+    version = "0.5.0"
+    version_name = "Goblin Alchemist"
     # If the database does not exist it will be created in Storage/<name>.sql
     database_name = "fudge_c2.sql"
     # The port which FudgeC2 will run on. This will remove the port from available listener ports.

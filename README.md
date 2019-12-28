@@ -51,9 +51,13 @@ An overview of functionality can be seen below, for more information see the imp
 |`:: sys_info`              | Collects username, hostname, domain, and local IP
 |`:: enable_persistence`    | Enables persistence by embedding a stager payload into the following autorun registry key
 |`:: export_clipboard`      | Attempts to collect any text data stored in the users clipboard.
-|`:: load_module [target script]` |This will load external Powershell modules, such as JAWS, or PowerUp.
+|`:: load_module [target script]` |This will load external powershell modules, such as JAWS.
 |`:: exec_module [loaded module name]` |Executes a specific function of a loaded module.
 |`:: list_modules`          |Lists all loaded modules by the implant.
+|`:: download_file [target file]`  |Downloads the target file to the FudgeC2 server
+|`:: upload_file [local file] [remote path/filename]`  |Uploads a file to the target path and specific filename
+|`:: play_audio [audio file (mp3)]`  |Plays an audio file on the compromised host.
+
 
 ### Contributing
 All contributions, suggestions, and feature requests are welcome. Feel free to reach out over GitHub, or via [Twitter](https://twitter.com/Ziconius) with ideas, suggestions and questions.
