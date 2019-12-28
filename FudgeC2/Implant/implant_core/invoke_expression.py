@@ -5,8 +5,8 @@ class InvokeExpression:
     args = "Module name"
     input = "exec_module"
 
-    def process_implant_response(self):
-        print("We're processing invoked expressions from loaded modules")
+    def process_implant_response(self, data, args):
+        return f"Exec'ing module: {args}\n{data.decode()}", None
 
     def implant_text(self):
         var = '''

