@@ -3,7 +3,6 @@ $.ajax({
         url:`/${cid}/export_campaign`,
         type:"GET",
         success: function (response) {
-            console.log("Getting things.")
             $('#FormSubmissionModal').modal({show:true})
             document.getElementById('modal-password').innerHTML = response['password'];
             document.getElementById('filename_input').value = response['filename'];
@@ -16,7 +15,6 @@ $(function() {
     $('#AddUserBtn').on('click', function (e) {
         e.preventDefault();
         var $form = $('#AnswerForm');
-        console.log($form.serialize())
         $.ajax({
             url: $form.attr("action"),
             type: $form.attr("method"),
@@ -43,9 +41,7 @@ $(document).ready(function() {
     $(".search").keyup(function () {
         var searchTerm = $(".search").val();
         var listItem = $('.results tbody').children('tr');
-        console.log(listItem)
         var searchSplit = searchTerm.replace(/ /g, "'):containsi('")
-        console.log("aa")
 
         $.extend($.expr[':'], {'containsi': function(elem, i, match, array){
             return (elem.textContent || elem.innerText || '').toLowerCase().indexOf((match[3] || "").toLowerCase()) >= 0;

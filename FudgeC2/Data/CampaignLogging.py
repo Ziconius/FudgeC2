@@ -1,5 +1,5 @@
 import time
-
+import ast
 
 class CampaignLoggingDecorator:
 
@@ -68,7 +68,7 @@ class CampaignLoggingDecorator:
                 b['campaign'] = args[1].cid
                 b['time'] = time.time()
                 b['log_type'] = "cmd_pickup"
-                b['entry'] = {"cmd": args[1].log_entry,
+                b['entry'] = {"cmd":  ast.literal_eval(args[1].log_entry),
                               "uik": args[1].uik}
                 args[0].db_methods.Log_CampaignAction(b)
             return a

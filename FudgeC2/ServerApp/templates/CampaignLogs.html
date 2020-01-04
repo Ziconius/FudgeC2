@@ -3,20 +3,25 @@
 <div class="row">
     <div class="col-md-12">
         <h3>Campaign Logs</h3>
-        <p class="text-warning">Dev note: The campaign logging is currently under active development and will be released as a working beta in v0.5.0.</p>
+        <div class="row">
+            <div class="col-md-6">Number of records:<span class="counter pull-right">0 items</span></div>
+            <div class="col-md-6">
+                <label>
+                    <input type="search" class="form form-control form-control-sm search" placeholder="Search logs" aria-controls="dtBasicExample">
+                </label>
+            </div>
+        </div>
         <table class="table table-striped table-bordered table-sm results table-hover" id="dtBasicExample" cellspacing="0" width="100%">
             <thead>
                 <tr>
-                    <th scope="col">Type</th>
-                    <th scope="col">Content</th>
+                    <th scope="col">Event</th>
+                    <th scope="col">Data</th>
+                    <th scope="col">Time</th>
                 </tr>
             </thead>
-            <tbody id="test_2">
+            <tbody id="campaign_logs">
             </tbody>
         </table>
-    </div>
-    <div class="col-md-6">
-        <div id="campaign_logs"></div>
     </div>
 </div>
 
@@ -36,49 +41,59 @@ function unix_to_human_time(unixtime){
     return time_last_seen
 }
 
-function render_campaign_data_list(){
-    $.ajax({
-        url:"/{{ cid }}/logs",
-        type:"POST",
-        success: function (response) {
-            for (item in response){
-                ToWrite = ""
-                if (response[item]['log_type'] === "new_imp") {
-                    var obfs_lvl = "Unknown"
-                    if ( response[item]['entry']['obfuscation_level'] === 0){
-                        obfs_lvl = "Full"
-                    }
-                    ToWrite = "<br> New implant activated<br>Common Name: "+response[item]['entry']['generated_title']+"<br>Callback URL: "+response[item]['entry']['callback_url']+"<br>Time: "+unix_to_human_time(response[item]['time'])+"<br>Obfuscation Level: "+obfs_lvl+"<hr>"
-                } else if (response[item]['log_type'] === "cmd_reg") {
-                    ToWrite = "<br>New command reg<br>Implant: "+response[item]['entry']['uik']+"<br>CMD: "+response[item]['entry']['cmd']+"<br>Time: "+unix_to_human_time(response[item]['time'])+"<hr>"
-                } else if (response[item]['log_type'] === "cmd_pickup") {
-                    ToWrite = "<br>Command read by Implant<br>Implant: "+response[item]['entry']['uik']+"<br>CMD: "+response[item]['entry']['cmd']+"<br>Time: "+unix_to_human_time(response[item]['time'])+"<hr>"
-                } else if (response[item]['log_type'] === "cmd_response"){
-                    ToWrite = "<br>Command Response<br>Implant: "+response[item]['entry']['uik']+"<br>Response: "+response[item].entry.response+"<br>Time: "+unix_to_human_time(response[item].time)+"<hr>"
-                }
-                document.getElementById('campaign_logs').innerHTML = document.getElementById('campaign_logs').innerHTML + ToWrite;
-            }
-        }
-    })
+function process_log_entries(log_list){
+    for (item in log_list){
+        if (log_list[item]['log_type'] == "cmd_reg"){log_type_cmd_reg(log_list[item])}
+        if (log_list[item]['log_type'] == "new_implant_template"){log_type_new_implant_template(log_list[item])}
+        if (log_list[item]['log_type'] == "new_imp"){log_type_new_imp(log_list[item])}
+        if (log_list[item]['log_type'] == "cmd_pickup"){log_type_cmd_pickup(log_list[item])}
+    }
 }
-render_campaign_data_list()
 
-function render_2(){
+function log_printer(type_data, content_data, time_data){
+    time = unix_to_human_time(time_data)
+    tag = `<tr><td>${type_data}</td><td>${content_data}</td><td>${time}</td></tr>`
+    base = document.getElementById('campaign_logs').innerHTML;
+    document.getElementById('campaign_logs').innerHTML = base + tag;
+}
+
+function log_type_cmd_reg(data){
+    string = `Type: ${data['entry']['cmd']['type']}<br>Arguments: ${data['entry']['cmd']['args']}`
+    log_printer("Command registered", string, data['time'])
+}
+
+function log_type_new_implant_template(data){
+    title = data['entry']['title']
+    description = data['entry']['description']
+    url = data['entry']['url']
+    string = `Name: ${title}<br>Description: ${description}<br>URL: ${url}`
+    log_printer("Implant template created", string, data['time'])
+}
+
+function log_type_new_imp(data){
+    title = data['entry']['title']
+    url = data['entry']['callback_url']
+    string = `Name: ${title}<br>URL: ${url}`
+    log_printer("Active implant deployed", string, data['time'])
+}
+
+function log_type_cmd_pickup(data){
+    type = data['entry']['cmd']['type']
+    args = data['entry']['cmd']['args']
+    string = `Type: ${type}<br>Arguments: ${args}`
+    log_printer("Command retrieved", string, data['time'])
+}
+
+function render_logs(){
     $.ajax({
         url:"/{{ cid }}/logs",
         type:"POST",
         success: function (response) {
-            for (item in response){
-                if (response[item]['log_type'] != "implant_check_in"){
-                    tag = `<tr><td>${response[item]['log_type']}</td><td>${response[item]['entry']}</td></tr>`
-                    base = document.getElementById('test_2').innerHTML;
-                    document.getElementById('test_2').innerHTML = base + tag;
-                }
-            }
+            process_log_entries(response)
         }
     })
 }
-render_2()
+render_logs()
 
 </script>
 {% endblock %}
