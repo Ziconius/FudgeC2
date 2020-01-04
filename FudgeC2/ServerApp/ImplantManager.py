@@ -290,17 +290,6 @@ def display_active_implant(cid, uik=None):
     return render_template("implant/ActiveImplants.html", imp=implants)
 
 
-@app.route("/<cid>/graphs", methods=['GET', 'POST'])
-@login_required
-def CampaignGraph(cid):
-    g.setdefault('cid', cid)
-    # -- If we receive a POST request then we will populate the page, this will be called AFTER the page has loaded.
-    if request.method == "POST":
-        blah = {'a': "1", 'b': "v"}
-        return jsonify(blah)
-    return render_template("CampaignGraph.html")
-
-
 @app.route("/<cid>/logs", methods=["GET", "POST"])
 @login_required
 def CampaignLogs(cid):
