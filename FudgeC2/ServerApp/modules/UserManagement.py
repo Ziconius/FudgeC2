@@ -82,6 +82,10 @@ class UserManagementController:
     def get_user_object(self, user):
         return self.db.user.Get_UserObject(user)
 
+    def get_users_state(self, user):
+        if self.db.user.User_IsUserAdminAccount(user):
+            return self.db.user.get_user_state_list()
+        return []
     def update_active_account_state(self, user, form):
         if self.db.user.User_IsUserAdminAccount(user):
             target_user = form['user']

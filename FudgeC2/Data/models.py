@@ -19,7 +19,7 @@ class Users(Base):
     password = Column(String(255), nullable=False)
     last_login = Column(String(255), nullable=False)
     authenticated = Column(String, server_default=text("False"))
-    active_account = Column(String(), server_default=text("True"))
+    active_account = Column(String(), default=1)
     admin = Column(String(255), nullable=False)
     first_logon = Column(INTEGER(1), nullable=False, default=0)
     first_logon_guid = Column(String(32), nullable=False, default="0")

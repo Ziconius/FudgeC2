@@ -81,23 +81,27 @@ def page_not_found(e):
 # ------------------------------ #
 @app.route("/auth/login", methods=['GET', 'POST'])
 def login():
+    error = None
     if request.method == "POST":
+
         if 'email' in request.form and 'password' in request.form and request.form['email'] is not None and request.form['password'] is not None:
             user_object = UsrMgmt.user_login(request.form['email'], request.form['password'])
             if user_object is False:
-                return redirect(url_for("BaseHomePage", error="Incorrect Username/Password"))
-
-            if user_object.first_logon == 1:
-                login_user(user_object)
-                return redirect(url_for("BaseHomePage"))
-
+                error = "Incorrect Username/Password"
+                # return redirect(url_for("BaseHomePage", error="Incorrect Username/Password"))
             else:
-                guid = UsrMgmt.get_first_logon_guid(request.form['email'])
-                # return render_template("auth/PasswordResetPage.html",guid=guid)
-                return redirect(url_for("PasswordReset", guid=guid))
+                if user_object.first_logon == 1:
+                    login_user(user_object)
+                    return redirect(url_for("BaseHomePage"))
+
+                else:
+                    guid = UsrMgmt.get_first_logon_guid(request.form['email'])
+                    # return render_template("auth/PasswordResetPage.html",guid=guid)
+                    return redirect(url_for("PasswordReset", guid=guid))
     return render_template("auth/LoginPage.html",
                            fudge_version=AppManager.get_software_verision_number(),
-                           fudge_version_name=AppManager.get_software_verision_name())
+                           fudge_version_name=AppManager.get_software_verision_name(),
+                           error=error)
 
 
 @app.route("/auth/logout")
@@ -157,9 +161,29 @@ def global_settings_page():
         # -- Add user returns a dict with action/result/reason keys.
         result = UsrMgmt.add_new_user(request.form, current_user.user_email)
         return jsonify(result)
+    # Getting server & user logs, reversing for newest first.
     logs = AppManager.get_application_logs(current_user.user_email)
     logs.reverse()
-    return render_template("settings/GlobalSettings.html", logs=logs)
+
+    user_list = UsrMgmt.get_users_state(current_user.user_email)
+    # Removing our own user as to not present a self-disabling option.
+    for index, user in enumerate(user_list):
+        if user['user_email'] == current_user.user_email:
+            del user_list[index]
+    return render_template("settings/GlobalSettings.html", logs=logs, users=user_list)
+
+
+@app.route("/settings/user", methods=['POST'])
+@login_required
+def settings_change_user_state():
+    for user in request.form:
+        if user == "disable":
+            change = {"user": request.form[user], "to_state": False}
+            UsrMgmt.update_active_account_state(current_user.user_email, change)
+        elif user == "enable":
+            change = {"user": request.form[user], "to_state": True}
+            UsrMgmt.update_active_account_state(current_user.user_email, change)
+    return redirect(url_for('global_settings_page'))
 
 
 @app.route("/help", methods=["GET"])

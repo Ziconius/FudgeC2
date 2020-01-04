@@ -17,11 +17,38 @@
             </div>
             <button type="submit" class="btn btn-default" id="AddUserBtn">Submit</button>
         </form>
-
         <br>
-        <h5 class="text-danger">Disable User</h5><hr>
-        <p>TODO: Generate a list of with enable/disabled check boxes for any admin users. Ensure "self-disabling" cannot happen.</p>
+        {% if users %}
+        <hr>
+        <h5>User status</h5><p>Below are all user accounts, any disabled accounts will not be able to log into the platform. Any login attempted by disabled accounts will be logged.</p>
+        {% for x in users %}
+            <div class="row">
+            <div class="col-md-2">
+                {{ x.user_email }}
+            </div>
 
+            {% if x.active_account == "1" %}
+            <div class="col-md-2">
+                <p class="text-success">Active</p>
+            </div>
+            <div class="col-md-2">
+                <form action="/settings/user" method="POST" role="form" id="UserDisable">
+                    <button type="submit" class="btn btn-danger"  name="disable" value="{{ x.user_email }}" >Disable user</button>
+                </form>
+            </div>
+            {% else %}
+            <div class="col-md-2">
+                <p class="text-danger">Disabled</p>
+            </div>
+            <div class="col-md-2">
+                <form action="/settings/user" method="POST" role="form" id="UserDisable">
+                    <button type="submit" class="btn btn-success"  name="enable" value="{{ x.user_email }}" >Enable user</button>
+                </form>
+            </div>
+            {% endif %}
+                </div>
+        {% endfor %}
+        {% endif %}
         <br>
         <h5>Logs</h5><hr>
         <div class="row">

@@ -76,12 +76,12 @@ class DatabaseUser:
         self.Session.commit()
         return pre_guid
 
-    def user_login(self, email, password):
+    def     user_login(self, email, password):
         # Auths a user and returns user object
         user = self.Session.query(Users).filter(Users.user_email == email).first()
         if user is not None:
             if bcrypt.checkpw(password.encode(), user.password):
-                if user.active_account == "False":
+                if int(user.active_account) != 1:
                     self.db_methods.app_logging("auth", f"Failed login attempt for disabled account: {email} ")
                     return False
 
@@ -107,6 +107,17 @@ class DatabaseUser:
         except Exception as e:
             print("Error: account not found, or state not changed.")
             return False
+
+    def get_user_state_list(self):
+        users = self.Session.query(Users)
+        to_return = []
+        for user in users:
+            del user.__dict__['_sa_instance_state']
+            del user.__dict__['password']
+            del user.__dict__['first_logon_guid']
+
+            to_return.append(user.__dict__)
+        return to_return
 
     def Get_UserObject(self, email):
         # Returns the user object based on username/email.
