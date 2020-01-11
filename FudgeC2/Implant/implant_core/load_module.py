@@ -4,7 +4,7 @@ class LoadModule:
     input = "load_module"
 
     def process_implant_response(self,data, args):
-        return f"Load module: {data.decode()}", None
+        return f"Load module:\n{data.decode()}", None
 
     def implant_text(self):
         var = '''

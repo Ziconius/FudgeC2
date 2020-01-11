@@ -4,7 +4,7 @@ class PlayAudio:
     input = "play_audio"
 
     def process_implant_response(self, data, args):
-        return f"Audio success: {args}", None
+        return f"Audio success:\n{args}", None
 
     def implant_text(self):
         var = '''
