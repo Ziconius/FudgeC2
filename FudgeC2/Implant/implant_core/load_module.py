@@ -15,7 +15,7 @@ function {{ ron.obf_load_module }} ($data) {
     $bgt = $data[1]
     $b = [ScriptBlock]::Create($bgt)
     New-Module -ScriptBlock $b -Name $name -Verbose | Import-Module
-    $Script:tr = Get-Command -Module $name -Verbose
+    $global:tr = Get-Command -Module $name -Verbose
 }'''
         return var
 

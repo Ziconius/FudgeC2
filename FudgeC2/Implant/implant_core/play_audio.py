@@ -10,7 +10,7 @@ class PlayAudio:
         var = '''
 function {{ ron.obf_remote_play_audio }}($data){
     if ($data.length -lt 4){
-            $Script:tr = "1"
+            $global:tr = "1"
         }
     $file = "dev_temp_name"
     $t = "$env:TMP/$file.mp3"
@@ -26,11 +26,10 @@ function {{ ron.obf_remote_play_audio }}($data){
     $duration = 2
     $duration = $duration + $mediaPlayer.NaturalDuration.TimeSpan.TotalSeconds
     $mediaPlayer.Play()
-    #$duration = $mediaPlayer.NaturalDuration.TimeSpan.TotalSeconds
     sleep($duration)
     $mediaPlayer.Close()
     Remove-Item -Confirm:$false "$t"
-    $Script:tr = "Audio success."
+    $global:tr = "Audio success."
     return
 }
 

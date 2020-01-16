@@ -11,9 +11,9 @@ class ScreenCapture:
         var = '''
 function {{ ron.obf_screen_capture }} ($b){
     try {
-        $Script:tr = "1"
+        $global:tr = "1"
     } catch {
-        Script:tr = "0"
+        $global:tr = "0"
     }
 }'''
         return var
