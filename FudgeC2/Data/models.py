@@ -1,7 +1,7 @@
 # coding: utf-8
 import os
 
-from sqlalchemy import Column, ForeignKey, String, text, create_engine  # , Table, Text, Index, Date, DateTime, Float,
+from sqlalchemy import Column, ForeignKey, String, text, create_engine, DateTime  # , Table, Text, Index, Date, DateTime, Float,
 from sqlalchemy.dialects.mysql import INTEGER  # MEDIUMTEXT, TINYINT, VARCHAR, BIGINT
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -50,6 +50,7 @@ class ImplantTemplate(Base):
     callback_url = Column(String(255), nullable=False)
     description = Column(String(255))
     beacon = Column(INTEGER(10), nullable=False)
+    kill_date = Column(String(32), default=None)
     initial_delay = Column(INTEGER(10))
     comms_http = Column(INTEGER(1), default=0)
     comms_https = Column(INTEGER(1), default=0)

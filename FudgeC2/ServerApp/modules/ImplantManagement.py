@@ -2,6 +2,7 @@ from Data.Database import Database
 from Implant.Implant import ImplantSingleton
 from Implant.ImplantFunctionality import ImplantFunctionality
 
+import datetime
 
 class ImplantManagement:
     # -- The implant management class is responsible for performing pre-checks and validation before sending data
@@ -51,6 +52,20 @@ submitted command."}}
             r_command = {"type": "CM", "args": command}
             return r_command, True
 
+    def _validate_template_kill_date(self, form):
+        if 'kill_date' in form:
+            try:
+                # Checking to ensure a the time is not before current time.
+                user_time = datetime.datetime.strptime(form['kill_date'], '%m/%d/%Y %H:%M %p')
+                current_time = datetime.datetime.now()
+
+                if user_time < current_time:
+                    return None
+                else:
+                    return user_time
+            except:
+                return None
+
     def ImplantCommandRegistration(self, cid, username, form):
         # -- This should be refactored at a later date to support read/write changes to
         # --    granular controls on templates, and later specific implants
@@ -99,7 +114,8 @@ submitted command."}}
                 "comms_https": None,
                 "comms_binary": None,
                 "comms_dns": None
-            }
+            },
+            "kill_date": None
         }
         try:
             User = self.db.user.Get_UserObject(user)
@@ -111,6 +127,8 @@ submitted command."}}
 
             if "CreateImplant" in form:
                 obfuscation_level = self._form_validated_obfucation_level_(form)
+                implant_configuration['kill_date'] = self._validate_template_kill_date(form)
+
                 if obfuscation_level is None:
                     raise ValueError('Missing, or invalid obfuscation level.')
                 else:
@@ -145,6 +163,8 @@ submitted command."}}
                      "comms_https": "https-port",
                      "comms_dns": "dns-port",
                      "comms_binary": "binary-port"}
+
+
                 for element in a.keys():
                     if element in form:
                         if int(form[a[element]]):

