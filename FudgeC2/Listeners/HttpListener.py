@@ -131,7 +131,6 @@ def stager():
 def implant_beacon_endpoint():
     if 'X-Implant' not in request.headers:
         return "=="
-
     next_cmd, command_id = Imp.issue_command(request.headers['X-Implant'], app.config['listener_type'])
     if next_cmd is not None:
         processed_return_val = preprocessing[next_cmd['type']](next_cmd, command_id)

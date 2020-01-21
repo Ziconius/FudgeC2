@@ -86,16 +86,17 @@ class DatabaseImplant:
         result = self.Session.query(GeneratedImplants, ImplantTemplate).filter(ImplantTemplate.iid == GeneratedImplants.iid,
                                                                         GeneratedImplants.unique_implant_id == UIK
                                                                         ).first()
+        if result is not None:
+            implant_list = self.db_methods.__splice_implants_and_generated_implants__(result)
+            for implant_template in implant_list:
+                if '_sa_instance_state' in implant_template:
+                    del implant_template['_sa_instance_state']
 
-        implant_list = self.db_methods.__splice_implants_and_generated_implants__(result)
-        for implant_template in implant_list:
-            if '_sa_instance_state' in implant_template:
-                del implant_template['_sa_instance_state']
+            if implant_list is not None:
+                return implant_list[0]
+            else:
+                return False
 
-        if implant_list is not None:
-            return implant_list[0]
-        else:
-            return False
 
     @CL.log_implant_activation
     def Register_NewImplantFromStagerKey(self, stager_key):

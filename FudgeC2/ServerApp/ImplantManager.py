@@ -248,12 +248,9 @@ def NewImplant(cid):
     # -- set SID and user DB to convert --#
     g.setdefault('cid', cid)
     if request.method == "POST":
-        print(request.form)
-        for x in request.form:
-            print(x)
         result, result_text = ImpMgmt.CreateNewImplant(cid, request.form, current_user.user_email)
         if result is True:
-            return render_template('CreateImplant.html', success=result_text)
+            return render_template('CreateImplant.html', success=result_text), 200
         else:
             return render_template('CreateImplant.html', error=result_text), 409
     return render_template('CreateImplant.html')

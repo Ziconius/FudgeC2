@@ -25,6 +25,8 @@ class ImplantSingleton:
                 # TODO:
                 # BUG: If the X-Header is mangled this errors.
                 ImplantObj = db.implant.Get_GeneratedImplantDataFromUIK(UIK)
+                if ImplantObj is None:
+                    return None, None
                 db.implant.Update_ImplantLastCheckIn(ImplantObj['cid'], UIK, c2_protocol)
 
                 for implant in ImplantObj:

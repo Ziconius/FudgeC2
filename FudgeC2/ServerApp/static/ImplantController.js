@@ -77,8 +77,12 @@ async function get_active_implant_command_queue (cid){
             document.getElementById('awaiting').innerHTML = ""
             for (element in response){
                 if (response[element].read_by_implant == 0){
-                    line="<p>Implant ID: "+response[element].uik+"</br>Command: "+response[element].log_entry+"</p>"
-                    document.getElementById('awaiting').innerHTML =  document.getElementById('awaiting').innerHTML + line
+                    $('#awaiting')
+                    .append("<p>")
+                    .append($("<span></span>").text("Implant ID: "+response[element].uik))
+                    .append("<br>")
+                    .append($("<span></span>").text("Command: "+response[element].log_entry))
+                    .append("</p>")
                 }
             }
         }

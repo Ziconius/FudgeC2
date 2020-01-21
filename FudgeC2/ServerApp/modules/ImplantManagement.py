@@ -55,15 +55,16 @@ submitted command."}}
     def _validate_template_kill_date(self, form):
         if 'kill_date' in form:
             try:
-                # Checking to ensure a the time is not before current time.
-                user_time = datetime.datetime.strptime(form['kill_date'], '%m/%d/%Y %H:%M %p')
+                # Checking to ensure a the time is not before current time. # This time must match the webapp
+                # submission format.
+                user_time = datetime.datetime.strptime(form['kill_date'], '%d/%m/%Y, %H:%M')
                 current_time = datetime.datetime.now()
-
                 if user_time < current_time:
                     return None
                 else:
                     return user_time
-            except:
+            except Exception as E:
+                print(f"Error: Implant format: {E}")
                 return None
 
     def ImplantCommandRegistration(self, cid, username, form):
