@@ -19,7 +19,7 @@ class ImplantFunctionality:
         self.module_list = []
         self.module_list.append(DownloadFile())
         self.module_list.append(UploadFile())
-        self.module_list.append(PlayAudio())            # non-functional placeholder for 0.6.0
+        self.module_list.append(PlayAudio())            # Early PoC
         self.module_list.append(EnablePersistence())
         self.module_list.append(ExportClipboard())
         self.module_list.append(SystemInfo())

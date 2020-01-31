@@ -1,6 +1,7 @@
 import time
 import random
 import secrets
+import json
 
 from Data.models import ImplantResponse, ImplantTemplate, ImplantCommands, Campaigns, CampaignUsers, GeneratedImplants, HostData
 from Data.CampaignLogging import CampaignLoggingDecorator
@@ -27,7 +28,7 @@ class DatabaseImplant:
     # TODO: Add logging
     @CL.new_implant_template_created
     def create_new_implant_template(self, user, cid, config):
-
+        print("fff", config['protocol'], "kkk",config['obfuscation_level'])
         stager_key = random.randint(10000, 99999)
         new_implant = ImplantTemplate(
             cid=cid,
@@ -39,10 +40,7 @@ class DatabaseImplant:
             kill_date=config['kill_date'],
             initial_delay=config['initial_delay'],
             obfuscation_level=config['obfuscation_level'],
-            comms_http=config['protocol']['comms_http'],
-            comms_https=config['protocol']['comms_https'],
-            comms_binary=config['protocol']['comms_binary'],
-            comms_dns=config['protocol']['comms_dns']
+            network_profiles = config['protocol']
         )
         self.Session.add(new_implant)
         try:
@@ -62,6 +60,7 @@ class DatabaseImplant:
             b = implant.__dict__
             if '_sa_instance_state' in b:
                 del b['_sa_instance_state']
+                #b['network_profiles'] = json.dumps(b['network_profiles'])
             processed_implants.append(b)
 
         if processed_implants is not None:

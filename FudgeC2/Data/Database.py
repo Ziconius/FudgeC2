@@ -63,13 +63,25 @@ class Database:
     #     else:
     #         print(q[0])
 
+    # This needs to be alterd and renamed
     def __sa_to_dict__(self, sa_obj):
+
         if len(sa_obj) == 1:
             a = sa_obj[0]
             del a.__dict__['_sa_instance_state']
             return a.__dict__
         else:
             return None
+    @staticmethod
+    def _sqlalc_rows_to_list(rows):
+        for index , row in enumerate(rows):
+            try:
+                del rows[index].__dict__['_sa_instance_state']
+                rows[index] = rows[index].__dict__
+            except:
+                print("Error: Cannot delete _sa_instance_state from sqlalc")
+        return rows
+
 
     @staticmethod
     def __splice_implants_and_generated_implants__(obj):

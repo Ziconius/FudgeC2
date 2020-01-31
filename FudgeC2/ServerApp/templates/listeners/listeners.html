@@ -21,20 +21,20 @@
         </div>
         {% endif %}
         <div><h1>Listeners</h1>
-            <p>All listeners can be created, started, and stopped from here. </p>
+            <p>Listeners are the server component to the implants network profile. Any active implants will require it's respective listener to be active and on the same port. Take care to not collide ports between network profiles. It is possible to have the same profile listener communicate to many listeners from many campaigns.</p>
         </div>
         <h5>Configured listeners:</h5>
         <p>
             {% for key_2 in test_data %}
-            <span class="font-weight-bold">Name:</span> <code>{{ test_data[key_2].common_name }}</code><br>
-            <span class="font-weight-bold">Protocol:</span> <code>{{ test_data[key_2].type }}</code><br>
-            <span class="font-weight-bold">Port:</span> <code>{{ test_data[key_2].port }}</code><br>
-            {% if test_data[key_2].state == True %}
+            <span class="font-weight-bold">Name:</span> <code>{{ key_2.name }}</code><br>
+            <span class="font-weight-bold">Network Profile:</span> <code>{{ key_2.protocol }}</code><br>
+            <span class="font-weight-bold">Port:</span> <code>{{ key_2.port }}</code><br>
+            {% if key_2.state == True %}
             <span class="font-weight-bold">State:</span> <span class="text-success">Running</span><br>
-                <form action="/api/v1/listener/change" method="POST" role="form"><button name="state_change" value="{{ test_data[key_2].common_name }}">Stop</button></form>
-            {% elif test_data[key_2].state == False %}
+                <form action="/api/v1/listener/change" method="POST" role="form"><button name="off" value="{{ key_2.name }}">Stop</button></form>
+            {% elif key_2.state == False %}
                 <span class="font-weight-bold">State:</span> <span class="text-danger">Stopped</span><br>
-                <form action="/api/v1/listener/change" method="POST" role="form"><button name="state_change" value="{{ test_data[key_2].common_name }}">Start</button></form>
+                <form action="/api/v1/listener/change" method="POST" role="form"><button name="on" value="{{ key_2.name }}">Start</button></form>
             {% endif %}
 
             <hr>
@@ -45,9 +45,16 @@
         $('#FormSubmissionModal').modal({show:true})
         }
         </script>
-        <form><button type="button" onclick="CreateListener()">Create Listener</button> </form>
+        <hr><hr>
 
-        <!-- Modal -->
+
+
+
+
+
+
+
+                <!-- Modal -->
     <div class="modal fade" id="FormSubmissionModal" tabindex="-1" role="dialog" aria-labelledby="FormSubmissionModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -58,31 +65,33 @@
             </button>
           </div>
           <div class="modal-body">
-            <!--<div id="modal-result"></div>-->
-            <!--<div id="modal-reason"></div>-->
-                <form action="{{ url_for('create_new_listener') }}" method="POST" role="form" id="AnswerForm">
-            <div class="form-group">
-                <label>Listener Name</label>
-                <input onfocus="this.placeholder=''" type="text" name="listener_name" class="form-control" id="listener_name_id" placeholder="Listener Name">
-            </div>
-            <div class="form-group">
-              <label for="listener_protocol">Select listener type:</label>
-              <select class="form-control" id="listener_protocol" name="listener_protocol">
-                <option>HTTP</option>
-                <option>HTTPS</option>
-                <option>DNS    (Not implemented)</option>
-                <option>Binary (Not implemented)</option>
-              </select>
-            </div>
-            <div class="form-group">
-                <input type="number" name="listener_port" id="listener_port_id" min="1" max="65535" data-bind="value:listener_port_id" />
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" name="auto_start" id="auto_start_id">
-                <label class="form-check-label" for="auto_start_id">Auto-start Listener</label>
-            </div>
-            <button type="submit" class="btn btn-default" id="AddUserBtn">Submit</button>
-        </form>
+
+            <form action="{{ url_for('create_new_listener') }}" method="POST" role="form" id="AnswerForm">
+                <div class="form-group">
+                    <label>Listener Name</label>
+                    <input onfocus="this.placeholder=''" type="text" name="listener_name" class="form-control" id="listener_name_id" placeholder="Listener Name">
+                </div>
+                <div class="form-group">
+                    <label for="listener_protocol">Select listener type:</label>
+                    <select class="form-control" id="listener_protocol" name="listener_protocol">
+                        {% for x in listeners %}
+                            <option value="{{ x.profile_tag}}">{{ x.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-check-label" for="auto_start_id">Listener Port</label>
+                    <input type="number" name="listener_port" id="listener_port_id" min="1" max="65535" data-bind="value:listener_port_id" />
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" name="auto_start" id="auto_start_id">
+                    <label class="form-check-label" for="auto_start_id">Auto-start Listener</label>
+                </div>
+
+                <button type="submit" class="btn btn-default" id="AddListenerBtn">Submit</button>
+            </form>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -90,11 +99,17 @@
         </div>
       </div>
     </div>
-        <script>
-            $("#listener_name_id").on("change",function(){
-              ($(this).val() === "") ? false : $("#AddUserBtn").prop("disabled",false);
-            })
-        </script>
+        <form><button type="button" onclick="CreateListener()">Create Listener New</button> </form>
+
+    <script>
+        function CreateListener(){
+            $('#FormSubmissionModal').modal({show:true})
+        }
+
+        $("#listener_name_id").on("change",function(){
+            ($(this).val() === "") ? false : $("#AddListenerBtn").prop("disabled",false);
+        })
+    </script>
     </div>
 </div>
 {% endblock %}

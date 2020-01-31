@@ -211,11 +211,11 @@ function get_listener_info(){
         url:`/api/v1/listener`,
         type:"GET",
         success: function (response) {
-            for (x in response){
-                A=response[x]['common_name']
-                B = response[x]['port']
-                C= response[x]['type']
-                D =response[x]['state']
+            for (x in response['test']){
+                A = response['test'][x]['name']
+                B = response['test'][x]['protocol']
+                C = response['test'][x]['port']
+                D = response['test'][x]['state']
 
                 E = document.getElementById('t_body_listener').innerHTML;
                 line = `<td>${A}</td><td>${B}</td><td>${C}</td><td>${D}</td>`
@@ -224,6 +224,7 @@ function get_listener_info(){
         }
     })
 }
+
 
 
 function get_campaign_info_by_id(rrr, cid){

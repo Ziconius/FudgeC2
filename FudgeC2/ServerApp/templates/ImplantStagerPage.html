@@ -2,6 +2,7 @@
 {% block main2 %}
 <div class="m-0 p-3">
     <h4>Existing Implants & Stagers</h4>
+
     {% if implantList %}
         {% for implant in implantList %}
         <p>
@@ -9,39 +10,52 @@
             <span class="font-weight-bold">Description:</span> {{ implantList[implant].description  }}<br>
             <span class="font-weight-bold">URL:</span> {{ implantList[implant].url }}
         </p>
-        <p class="text-secondary">Click to show stager</p>
-        <div>
+        <p class="font-weight-bold text-success" >Powershell stager</p>
+            {% for x in implantList[implant].powershell_stager %}
+                <div id="{{ implantList[implant].stager_key }}-ps1" class="">
+                    <button onclick="CopyToClipboard('{{ implantList[implant].stager_key }}_ps_{{ loop.index }}')" type="button" class="btn btn-dark">Copy Payload</button><br><br>
+                    <div class="bg-dark p-2">
+                    <code class="font-weight-normal" id="{{ implantList[implant].stager_key }}_ps_{{ loop.index }}">{{ x }}</code>
+                    </div>
+                </div>
+                <br>
+            {% endfor %}
 
-            <div data-toggle="collapse" data-target="#{{ implantList[implant].stager_key }}-ps1" class="text-success font-weight-bold"> Powershell </div>
-            <div id="{{ implantList[implant].stager_key }}-ps1" class="">
-                <button onclick="copy_stager('{{ implantList[implant].stager_key }}_ps1_code')" type="button" class="btn btn-dark">Copy Payload</button><br>
-                <br>
-                <div class="bg-dark p-2">
-                <code class="font-weight-normal" id="{{ implantList[implant].stager_key }}_ps1_code">{{ implantList[implant].powershell_stager }}</code>
+        <p class="font-weight-bold text-success" >Docm stager</p>
+            {% for y in implantList[implant].docm_macro_stager %}
+                <div id="{{ implantList[implant].stager_key }}-docm" class="">
+                    <button onclick="CopyToClipboard('{{ implantList[implant].stager_key }}_docm_{{ loop.index }}')" type="button" class="btn btn-dark">Copy Payload</button><br><br>
+
+                    <div class="bg-dark p-2">
+                        <pre class="font-weight-normal text-success" id="{{ implantList[implant].stager_key }}_docm_{{ loop.index }}">{{ y | replace('\n\n', '\n') | safe}}</pre>
+                    </div>
                 </div>
-            </div>
-            <br>
-            <div data-toggle="collapse" data-target="#{{ implantList[implant].stager_key }}-docm" class="text-success font-weight-bold"> Docm Macro </div>
-            <div id="{{ implantList[implant].stager_key }}-docm" class="">
-                <button onclick="copy_stager('{{ implantList[implant].stager_key }}_docm_code')" type="button" class="btn btn-dark">Copy Payload</button><br>
                 <br>
-                <div class="bg-dark p-2">
-                    <pre class="font-weight-normal text-success" id="{{ implantList[implant].stager_key }}_docm_code">{{ implantList[implant].docm_macro_stager }}</pre>
-                </div>
-            </div>
-        </div>
+            {% endfor %}
         <hr>
         {% endfor %}
+
     {% else %}
         <p>There are no implant associated with this campaign yet.</p>
     {% endif %}
 
+
     <script>
-        function copy_stager(element) {
-            var stager_text = document.getElementById(element).innerHTML;
-            var dummy = $('<input style="white-space: pre-wrap;">').val(stager_text).appendTo('body').select()
-            document.execCommand('copy')
+        function CopyToClipboard(containerid) {
+          if (document.selection) {
+            var range = document.body.createTextRange();
+            range.moveToElementText(document.getElementById(containerid));
+            range.select().createTextRange();
+            document.execCommand("copy");
+
+          } else if (window.getSelection) {
+            var range = document.createRange();
+            range.selectNode(document.getElementById(containerid));
+            window.getSelection().addRange(range);
+            document.execCommand("copy");
+          }
         }
+
     </script>
 
 </div>

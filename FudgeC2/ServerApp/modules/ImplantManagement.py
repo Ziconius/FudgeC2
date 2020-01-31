@@ -1,6 +1,7 @@
 from Data.Database import Database
 from Implant.Implant import ImplantSingleton
 from Implant.ImplantFunctionality import ImplantFunctionality
+from NetworkProfiles.NetworkProfileManager import NetworkProfileManager
 
 import datetime
 
@@ -10,6 +11,7 @@ class ImplantManagement:
     db = Database()
     Imp = ImplantSingleton.instance
     ImpFunc = ImplantFunctionality()
+    NetProMan = NetworkProfileManager()
 
     def _form_validated_obfucation_level_(self, form):
         if "obfuscation" in form:
@@ -64,8 +66,11 @@ submitted command."}}
                 else:
                     return user_time
             except Exception as E:
-                print(f"Error: Implant format: {E}")
+                # print(f"Error: Implant format: {E}")
                 return None
+
+    def get_network_profile_options(self):
+        return self.NetProMan.get_implant_template_code()
 
     def ImplantCommandRegistration(self, cid, username, form):
         # -- This should be refactored at a later date to support read/write changes to
@@ -101,6 +106,23 @@ submitted command."}}
             return {"cmd_reg": {"result": True, "reason": "Command registered"}}
         return {"cmd_reg": {"result": False, "reason": "Incorrect implant given, or non-existent active implant."}}
 
+
+    def _verify_network_profile_(self, form):
+        #print(f"ImpMan: {form}")
+        network_protocols = {}
+        for key in form:
+            # print(f"{key}::{form[key]}::")
+            a = self.NetProMan.validate_web_form(key, form[key])
+            #print(":::",a)
+            if a is not None:
+                if a != False:
+                    #print(f"Updating: {a}")
+                    network_protocols.update(a)
+
+        print(f"THIS IS THE RESULT OF THE NEW STUFF: {network_protocols}")
+        return network_protocols
+
+
     def CreateNewImplant(self, cid, form, user):
         # TODO: Create checks for conflicting ports.
         implant_configuration = {
@@ -110,12 +132,7 @@ submitted command."}}
             "beacon": None,
             "inital_delay": None,
             "obfuscation_level": None,
-            "protocol": {
-                "comms_http": None,
-                "comms_https": None,
-                "comms_binary": None,
-                "comms_dns": None
-            },
+            "protocol": {},
             "kill_date": None
         }
         try:
@@ -160,34 +177,19 @@ submitted command."}}
                     implant_configuration['description'] = form['description']
                     implant_configuration['beacon'] = form['beacon_delay']
 
-                a = {"comms_http": "http-port",
-                     "comms_https": "https-port",
-                     "comms_dns": "dns-port",
-                     "comms_binary": "binary-port"}
+                # Verify the input against all loaded network profiles.
+                validated_network_protocols = self._verify_network_profile_(form)
+                if len(validated_network_protocols) != 0:
+                    implant_configuration['protocol'].update(validated_network_protocols)
+                else:
+                    raise ValueError("Error: No valid network profiles submitted.")
 
 
-                for element in a.keys():
-                    if element in form:
-                        if int(form[a[element]]):
-                            if int(form[a[element]]) > 0 or int(form[a[element]]) < 65536:
-                                implant_configuration["protocol"][element] = int(form[a[element]])
-                            else:
-                                raise ValueError(f"Submitted port for {a[element]} is out of range")
-                        else:
-                            raise ValueError("Ports must be submitted as an integer")
-
-                protocol_set = False
-                for proto in implant_configuration['protocol'].keys():
-                    if implant_configuration['protocol'][proto] is None:
-                        protocol_set = True
-                if protocol_set is False:
-                    raise ValueError('No protocol selected, ensure a protocol and port are selected.')
-
-                a = self.db.implant.create_new_implant_template(user, cid, implant_configuration)
-                if a is True:
+                implant_creation = self.db.implant.create_new_implant_template(user, cid, implant_configuration)
+                if implant_creation is True:
                     return True, "Implant created."
                 else:
-                    raise ValueError("Error creating entry. Ensure implant title is unique.")
+                    raise ValueError(f"Error: {implant_creation}")
 
         except Exception as E:
             return False, E

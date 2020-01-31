@@ -5,7 +5,9 @@ import os
 
 from Storage.settings import Settings
 from ServerApp import ImplantManager
-from Listeners import ListenerManagement
+
+from NetworkProfiles.NetworkListenerManagement import NetworkListenerManagement
+NLM = NetworkListenerManagement.instance
 
 
 def check_tls_certificates(cert, key):
@@ -21,9 +23,8 @@ def check_key_folders():
     return
 
 
-def start_controller(listener_management):
+def start_controller():
     # Server configuration can be found in Storage/settings.py
-    Manager.config['listener_management'] = listener_management
     Manager.run(debug=Settings.server_app_debug,
                 use_reloader=False,
                 host='0.0.0.0',
@@ -34,15 +35,14 @@ def start_controller(listener_management):
 
 
 Manager = ImplantManager.app
-LM = ListenerManagement.ListenerManagement(Settings.tls_listener_cert, Settings.tls_listener_key)
-LM.start_auto_run_listeners_at_boot()
+NLM.startup_auto_run_listeners()
 
 try:
     check_tls_certificates(Settings.tls_listener_cert, Settings.tls_listener_key)
     check_key_folders()
-    _thread.start_new_thread(start_controller, (LM,))
+    _thread.start_new_thread(start_controller, ())
 except Exception as E:
-    print("Error: Unable to start thread: ", E)
+    print(f"Error: Unable to start FudgeC2 server thread, exception: {E}")
     exit()
 
 while 1:

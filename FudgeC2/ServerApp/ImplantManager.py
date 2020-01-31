@@ -11,13 +11,17 @@ from ServerApp.modules.StagerGeneration import StagerGeneration
 from ServerApp.modules.ImplantManagement import ImplantManagement
 from ServerApp.modules.ApplicationManager import AppManager
 from ServerApp.modules.ExportManager import CampaignExportManager
+from NetworkProfiles.NetworkProfileManager import NetworkProfileManager
+from NetworkProfiles.NetworkListenerManagement import NetworkListenerManagement
 
+Listener = NetworkListenerManagement.instance
 Imp = ImplantSingleton.instance
 UsrMgmt = UserManagementController()
 ImpMgmt = ImplantManagement()
 StagerGen = StagerGeneration()
 AppManager = AppManager()
 ExpoManager = CampaignExportManager()
+NetProfMng = NetworkProfileManager()
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -59,6 +63,9 @@ def load_user(user):
 
 @app.before_request
 def before_request():
+    # -- DEV REMOVE
+    login_user(UsrMgmt.user_login("admin", "letmein"))
+    # -- DEV REMOVE
     return
 
 
@@ -192,38 +199,60 @@ def help_page():
     return render_template("HelpPage.html")
 
 
+# -- Dev REQURIES CLEAN UP
 @app.route("/listener", methods=['GET', 'POST'])
 @login_required
 def GlobalListenerPage():
-    if app.config['listener_management'].check_tls_certificates() is False:
+    if 'state' in request.args:
+        flash(f"Implant creation: {request.args['state']}")
+    # -- DEV THIS NEEDS UPDATED AND REMOVED
+    if Listener.check_tls_certificates() is False:
         flash('TLS certificates do not exist within the <install dir>/FudgeC2/Storage directory.')
     return render_template("listeners/listeners.html",
-                           test_data=app.config['listener_management'].get_active_listeners())
+                           test_data=Listener.get_all_listeners(),
+                           listeners=NetProfMng.get_all_listener_forms()
+                           )
 
 
 @app.route("/api/v1/listener/")
 @login_required
 def get_listener_details():
-
-    return jsonify(app.config['listener_management'].get_active_listeners())
-
+    # -- DEV: Check the return data matches the JS This is needed for the main page.
+    to_return = []
+    bb = Listener.get_all_listeners()
+    for x in bb:
+        x['interface'] = 0
+        to_return.append(x)
+    return jsonify(test=to_return)
 
 @app.route("/api/v1/listener/change", methods=['POST'])
 @login_required
 def Listener_Updates():
-    form_response = app.config['listener_management'].update_listener_state(current_user.user_email, request.form)
+    print(request.form)
+    if 'off' in request.form:
+        form_response = Listener.listener_state_change(current_user.user_email, request.form['off'], 0)
+    elif 'on' in request.form:
+        form_response = Listener.listener_state_change(current_user.user_email, request.form['on'], 1)
     flash(form_response[1])
     return redirect(url_for('GlobalListenerPage'))
-
 
 @app.route("/api/v1/listener/create", methods=['POST'])
 @login_required
 def create_new_listener():
-    form_response = app.config['listener_management'].create_new_listener(current_user.user_email, request.form)
-    if form_response[0] is False:
-        return url_for('GlobalListenerPage'), 409
-    else:
-        return url_for('GlobalListenerPage'), 201
+    auto_start = False
+    if 'listener_name' in request.form and 'listener_protocol' in request.form and 'listener_port' in request.form:
+        if 'auto_start' in request.form:
+            auto_start = True
+        result = Listener.create_new_listener(current_user.user_email,
+                                              request.form['listener_name'],
+                                              request.form['listener_protocol'],
+                                              request.form['listener_port'],
+                                              auto_start)
+        if result:
+            return redirect(url_for('GlobalListenerPage', state="Successful"))
+
+    return redirect(url_for('GlobalListenerPage', state="Failed"))
+
 
 # -- CAMPAIGN SPECIFIC PAGES -- #
 # ----------------------------- #
@@ -247,13 +276,14 @@ def BaseImplantSettings(cid):
 def NewImplant(cid):
     # -- set SID and user DB to convert --#
     g.setdefault('cid', cid)
+    profiles = ImpMgmt.get_network_profile_options()
     if request.method == "POST":
         result, result_text = ImpMgmt.CreateNewImplant(cid, request.form, current_user.user_email)
         if result is True:
-            return render_template('CreateImplant.html', success=result_text), 200
+            return render_template('CreateImplant.html', profiles=profiles, success=result_text), 200
         else:
-            return render_template('CreateImplant.html', error=result_text), 409
-    return render_template('CreateImplant.html')
+            return render_template('CreateImplant.html', profiles=profiles, error=result_text), 409
+    return render_template('CreateImplant.html', profiles=profiles)
 
 
 @app.route("/<cid>/implant/stagers", methods=["GET", "POST"])

