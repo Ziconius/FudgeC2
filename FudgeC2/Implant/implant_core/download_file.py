@@ -1,7 +1,7 @@
 import secrets
 import base64
 
-from FudgeC2.Storage.settings import Settings
+from Storage.settings import Settings
 
 
 class DownloadFile:

@@ -11,5 +11,6 @@ COPY FudgeC2/ /opt/FudgeC2/
 WORKDIR /opt/FudgeC2
 
 RUN pip3 install -r /opt/FudgeC2/requirements.txt
-CMD ["python3", "Controller.py"]
+CMD ["python3", "/opt/FudgeC2/Controller.py"]
+
 
