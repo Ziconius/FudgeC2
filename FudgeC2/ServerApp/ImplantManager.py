@@ -63,9 +63,6 @@ def load_user(user):
 
 @app.before_request
 def before_request():
-    # -- DEV REMOVE
-    login_user(UsrMgmt.user_login("admin", "letmein"))
-    # -- DEV REMOVE
     return
 
 
