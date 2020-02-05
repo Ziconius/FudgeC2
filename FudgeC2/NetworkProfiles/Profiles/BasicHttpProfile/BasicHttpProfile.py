@@ -3,7 +3,6 @@
 class BasicHttpProfile:
     name = "Basic Http Profile"
     description = "This is a basic network profile which use base64 commands and unencrypted traffic"
-    web_form_id = "BasicHttpProfile" # Need to be changed to 'NetProfTag or something
     profile_tag = "BasicHttpProfile"
 
     def get_powershell_code(self):
@@ -50,8 +49,6 @@ End Sub
 :return:'''
         return stager_string
 
-
-
     def get_webform(self):
         a = '''
 <div class="checkbox">
@@ -64,14 +61,13 @@ End Sub
     def validate_web_form(self, key, value):
         try:
             if int(value) > 0 and int(value) < 65355:
-                return {self.web_form_id: int(value)}
+                return {self.profile_tag: int(value)}
             else:
                 return False
         except:
             return False
 
     def get_listener_profile_form(self):
-        # a = "<p>hello world this is the http profile form</p>"
         a = {"name": self.name,
              "profile_tag": self.profile_tag,
              "port": "Port"}
@@ -79,11 +75,11 @@ End Sub
 
     @staticmethod
     def get_listener_interface():
-        import NetworkProfiles.Profiles.BasicHttpProfile.BasicHttpInterface as g
-        g = g.ListenerInterface()
-        return g
+        import NetworkProfiles.Profiles.BasicHttpProfile.BasicHttpInterface as interface
+        interface = interface.ListenerInterface()
+        return interface
 
     @staticmethod
     def get_listener_object():
-        import NetworkProfiles.Profiles.BasicHttpProfile.HttpListener as a
-        return a
+        import NetworkProfiles.Profiles.BasicHttpProfile.HttpListener as listener
+        return listener

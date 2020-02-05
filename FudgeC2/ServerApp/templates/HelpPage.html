@@ -9,7 +9,7 @@
     <div class="col-md-10 m-0 p-2">
         <div class="p-5 m-0 rounded iplm  ">
             <h1>FudgeC2 Documentation</h1>
-            <p class="text-warning font-weight-bold">This documentation may contain incomplete information, as well as partial documentation on unimplemented features.</p>
+            <p class="text-warning font-weight-bold">The documentation on this page will likely be removed in 0.5.5 in favour of a reference page - Full docs can be found on the  <a href="https://github.com/Ziconius/FudgeC2/wiki" target="_blank">Github wiki page</a></p>
             <h3>Configuration</h3>
             <h4>User Account</h4>
             <h5>Add user</h5>
@@ -23,58 +23,108 @@
                 <a href="/settings">/settings</a>   </p>
             <br>
 
-            <hr>
+
             <h2>Implant commands</h2>
             <p>Active implants have a number of builtin commands designed to perform common actions, such as harvestings host information. These built in commands are invoked by pre-fixing <code>::</code> to the required command. If no pre-fix is used the implant will try to execute anything else using Powershell.<br>
             </p>
-            <div class="row p-1">
-                <div class="col-sm-3 border-bottom"><code></code></div>
-                <div class="col-sm-9 border-bottom"></div>
-                <!-- copy above -->
 
-                <div class="col-sm-4 p-1 border-bottom bg-light"><code>:: sys_info</code></div>
-                <div class="col-sm-8 p-1 border-bottom bg-light">Collects username, hostname, domain, and local IP</div>
+            <table class="table table-striped table-bordered table-sm results table-hover" cellspacing="1" width="100%">
+                <thead><tr><th scope="col">Command</th><th scope="col">Description</th>
+                </tr></thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <code>:: sys_info</code>
+                    </td>
+                    <td>
+                        Collects username, hostname, domain, and local IP
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>:: enable_persistence</code>
+                    </td>
+                    <td>
+                        Enables persistence by embedding a stager payload into the following autorun register key:<br>
+                        <pre class="font-weight-bold">HKCU:\Software\Microsoft\Windows\CurrentVersion\Run\</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>:: export_clipboard</code>
+                    </td>
+                    <td>
+                        Attempts to collect any text data stored in the users clipboard.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>:: load_module [target script]</code>
+                    </td>
+                    <td>
+                        This will load external powershell modules, such as J.A.W.S, or PowerUp.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>:: exec_module [loaded module name]</code>
+                    </td>
+                    <td>
+                        Downloads a file from the infected host. Downloads wil be placed in the directory set in the settings file.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>:: list_modules</code>
+                    </td>
+                    <td>
+                        Lists all loaded modules by the implant.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>:: download_file [[ path ] target ]</code>
+                    </td>
+                    <td>
+                        Downloads a file from the infected host. Downloads wil be placed in the directory set in the settings file.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>:: upload_file [local filename] [[path] filename ] </code>
+                    </td>
+                    <td>
+                        Uploads a target file to the supplied directory. All target upload files should be placed in:<br>
+                        <span class="font-weight-bold">{installation dir}/FudgeC2/Storage/implant_resources/</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>:: play_audio [target audio file]</code>
+                    </td>
+                    <td>
+                        This plays audio on the target host, assuming the target has an audio device. Simply for PoC demonstrations. It should be noted that this will create a temp file on the host.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
 
-                <div class="col-sm-4 p-1 border-bottom"><code>:: enable_persistence</code></div>
-                <div class="col-sm-8 p-1 border-bottom">Enables persistence by embedding a stager payload into the following autorun register key:<br>
-                <pre class="font-weight-bold">HKCU:\Software\Microsoft\Windows\CurrentVersion\Run\</pre>
-                </div>
+                    </td>
+                    <td>
 
-                <div class="col-sm-4 p-1 border-bottom bg-light"><code>:: export_clipboard</code></div>
-                <div class="col-sm-8 p-1 border-bottom bg-light">Attempts to collect any text data stored in the users clipboard.
-                </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code class="text-secondary">:: screenshot</code>
+                    </td>
+                    <td>
+                        IN DEV: This will look to capture the users desktop and will exfiltrate the image.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
 
-                <div class="col-sm-4 p-1 border-bottom"><code>:: load_module [target script]</code></div>
-                <div class="col-sm-8 p-1 border-bottom">This will load external powershell modules, such as JAWS.
-                </div>
-
-                <div class="col-sm-4 p-1 border-bottom bg-light"><code>:: exec_module [loaded module name]</code></div>
-                <div class="col-sm-8 p-1 border-bottom bg-light">Executes a specific function of a loaded module.
-                </div>
-
-                <div class="col-sm-4 p-1 border-bottom"><code>:: list_modules</code></div>
-                <div class="col-sm-8 p-1 border-bottom">Lists all loaded modules by the implant.
-                </div>
-
-                <div class="col-sm-4 p-1 border-bottom bg-light"><code>:: download_file [[ path ] target ]</code></div>
-                <div class="col-sm-8 p-1 border-bottom bg-light">Downloads a file from the infected host. Downloads wil be placed in the directory set in the settings file.
-                </div>
-
-                <div class="col-sm-4 p-1 border-bottom"><code>:: upload_file [local filename] [[path] filename ] </code></div>
-                <div class="col-sm-8 p-1 border-bottom">Uploads a target file to the supplied directory. All target upload files should be placed in:<br>
-                    <span class="">{installation dir}/FudgeC2/Storage/implant_resources/</span>
-                </div>
-
-                <div class="col-sm-12 border-bottom"><pre>Under development:</pre></div>
-
-
-                <div class="col-sm-4 p-1 border-bottom"><code class="text-secondary">:: play_audio [target audio file]</code></div>
-                <div class="col-sm-8 p-1 border-bottom">This will simply play audio on the target host, assuming the target has an audio device. Simply for PoC demonstrations. It should be noted that this will create a temp file.</div>
-
-                <div class="col-sm-4 p-1 border-bottom"><code class="text-secondary">:: screenshot</code></div>
-                <div class="col-sm-8 p-1 border-bottom">captures the users screen if possible</div>
-
-            </div>
             <br>
 <hr>
             <h4>Listeners</h4>

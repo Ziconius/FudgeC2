@@ -6,6 +6,7 @@ class NetworkProfileManager:
     #   the standards to be functional w/o the risk of error.
     profiles = [
         BasicHttpProfile()
+        # Current profiles in dev branches:
         # TcpProfile()
         # HttpsProfile()
         # DnsProfile()
@@ -13,15 +14,15 @@ class NetworkProfileManager:
     ]
 
     def get_available_profiles(self):
-        a = []
-        for x in self.profiles:
-            a.append(x.name)
-        return a
+        avaliable_profiles = []
+        for netprof in self.profiles:
+            avaliable_profiles.append(netprof.name)
+        return avaliable_profiles
 
-    def get_implant_powershell_code(self, web_form_id):
-        for x in self.profiles:
-            if web_form_id == x.web_form_id:
-                return x.get_powershell_code(), x.get_powershell_obf_strings()
+    def get_implant_powershell_code(self, profile_tag):
+        for netprof in self.profiles:
+            if profile_tag == netprof.profile_tag:
+                return netprof.get_powershell_code(), netprof.get_powershell_obf_strings()
         return False
 
     def get_implant_template_code(self):
@@ -32,19 +33,19 @@ class NetworkProfileManager:
 
     def validate_web_form(self, key, value):
         for x in self.profiles:
-            if key == x.web_form_id:
+            if key == x.profile_tag:
                 a = x.validate_web_form(key, value)
                 return a
         return False
 
     def get_powershell_implant_stager(self, profile_tag, implant_data):
         for profile in self.profiles:
-            if profile.web_form_id == profile_tag:
+            if profile.profile_tag == profile_tag:
                 return profile.get_powershell_implant_stager(implant_data)
 
     def get_docm_implant_stager(self, profile_tag, implant_data):
         for profile in self.profiles:
-            if profile.web_form_id == profile_tag:
+            if profile.profile_tag == profile_tag:
                 return profile.get_docm_implant_stager(implant_data)
 
     def get_all_listener_forms(self):
