@@ -28,7 +28,6 @@ class DatabaseImplant:
     # TODO: Add logging
     @CL.new_implant_template_created
     def create_new_implant_template(self, user, cid, config):
-        print("fff", config['protocol'], "kkk",config['obfuscation_level'])
         stager_key = random.randint(10000, 99999)
         new_implant = ImplantTemplate(
             cid=cid,
@@ -45,11 +44,10 @@ class DatabaseImplant:
         self.Session.add(new_implant)
         try:
             self.Session.commit()
-            self.Session.query(ImplantTemplate).first()
             return True
 
         except Exception as e:
-            print("db.Add_Implant: ", e)
+            print(f"Error in create_new_implant_template(): {e}")
             return e
 
     def Get_AllImplantBaseFromCid(self, cid):
@@ -60,7 +58,6 @@ class DatabaseImplant:
             b = implant.__dict__
             if '_sa_instance_state' in b:
                 del b['_sa_instance_state']
-                #b['network_profiles'] = json.dumps(b['network_profiles'])
             processed_implants.append(b)
 
         if processed_implants is not None:

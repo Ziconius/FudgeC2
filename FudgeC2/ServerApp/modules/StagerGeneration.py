@@ -15,8 +15,6 @@ class StagerGeneration:
         ret_data = {}
         if self.db.campaign.Verify_UserCanAccessCampaign(user, cid):
             implant_info = self.db.implant.Get_AllImplantBaseFromCid(cid)
-            print(type(implant_info[0]["network_profiles"]))
-            print(implant_info)
             if implant_info is not False:
                 for implant in implant_info:
 
@@ -33,7 +31,6 @@ class StagerGeneration:
     def GenerateSingleStagerFile(self, cid, user, stager_type):
         # TODO: Create docx file download from template.
         if self.db.campaign.Verify_UserCanAccessCampaign(user, cid):
-
             if stager_type == "docx":
                 return self._generate_docx_stager_file()
             return
@@ -50,7 +47,6 @@ class StagerGeneration:
             return stager_list
         else:
             return stager_list
-
 
     def _generate_powershell_stager_string(self, implant_data):
         # Calls the Network Profile Manager to see if a powershell stager exists, if not the network profile will return

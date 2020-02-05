@@ -144,7 +144,7 @@ class CampaignLogs(Base):
     campaign = Column(INTEGER(8), nullable=False)
     time = Column(INTEGER(32), nullable=False)
     log_type = Column(String(32), nullable=False)
-    entry = Column(String(1024), nullable=False)
+    entry = Column(TextPickleType(), nullable=False)
 
 
 class HostData(Base):

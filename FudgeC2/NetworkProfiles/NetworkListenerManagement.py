@@ -4,11 +4,9 @@ from Data.Database import Database
 
 class NetworkListenerManagement:
     class __OnlyOne:
-        # Transition notes: This is class considered complete and functional.
         # Dev Work:
         #   Improve logging on listener events
         #   Improve race-condition checks
-        #   Rework and rename 'protocol' as a word to 'profile_tag' to match network profile terminology
 
         listeners = []
         db = Database()
@@ -31,6 +29,7 @@ class NetworkListenerManagement:
                             listener['interface'].configure(listener_class, args)
                             self.listeners.append(listener)
                             self.listener_state_change(username, listener['name'], listener['auto_run'])
+                            return True
             return False
 
         def get_all_listeners(self):
@@ -67,7 +66,7 @@ class NetworkListenerManagement:
                             listener['state'] = 1
                             listener['interface'].start_listener()
                             state_change_message = f"Successfully started {common_name}"
-            return False, state_change_message
+            return state_change_message
 
         # Undecided if I want to check for server certificates at a global level - this should be down to
         #   specific network profiles?

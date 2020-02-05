@@ -3,7 +3,6 @@ import uuid
 
 from flask import Flask, render_template, flash, request, jsonify, g, url_for, redirect, send_file
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user
-# from flask_socketio import SocketIO
 
 from Implant.Implant import ImplantSingleton
 from ServerApp.modules.UserManagement import UserManagementController
@@ -28,7 +27,6 @@ app.config.from_object(__name__)
 app.config['SECRET_KEY'] = str(uuid.uuid4())
 login = LoginManager(app)
 login.init_app(app)
-# socketio = SocketIO(app)
 
 # TODO: Controller dev work.
 listener_management = None
@@ -92,7 +90,6 @@ def login():
             user_object = UsrMgmt.user_login(request.form['email'], request.form['password'])
             if user_object is False:
                 error = "Incorrect Username/Password"
-                # return redirect(url_for("BaseHomePage", error="Incorrect Username/Password"))
             else:
                 if user_object.first_logon == 1:
                     login_user(user_object)
@@ -100,7 +97,6 @@ def login():
 
                 else:
                     guid = UsrMgmt.get_first_logon_guid(request.form['email'])
-                    # return render_template("auth/PasswordResetPage.html",guid=guid)
                     return redirect(url_for("PasswordReset", guid=guid))
     return render_template("auth/LoginPage.html",
                            fudge_version=AppManager.get_software_verision_number(),
@@ -201,7 +197,7 @@ def help_page():
 @login_required
 def GlobalListenerPage():
     if 'state' in request.args:
-        flash(f"Implant creation: {request.args['state']}")
+        flash(f"Listener creation: {request.args['state']}")
     # -- DEV THIS NEEDS UPDATED AND REMOVED
     if Listener.check_tls_certificates() is False:
         flash('TLS certificates do not exist within the <install dir>/FudgeC2/Storage directory.')
@@ -214,7 +210,7 @@ def GlobalListenerPage():
 @app.route("/api/v1/listener/")
 @login_required
 def get_listener_details():
-    # -- DEV: Check the return data matches the JS This is needed for the main page.
+    # -- DEV: Check the return data matches the JS This is needed for the home page.
     to_return = []
     bb = Listener.get_all_listeners()
     for x in bb:
@@ -225,12 +221,12 @@ def get_listener_details():
 @app.route("/api/v1/listener/change", methods=['POST'])
 @login_required
 def Listener_Updates():
-    print(request.form)
+    form_response = "Error in input submission"
     if 'off' in request.form:
         form_response = Listener.listener_state_change(current_user.user_email, request.form['off'], 0)
     elif 'on' in request.form:
         form_response = Listener.listener_state_change(current_user.user_email, request.form['on'], 1)
-    flash(form_response[1])
+    flash(form_response)
     return redirect(url_for('GlobalListenerPage'))
 
 @app.route("/api/v1/listener/create", methods=['POST'])

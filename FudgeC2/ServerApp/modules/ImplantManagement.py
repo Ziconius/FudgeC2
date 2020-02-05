@@ -57,16 +57,16 @@ submitted command."}}
     def _validate_template_kill_date(self, form):
         if 'kill_date' in form:
             try:
-                # Checking to ensure a the time is not before current time. # This time must match the webapp
-                # submission format.
+                # Checking to ensure a the time is not before current time.
+                #  This time must match the webapp submission format.
                 user_time = datetime.datetime.strptime(form['kill_date'], '%d/%m/%Y, %H:%M')
                 current_time = datetime.datetime.now()
                 if user_time < current_time:
                     return None
                 else:
-                    return user_time
+                    # Reformatting the datetime to match implant datetime format string
+                    return datetime.datetime.strftime(user_time, '%Y-%m-%d %H:%M:%S')
             except Exception as E:
-                # print(f"Error: Implant format: {E}")
                 return None
 
     def get_network_profile_options(self):
@@ -192,6 +192,7 @@ submitted command."}}
                     raise ValueError(f"Error: {implant_creation}")
 
         except Exception as E:
+            print(E)
             return False, E
 
     def Get_RegisteredImplantCommands(self, username, cid=0):

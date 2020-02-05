@@ -24,19 +24,24 @@
             <p>Listeners are the server component to the implants network profile. Any active implants will require it's respective listener to be active and on the same port. Take care to not collide ports between network profiles. It is possible to have the same profile listener communicate to many listeners from many campaigns.</p>
         </div>
         <h5>Configured listeners:</h5>
-        <p>
+
             {% for key_2 in test_data %}
+            <div>
             <span class="font-weight-bold">Name:</span> <code>{{ key_2.name }}</code><br>
             <span class="font-weight-bold">Network Profile:</span> <code>{{ key_2.protocol }}</code><br>
             <span class="font-weight-bold">Port:</span> <code>{{ key_2.port }}</code><br>
             {% if key_2.state == True %}
-            <span class="font-weight-bold">State:</span> <span class="text-success">Running</span><br>
-                <form action="/api/v1/listener/change" method="POST" role="form"><button name="off" value="{{ key_2.name }}">Stop</button></form>
+                <span class="font-weight-bold">State:</span>
+                <span class="text-success">Running</span><br>
+                <form action="/api/v1/listener/change" method="POST" role="form">
+                <button name="off" value="{{ key_2.name }}" class="btn btn-danger m-1">Stop</button></form>
             {% elif key_2.state == False %}
-                <span class="font-weight-bold">State:</span> <span class="text-danger">Stopped</span><br>
-                <form action="/api/v1/listener/change" method="POST" role="form"><button name="on" value="{{ key_2.name }}">Start</button></form>
+                <span class="font-weight-bold">State:</span>
+                <span class="text-danger">Stopped</span><br>
+                <form action="/api/v1/listener/change" method="POST" role="form">
+                <button name="on" value="{{ key_2.name }}" class="btn btn-success m-1">Start</button></form>
             {% endif %}
-
+            </div>
             <hr>
             {% endfor %}
 
@@ -45,7 +50,6 @@
         $('#FormSubmissionModal').modal({show:true})
         }
         </script>
-        <hr><hr>
 
 
 
@@ -99,7 +103,7 @@
         </div>
       </div>
     </div>
-        <form><button type="button" onclick="CreateListener()">Create Listener New</button> </form>
+        <form><button class="btn btn-primary" type="button" onclick="CreateListener()"> + Create Listener New</button> </form>
 
     <script>
         function CreateListener(){
