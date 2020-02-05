@@ -138,20 +138,19 @@ class Database:
             return False
 
     def Log_CampaignAction(self, dict_of_stuff):
-        # print("Logging data")
         try:
             logs = CampaignLogs(
                 user=dict_of_stuff['user'],
                 campaign=dict_of_stuff['campaign'],
                 time=dict_of_stuff['time'],
                 log_type=dict_of_stuff['log_type'],
-                entry=str(dict_of_stuff['entry'])
+                entry=dict_of_stuff['entry']
             )
             self.Session.add(logs)
             self.Session.commit()
             return True
         except Exception as e:
-            print(e)
+            print(f"Error in Log_CampaignAction(): {e}")
             return False
 
     # Used by WebApp to display the campaign logs.
@@ -162,7 +161,6 @@ class Database:
         for count, row in enumerate(result):
             ret_dict[count] = row.__dict__
             del ret_dict[count]['_sa_instance_state']
-            ret_dict[count]['entry'] = ast.literal_eval(ret_dict[count]['entry'])
         return ret_dict
 
     def app_logging(self, log_type, message):

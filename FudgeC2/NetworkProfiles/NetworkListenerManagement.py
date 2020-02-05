@@ -29,6 +29,7 @@ class NetworkListenerManagement:
                             listener['interface'].configure(listener_class, args)
                             self.listeners.append(listener)
                             self.listener_state_change(username, listener['name'], listener['auto_run'])
+                            return True
             return False
 
         def get_all_listeners(self):

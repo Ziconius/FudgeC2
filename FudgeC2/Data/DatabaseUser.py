@@ -76,7 +76,7 @@ class DatabaseUser:
         self.Session.commit()
         return pre_guid
 
-    def     user_login(self, email, password):
+    def user_login(self, email, password):
         # Auths a user and returns user object
         user = self.Session.query(Users).filter(Users.user_email == email).first()
         if user is not None:
@@ -93,6 +93,7 @@ class DatabaseUser:
                 self.db_methods.app_logging("auth", f"Failed login attempt for user {email} ")
                 return False
         else:
+            self.db_methods.app_logging("auth", f"Failed login attempt for unknown account: {email} ")
             return False
     def change_account_active_state(self, user, state):
         '''

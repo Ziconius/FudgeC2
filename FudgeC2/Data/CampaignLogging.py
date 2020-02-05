@@ -1,5 +1,6 @@
 import time
 import ast
+import copy
 
 class CampaignLoggingDecorator:
 
@@ -130,17 +131,18 @@ class CampaignLoggingDecorator:
         def decor_new_implant_template_created(*args, **kwargs):
             a = decorated_function(*args,**kwargs)
             # if statement checks that modify function returns true.
-            if a:
-                b = self.wireframe
-                b['user'] = args[1]
-                b['campaign'] = args[2]
-                b['time'] = time.time()
-                b['log_type'] = "new_implant_template"
-                b['entry'] = {}
-                for config_element in args[3]:
-                    b['entry'][config_element] = args[3][config_element]
-                # print(*args)
-                args[0].db_methods.Log_CampaignAction(b)
+            try:
+                if a:
+                    b = self.wireframe
+                    b['user'] = args[1]
+                    b['campaign'] = args[2]
+                    b['time'] = time.time()
+                    b['log_type'] = "new_implant_template"
+                    b['entry'] = args[3]
+                    args[0].db_methods.Log_CampaignAction(b)
+            except Exception as E:
+                print("EEEE", E)
+
             return a
         return decor_new_implant_template_created
 

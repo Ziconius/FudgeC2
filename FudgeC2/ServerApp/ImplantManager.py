@@ -197,7 +197,7 @@ def help_page():
 @login_required
 def GlobalListenerPage():
     if 'state' in request.args:
-        flash(f"Implant creation: {request.args['state']}")
+        flash(f"Listener creation: {request.args['state']}")
     # -- DEV THIS NEEDS UPDATED AND REMOVED
     if Listener.check_tls_certificates() is False:
         flash('TLS certificates do not exist within the <install dir>/FudgeC2/Storage directory.')
