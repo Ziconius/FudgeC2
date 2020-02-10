@@ -1,11 +1,13 @@
 from NetworkProfiles.Profiles.BasicHttpProfile.BasicHttpProfile import BasicHttpProfile
+from NetworkProfiles.Profiles.HttpsProfile.HttpsProfile import HttpsProfile
 
 
 class NetworkProfileManager:
     # Add new Network Profiles to the profiles list. Profiles must be compliant to
     #   the standards to be functional w/o the risk of error.
     profiles = [
-        BasicHttpProfile()
+        BasicHttpProfile(),
+        HttpsProfile()
         # Current profiles in dev branches:
         # TcpProfile()
         # HttpsProfile()
@@ -55,9 +57,11 @@ class NetworkProfileManager:
         return a
 
     def get_listener_interface(self, profile_tag):
+        print(f"get_listener_interface(){profile_tag}")
         for x in self.profiles:
             if x.profile_tag == profile_tag:
                 return x.get_listener_interface()
+        print(f"Error: get_listener_interface(){profile_tag}")
 
     def get_listener_object(self, profile_tag):
         for x in self.profiles:

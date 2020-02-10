@@ -30,7 +30,7 @@ $(function() {
             data: $form.serialize(),
             success: function (response) {
                 document.getElementById('implantCmd').value="";
-                if (response['cmd_reg']['result']===false){alert(response['cmd_reg']['reason'])}
+                if (response['result']===false){alert(response['reason'])}
             },
             error: function (response) {
                 alert('ajax failed');
