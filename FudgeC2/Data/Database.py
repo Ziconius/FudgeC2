@@ -84,7 +84,7 @@ class Database:
 
 
     @staticmethod
-    def __splice_implants_and_generated_implants__(obj):
+    def  __splice_implants_and_generated_implants__(obj):
         # Hand a list of generated implants and implant list pairs and splice
         #    them together returning in a [{},{}] format
         completed_list = []

@@ -271,7 +271,7 @@ def NewImplant(cid):
     g.setdefault('cid', cid)
     profiles = ImpMgmt.get_network_profile_options()
     if request.method == "POST":
-        result, result_text = ImpMgmt.CreateNewImplant(cid, request.form, current_user.user_email)
+        result, result_text = ImpMgmt.create_new_implant(cid, request.form, current_user.user_email)
         if result is True:
             return render_template('CreateImplant.html', profiles=profiles, success=result_text), 200
         else:
@@ -353,7 +353,7 @@ def export_campaign_by_cid(cid):
 def ImplantCommandRegistration(cid):
     if request.method == "POST":
         # -- This is the new format using ImpMgmt to handle validation of user and command.
-        registration_response = ImpMgmt.ImplantCommandRegistration(cid, current_user.user_email, request.form)
+        registration_response = ImpMgmt.implant_command_registration(cid, current_user.user_email, request.form)
         # -- Currently no return value is required. This should be defined.
         return jsonify(registration_response)
     return "000"

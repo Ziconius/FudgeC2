@@ -14,24 +14,22 @@ class ImplantManagement:
     NetProMan = NetworkProfileManager()
 
     def _form_validated_obfucation_level_(self, form):
-        if "obfuscation" in form:
-            try:
-                obfuscation_value = int(form['obfuscation'])
+        # Checking if obfuscation if an integer between 0-4, if not return None to raise an error.
+        try:
+            obfuscation_value = int(form['obfuscation'])
 
-                if obfuscation_value < 0:
-                    return 0
-                elif obfuscation_value > 3:
-                    return 3
-                else:
-                    return obfuscation_value
-            except:
-                return None
-        return None
+            if obfuscation_value < 0:
+                obfuscation_value = 0
+            elif obfuscation_value > 4:
+                obfuscation_value = 4
+            print(f"Returning obf_a: {form['obfuscation']} to ofb_b: {obfuscation_value}")
+            return obfuscation_value
+        except:
+            return None
 
     def _validate_command(self, command):
 
         command_listing = self.ImpFunc.command_listing()
-
         # Process command output into:
         # :: load_module powerup
         if command.lstrip()[0:2] == "::":
@@ -41,14 +39,13 @@ class ImplantManagement:
                     a = preprocessed_command.partition(x['input'])
                     r_command = {"type": x['type'], "args": a[2].strip()}
                     return r_command, True
-            return command, {"cmd_reg": {"result": False, "reason": "Unknown inbuilt command, i.e. '::'"}}
+            return command, "Unknown inbuilt command (::). See help page for more info."
         elif command.lstrip()[0:1] == ":":
             preprocessed_command = command.lstrip()[1:].lower().strip()
             for x in command_listing:
                 if x['input'] in preprocessed_command:
-                    return command, {"cmd_reg": {"result": False, "reason": f"Potential typo found in \
-command.A single colon was found, did you mean: :{command}. If not please submit a GitHub ticket with the \
-submitted command."}}
+                    return command, (f"Potential typo found in command. A single colon was found, did you mean :"
+                                     f"{command}. If not please raise a GitHub ticket with the submitted command.")
 
         else:
             r_command = {"type": "CM", "args": command}
@@ -72,58 +69,55 @@ submitted command."}}
     def get_network_profile_options(self):
         return self.NetProMan.get_implant_template_code()
 
-    def ImplantCommandRegistration(self, cid, username, form):
-        # -- This should be refactored at a later date to support read/write changes to
-        # --    granular controls on templates, and later specific implants
-        User = self.db.campaign.Verify_UserCanWriteCampaign(username, cid)
-        if User is False:
-            return {"cmd_reg": {"result": False, "reason": "You are not authorised to register commands in this campaign."}}
+    def implant_command_registration(self, cid, username, form):
+        result_msg = "Unknown error."
+        try:
+            User = self.db.campaign.Verify_UserCanWriteCampaign(username, cid)
+            if User is False:
+                result_msg = "You are not authorised to register commands in this campaign."
+                raise ValueError
 
-        # -- Get All implants or implants by name then send to 'implant.py'
-        # -- email, unique implant key, cmd
-        if "cmd" in form and "ImplantSelect" in form:
-            # -- before checking the database assess the cmd that was input.
+            if "cmd" not in form and "ImplantSelect" not in form:
+                result_msg = f"Malformed request: {form}"
+                raise ValueError
+
             if len(form['cmd']) == 0:
-                return {"cmd_reg": {"result": False, "reason": "No command submitted."}}
+                result_msg = "No command submitted."
+                raise ValueError
 
             processed_command, validated_command = self._validate_command(form['cmd'])
             if validated_command is not True:
-                return validated_command
+                result_msg = validated_command
+                raise ValueError
 
-            # -- If validated_command is True then continue as it IS a valid command. N.b it may not be a legitimate command, but it is considered valid here.
             if form['ImplantSelect'] == "ALL":
                 list_of_implants = self.db.implant.Get_AllGeneratedImplantsFromCID(cid)
             else:
                 list_of_implants = self.db.implant.Get_AllImplantIDFromTitle(form['ImplantSelect'])
 
-            # -- Access if this can fail. If empty return error.
+            # Check if any implants have been returned against the user submitted values.
             if len(list_of_implants) == 0:
-                return {"cmd_reg": {"result": False, "reason": "No implants listed."}}
+                result_msg = "No implants listed."
+                raise ValueError
 
+            # Assuming all checks have passed no Exceptions will have been raised and we can register commands.
             for implant in list_of_implants:
-                # -- Create return from the Implant.AddCommand() method.
-                self.Imp.AddCommand(username, cid, implant['unique_implant_id'], processed_command)
-            return {"cmd_reg": {"result": True, "reason": "Command registered"}}
-        return {"cmd_reg": {"result": False, "reason": "Incorrect implant given, or non-existent active implant."}}
-
+                self.Imp.add_implant_command_to_server(username, cid, implant['unique_implant_id'], processed_command)
+            return {"result": True, "reason": "Command registered"}
+        except:
+            return {"result": False, "reason": result_msg}
 
     def _verify_network_profile_(self, form):
-        #print(f"ImpMan: {form}")
         network_protocols = {}
         for key in form:
-            # print(f"{key}::{form[key]}::")
             a = self.NetProMan.validate_web_form(key, form[key])
-            #print(":::",a)
             if a is not None:
                 if a != False:
-                    #print(f"Updating: {a}")
                     network_protocols.update(a)
-
-        print(f"THIS IS THE RESULT OF THE NEW STUFF: {network_protocols}")
         return network_protocols
 
 
-    def CreateNewImplant(self, cid, form, user):
+    def create_new_implant(self, cid, form, user):
         # TODO: Create checks for conflicting ports.
         implant_configuration = {
             "title": None,

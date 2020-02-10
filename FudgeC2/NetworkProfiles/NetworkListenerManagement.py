@@ -1,6 +1,8 @@
 from NetworkProfiles.NetworkProfileManager import NetworkProfileManager
 from Data.Database import Database
 
+import copy
+
 
 class NetworkListenerManagement:
     class __OnlyOne:
@@ -23,7 +25,6 @@ class NetworkListenerManagement:
                     if self.db.listener.create_new_listener_record(common_name, args, profile_tag, auto_start):
                         listener = self.db.listener.get_listener_by_common_name(common_name)
                         if listener is not False:
-                            print(listener)
                             # already instantiated interface
                             listener['interface'] = listener_interface
                             listener['interface'].configure(listener_class, args)
@@ -33,7 +34,11 @@ class NetworkListenerManagement:
             return False
 
         def get_all_listeners(self):
-            return self.listeners
+            # Create copys of listeners to avoid the interface being removed.
+            to_return = []
+            for listener in self.listeners:
+                to_return.append(copy.copy(listener))
+            return to_return
 
         def get_listener_state(self, common_name):
             for listener in self.listeners:
@@ -46,7 +51,6 @@ class NetworkListenerManagement:
                 listener_class = self.npm.get_listener_object(listener['protocol'])
                 listener_interface = self.npm.get_listener_interface(listener['protocol'])
                 if listener_class is not None and listener_interface is not None:
-
                     # Already instantiated interface
                     listener['interface'] = listener_interface
                     listener['interface'].configure(listener_class, listener['port'])

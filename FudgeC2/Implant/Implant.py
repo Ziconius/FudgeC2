@@ -9,10 +9,11 @@ from Data.Database import Database
 class ImplantSingleton:
     class __OnlyOne:
         ImpFunc = ImplantFunctionality()
+        ImpGen = ImplantGenerator()
         # -- The Implant class is sole class responsible for controlling data to and from implants.
         # --    it manages  these interaction across all types of implants and communication protocols.
 
-        def AddCommand(self, user, cid, unique_implant_key, command):
+        def add_implant_command_to_server(self, user, cid, unique_implant_key, command):
             # AddCommand is responsible for creating new entries for implants to pickup.
             #   User validation checks must occur before a command is registered.
             db.implant.Register_ImplantCommand(user, unique_implant_key, command, cid=cid)
@@ -71,10 +72,10 @@ class ImplantSingleton:
         # -- Used by Implant stagers to create a suitable implant based on implant template configuration
         def GeneratePayload(self, NewSplicedImplantData):
             # -- Refactor code: variable names + checks on types.
-            ImpGen = ImplantGenerator()
+
             if len(NewSplicedImplantData) == 1:
                 NewSplicedImplantData = NewSplicedImplantData[0]
-            rendered_implant = ImpGen.generate_implant_from_template(NewSplicedImplantData)
+            rendered_implant = self.ImpGen.generate_implant_from_template(NewSplicedImplantData)
             db.implant.Set_GeneratedImplantCopy(NewSplicedImplantData, rendered_implant)
             return rendered_implant
 
