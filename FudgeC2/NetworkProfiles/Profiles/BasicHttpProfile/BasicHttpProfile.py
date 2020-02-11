@@ -50,13 +50,14 @@ End Sub
         return stager_string
 
     def get_webform(self):
-        a = '''
-<div class="checkbox">
-    <label><input type="checkbox" name="BasicHttpProfile" value="off"> Basic HTTP Profile</label>
-    <input type="text" class="form-control" id="BasicHttpProfile" name="BasicHttpProfile" placeholder="TCP Port for binary listener">
-</div>
-'''
-        return a
+        # TODO: Add string interolation on the form tied back to self.profile_tag to ensure that no breaking changes occur if the profile tag is changed.
+
+        webform = (f"<div>"
+                   f"    <label class=\"font-weight-bold\">{self.name}</label>"
+                   f'    <p><span class="font-italic">If left blank this network profile will not be included in the implant.</span><p>'
+                   f'    <input type="text" class="form-control" id="{self.profile_tag}" name="{self.profile_tag}" placeholder="TCP port for HTTP listener">'
+                   f"</div>")
+        return webform
 
     def validate_web_form(self, key, value):
         try:

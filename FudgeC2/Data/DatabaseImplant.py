@@ -47,8 +47,8 @@ class DatabaseImplant:
             return True
 
         except Exception as e:
-            print(f"Error in create_new_implant_template(): {e}")
-            return e
+            error = f"Error in create_new_implant_template() SQLAlc error: {e}"
+            return error
 
     def Get_AllImplantBaseFromCid(self, cid):
         # -- THIS NEED TO BE REBUILT

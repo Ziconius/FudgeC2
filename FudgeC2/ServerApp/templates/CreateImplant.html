@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
 
 <div class="row justify-content-md-center m-4">
-    <div class="col-lg-4 rounded p-3">
+    <div class="col-lg-5 rounded p-3">
         <h3>Create Implant Template</h3>
         <form id="Login" method="POST" action="create" name="CI">
             <div class="form-group"><div>Implant title <span class="text-danger">*</span></div>
@@ -23,7 +23,7 @@
             <div class="form-group">Beacon delay (seconds)
                 <input type="text" class="form-control" name="beacon_delay" id="beacon_delay" value="3600" placeholder="3600">
             </div>
-            <div class="form-group"><b>Implant obfuscation options:</b>
+            <div class="form-group"><b class="font-weight-bold">Implant obfuscation options:</b>
 
                 <div class="form-check">
                   <label class="form-check-label active">
@@ -72,8 +72,10 @@
             </script>
 
             {% if profiles%}
-            <h4>Network Profiles</h4>
+            <h4>Network Profiles<span class="text-danger">*</span></h4>
+            <div>To include a network profile in your implant simple enter the port it's listener will be listening on. At least one profile is required per implant template, any blank entries are not included</div>
                 {% for profile in profiles%}
+                    <hr>
                     {{ profile | safe }}
                 {% endfor %}
             {% else %}

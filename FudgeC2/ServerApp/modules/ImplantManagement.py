@@ -22,7 +22,6 @@ class ImplantManagement:
                 obfuscation_value = 0
             elif obfuscation_value > 4:
                 obfuscation_value = 4
-            print(f"Returning obf_a: {form['obfuscation']} to ofb_b: {obfuscation_value}")
             return obfuscation_value
         except:
             return None
