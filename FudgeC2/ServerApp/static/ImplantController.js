@@ -1,3 +1,8 @@
+function get_image_value(arg){
+    document.getElementById("model-image").src = document.getElementById(arg).src
+    $('#screenshot-modal').modal('show')
+}
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -170,7 +175,8 @@ function get_command_responses(cid){
                         c_state  = 0
                     }
 
-                    GG = bgc+"<p>Name: "+response[element].title+"<br>Time: "+d+"<br>Response:<br> <code>"+response_data+"</code></p></div>";
+                    GG = bgc+"<p><span class='font-weight-bold'>Name:</span> "+response[element].title+
+                    "<br><span class='font-weight-bold'>Time: </span>"+d+"<p><p><code>"+response_data+"</code></p></div>";
                     WP = document.getElementById('Response').innerHTML;
                     document.getElementById('Response').innerHTML = GG + WP;
                  }

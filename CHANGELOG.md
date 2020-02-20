@@ -16,14 +16,12 @@ Misc other fixes.
 #### 0.5.3 Changes
 Listeners have been removed and replaced with a much more flexible design now referred to as Network Profiles. These are created from three files:
  - Network profile
- - profile interface
- - profile listener
+ - Profile interface
+ - Profile listener
 
 Network Profiles which can be built by anyone to create custom communication protocols, or tweak existing profiles.
 
-Each profile is responsible for populating several pages within Fudge C2. There have been numerous change in this
-revision of FudgeC2 ready for the upcoming release of 2 network profiles. For more information see the FudgeC2 wiki
-for more information on how to build a network profile.
+Each profile is responsible for populating several pages within Fudge C2. There have been numerous change in this revision of FudgeC2 ready for the upcoming release of 2 network profiles. For more information see the FudgeC2 wiki for more information on how to build a network profile.
 
 Network Profiles now control the following:
  - Network Profiles are now used to populate and validate the implant template

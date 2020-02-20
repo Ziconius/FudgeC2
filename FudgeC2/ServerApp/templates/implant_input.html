@@ -60,25 +60,9 @@
     </div>
 </div>
 
-<style>
-    .modal-full {
-    min-width: 85%;
-    margin-left: auto;
-}
-
-.modal-full .modal-content {
-    min-height: 100vh;
-}
-</style>
-
 <script src="{{ url_for('static', filename='ImplantController.js') }}"></script>
 <script>
 implant_page_controller({{cid}})
-
-function get_image_value(arg){
-    document.getElementById("model-image").src = document.getElementById(arg).src
-    $('#screenshot-modal').modal('show')
-}
 </script>
 {% endblock %}
 
