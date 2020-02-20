@@ -39,8 +39,7 @@ class ImplantSingleton:
                     if len(tmpImpLogs) != 0:
                         Entry = min(tmpImpLogs, key=lambda x: x.time)
                         if db.implant.Register_ImplantCommandPickup(Entry, c2_protocol):
-                            # Entry.log_entry is currently cast to a string at this stage.
-                            return ast.literal_eval(Entry.log_entry), Entry.command_id
+                            return Entry.log_entry, Entry.command_id
 
             # -- Create a suitable null response.
             # --    This may be a random value, depending on how the implant handles it.

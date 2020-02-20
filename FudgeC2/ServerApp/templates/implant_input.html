@@ -3,11 +3,6 @@
 <!-- TODO: Refactor and improve performance and readability -->
 <div class="row p-0">
     <div class="col-md">
-        <!--Execute: COMMAND BOX-->
-        <!--Select Implant:-->
-        <!--Filters:-->
-        <!--Only show selected implant information.(JS)-->
-        <!--<hr>-->
         <form action="/{{ cid }}/implant/register_cmd" method="POST" role="form" class="form-horizontal" id="AnswerForm">
         <!-- TODO: insert Implants into selectable. -->
             <div class="form-group">
@@ -16,7 +11,7 @@
                   {% if Implants %}
                   <option name="a" id="b">ALL</option>
                   {% for imp in Implants %}
-                        <option name="{{ imp.unique_implant_id }}" id="{{ imp.unique_implant_id }}">{{ imp.generated_title }}</option>
+                        <option name="{{ imp.unique_implant_id }}" id="{{ imp.unique_implant_id }}" class="text-success">{{ imp.generated_title }}</option>
                   {% endfor %}
                   {% endif %}
               </select>
@@ -42,7 +37,11 @@
                 <h6>Queued commands</h6>
 
                 <div class="overflow-auto" id="awaiting">
-                    No awaiting commands
+                    <table class="table table-striped table-borderless table-sm results table-hover" cellspacing="0" width="100%">
+                    <tbody id="await_commands_tbl" class="m-5">
+
+                    </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -52,9 +51,34 @@
         <div id="Response"></div>
     </div>
 </div>
+
+<div class="modal fade" id="screenshot-modal" tabindex="-1" role="dialog" aria-labelledby="screenshot-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-full" role="document">
+        <div class="modal-body" >
+            <img src="" id="model-image" style="width:100%;max-width:100%">
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal-full {
+    min-width: 85%;
+    margin-left: auto;
+}
+
+.modal-full .modal-content {
+    min-height: 100vh;
+}
+</style>
+
 <script src="{{ url_for('static', filename='ImplantController.js') }}"></script>
 <script>
 implant_page_controller({{cid}})
+
+function get_image_value(arg){
+    document.getElementById("model-image").src = document.getElementById(arg).src
+    $('#screenshot-modal').modal('show')
+}
 </script>
 {% endblock %}
 

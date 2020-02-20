@@ -74,15 +74,15 @@ async function get_active_implant_command_queue (cid){
         url:`/api/v1/campaign/${cid}/implants/queued`,
         type:"GET",
         success: function (response) {
-            document.getElementById('awaiting').innerHTML = ""
+            document.getElementById('await_commands_tbl').innerHTML = ""
             for (element in response){
                 if (response[element].read_by_implant == 0){
-                    $('#awaiting')
-                    .append("<p>")
-                    .append($("<span></span>").text("Implant ID: "+response[element].uik))
-                    .append("<br>")
-                    .append($("<span></span>").text("Command: "+response[element].log_entry))
-                    .append("</p>")
+                 n1 = "Implant: "+response[element].uik
+                 n2 = "Cmd: "+ response[element].log_entry.type
+                 n3 = "Arg: "+response[element].log_entry.args
+                    table_element = "<tr><td class=\"p-2\"><span>"+ n1 + "<br>"+n2+"<br>"+n3+"</span></td></tr>"
+                    $('#await_commands_tbl')
+                    .append(table_element)
                 }
             }
         }
@@ -120,6 +120,13 @@ $.ajax({
                     } else if (response[element].status=='Healthy') {
                         var CodeColour="text-success"
                     }
+
+                    // Adding colour coding to help operators quickly identify active/dead implants.
+                    target_id = "#"+response[element].implant_id
+                    $(target_id).removeClass();
+                    $(target_id).addClass(CodeColour);
+
+
                     // Generate link to implant details page:
                     title_and_link = 'Title: <a href="/' + cid + '/implant/active/' + response[element].implant_id + '">' + response[element].title + '</a>'
                     Entry = "<div class=''>" + title_and_link + "<br>Time: " + time_last_seen+"<br>Status: <code class='"+CodeColour+"'>"+response[element].status+"</code></p></div><hr>"
@@ -131,7 +138,7 @@ $.ajax({
         })
 }
 
-
+// This whole section should be replaced with a table and styled with Bootstrap
 var contained_list=[];
 var c_state=0
 function get_command_responses(cid){
@@ -167,9 +174,8 @@ function get_command_responses(cid){
                     WP = document.getElementById('Response').innerHTML;
                     document.getElementById('Response').innerHTML = GG + WP;
                  }
-               }
-
             }
+        }
     })
 }
 

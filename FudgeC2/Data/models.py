@@ -97,7 +97,7 @@ class ImplantCommands(Base):
     uid = Column(INTEGER(11), nullable=False, index=True)
     uik = Column(INTEGER(11), nullable=False, index=True)
     time = Column(INTEGER(11), nullable=False, index=True)
-    log_entry = Column(String(255), nullable=False)
+    log_entry = Column(TextPickleType(), nullable=False)
     read_by_implant = Column(INTEGER(16), nullable=False, server_default=text("0"))
     c2_protocol = Column(String(128))
     command_id = Column(String(128))

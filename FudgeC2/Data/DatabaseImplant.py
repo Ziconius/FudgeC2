@@ -191,7 +191,7 @@ class DatabaseImplant:
                 new_implant_log = ImplantCommands(cid=cid,
                                                   uid=uid,
                                                   time=time.time(),
-                                                  log_entry=str(command),
+                                                  log_entry=command,
                                                   uik=uik,
                                                   read_by_implant=0,
                                                   command_id=cmd_id)
