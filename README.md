@@ -32,7 +32,7 @@ This will generate the F2 database, and first time credentials. You will then be
 
 For more information on installation and configuration see the wiki, [here](https://github.com/Ziconius/FudgeC2/wiki/Installation-and-Setup).
 
-### Implant Builtin Functionality
+### Implant Functionality and Usage
 
 FudgeC2 breaks projects down into campaigns. Each campaign will have their own implant templates, active implants, users, and targets.
 
@@ -57,10 +57,6 @@ F2 implants contain a variety of builtin commands, which are also easily extende
 |`:: upload_file [local file] [remote path/filename]`  |Uploads a file to the target path and specific filename
 |`:: play_audio [audio file (WAV)]`  |Plays a WAV audio file on the compromised host.
 |`:: screenshot`  |Takes a screenshot of the compromised hosts desktop.
-
-
-
-![fudgec2_implant_example](https://user-images.githubusercontent.com/6460785/75062098-09120100-54da-11ea-8b56-25f359c04535.png)
 
 
 ### Contributing
