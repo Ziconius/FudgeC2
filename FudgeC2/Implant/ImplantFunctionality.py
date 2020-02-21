@@ -67,10 +67,10 @@ class ImplantFunctionality:
     def validate_pre_registered_command(self, command_dict):
         # This function will validate the arguments of a command against it's modules checks.
         # Commonly we will be checking if a file exists on disk, i.e. modules, or upload files.
-        print(f"we have a dict with:\n    {command_dict['type']}\n    {command_dict['args']}")
+        #
+        # If the module passes checks return bool:True, or string: reason if it does not pass the checks.
+
         for implant_module in self.module_list:
             if implant_module.type == command_dict['type']:
-                if implant_module.pre_process_command(command_dict['args']):
-                    return True
-                else:
-                    return False
+                return implant_module.pre_process_command(command_dict['args'])
+

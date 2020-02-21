@@ -92,9 +92,9 @@ class ImplantManagement:
                 result_msg = validated_command
                 raise ValueError
 
-            if self.ImpFunc.validate_pre_registered_command(processed_command) is False:
-                print("Error found in arguments!")
-                result_msg = "Error found in arguments!"
+            result = self.ImpFunc.validate_pre_registered_command(processed_command)
+            if result is not True:
+                result_msg = result
                 raise ValueError
 
             if form['ImplantSelect'] == "ALL":
