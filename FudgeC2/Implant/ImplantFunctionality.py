@@ -69,7 +69,9 @@ class ImplantFunctionality:
         # Commonly we will be checking if a file exists on disk, i.e. modules, or upload files.
         #
         # If the module passes checks return bool:True, or string: reason if it does not pass the checks.
-
+        print(command_dict)
+        if command_dict['type'] == "CM":
+            return True
         for implant_module in self.module_list:
             if implant_module.type == command_dict['type']:
                 return implant_module.pre_process_command(command_dict['args'])
