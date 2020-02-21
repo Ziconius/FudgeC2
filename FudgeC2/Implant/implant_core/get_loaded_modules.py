@@ -12,3 +12,10 @@ function {{ ron.obf_get_loaded_modules }} () {
     $global:tr = Get-Command | Where {$_.Source -Like "FC2"}
 }'''
         return var
+
+    def pre_process_command(self, argument_string):
+        # Check if the argument to be passed to the implant is valid.
+        # I.e.
+        #    Does the file to be uploaded exist local?
+        #    Is the command to be executed dangerous?
+        return True

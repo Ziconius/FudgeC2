@@ -87,7 +87,7 @@ class CampaignLoggingDecorator:
                 b['time'] = time.time()
                 b['log_type'] = "cmd_response"
                 b['entry'] = {"uik": args[1],
-                              "response": args[2].decode(),
+                              "response": args[2],
                               # "response":ast.literal_eval(args[2].log_entry),
                               "c2_protocol": args[3]}
                 args[0].db_methods.Log_CampaignAction(b)

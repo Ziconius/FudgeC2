@@ -14,3 +14,10 @@ function {{ ron.obf_invoke_module }} ($data) {
     $global:tr = invoke-expression "$data"
 }'''
         return var
+
+    def pre_process_command(self, argument_string):
+        # Check if the argument to be passed to the implant is valid.
+        # I.e.
+        #    Does the file to be uploaded exist local?
+        #    Is the command to be executed dangerous?
+        return True

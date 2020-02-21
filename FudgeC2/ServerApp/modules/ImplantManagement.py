@@ -27,6 +27,9 @@ class ImplantManagement:
             return None
 
     def _validate_command(self, command):
+        # Validate the command is one of 2 thing either a Powershell direct execution or a
+        # builtin command using :: notation.
+        # Once validate this processes the command into a "type" and "arg", both strings.
 
         command_listing = self.ImpFunc.command_listing()
         # Process command output into:
@@ -87,6 +90,11 @@ class ImplantManagement:
             processed_command, validated_command = self._validate_command(form['cmd'])
             if validated_command is not True:
                 result_msg = validated_command
+                raise ValueError
+
+            if self.ImpFunc.validate_pre_registered_command(processed_command) is False:
+                print("Error found in arguments!")
+                result_msg = "Error found in arguments!"
                 raise ValueError
 
             if form['ImplantSelect'] == "ALL":
