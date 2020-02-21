@@ -10,11 +10,11 @@
 [![Stars](https://img.shields.io/github/stars/ziconius/fudgec2)](https://github.com/Ziconius/FudgeC2/stargazers)
 
 
-FudgeC2 is a Powershell command and control platform designed to facilitate team collaboration and campaign timelining. This aims to help clients better understand red team activities by presenting them with more granular detail of adversarial techniques.
+FudgeC2 is a Powershell C2 platform designed to facilitate team collaboration and campaign timelining, released at [BlackHat Arsenal USA 2019](https://www.blackhat.com/us-19/arsenal/schedule/index.html#fudge-a-collaborative-c-framework-for-purple-teaming-16968). This aims to help clients better understand red team activities by presenting them with more granular detail of adversarial techniques.
 
-Built on Python3 with a web frontend, FudgeC2 aims to provide red teamers a simple interface in which to manage active implants across their campaigns.
+Built on Python3 with a web frontend, FudgeC2 aims to provide red team operators a simple interface in which to manage active implants across their campaigns.
 
-_FudgeC2 is currently in beta, and should be used with caution in non-test environments. The beta was released at [BlackHat Arsenal USA 2019](https://www.blackhat.com/us-19/arsenal/schedule/index.html#fudge-a-collaborative-c-framework-for-purple-teaming-16968)._
+_FudgeC2 is in active development, and is receiving regular updates - if you have feature suggestions reach out with your ideas and suggestions._
 
 ### Installation
 
@@ -26,22 +26,21 @@ cd FudgeC2/FudgeC2
 sudo pip3 install -r requirements.txt
 sudo python3 Controller.py
 ```
-This will generate a new database, and first time credentials. You will then be able to access the platform from *http[s]://127.0.0.1:5001/*. The logon credentials are:
+This will generate the F2 database, and first time credentials. You will then be able to access the platform from *http[s]://127.0.0.1:5001/*. The logon credentials are:
 
 `admin`:`letmein`
 
 For more information on installation and configuration see the wiki, [here](https://github.com/Ziconius/FudgeC2/wiki/Installation-and-Setup).
 
-### Usage
+### Implant Builtin Functionality
 
-FudgeC2 breaks projects down into campaigns. Each campaign will have a their own implant templates, active implants, users, and targets.
+FudgeC2 breaks projects down into campaigns. Each campaign will have their own implant templates, active implants, users, and targets.
 
-Once you have generated a campaign and implants you will be able to interact with any active implants from the campaign specific homepage. This can be reached by clicking on the campaign name in the Campaign column, or via the Campaigns dropdown in the top navigation menu.
+To start you simply need to generate a new campaign, create an implant template with the campaign, and trigger one of the stagers on a target computer.
 
+![fudgec2_implant_example](https://user-images.githubusercontent.com/6460785/75062098-09120100-54da-11ea-8b56-25f359c04535.png)
 
-![Homepage](https://user-images.githubusercontent.com/6460785/68624234-4b38a900-04ce-11ea-95dc-a2253dec4ace.png)
-
-An overview of functionality can be seen below, for more information see the implant functionality pages on FudgeC2s' wiki, [found here](https://github.com/Ziconius/FudgeC2/wiki/Implant-Functionality).
+F2 implants contain a variety of builtin commands, which are also easily extended upon allowing operators the chance to create their own builtin functionality. An overview of functionality can be seen below, for more information on the builtin implant functionality or how to create custom modules see FudgeC2s' wiki, [found here](https://github.com/Ziconius/FudgeC2/wiki/Implant-Functionality).
 
 **Implant functionality**
 
@@ -56,7 +55,12 @@ An overview of functionality can be seen below, for more information see the imp
 |`:: list_modules`          |Lists all loaded modules by the implant.
 |`:: download_file [target file]`  |Downloads the target file to the FudgeC2 server
 |`:: upload_file [local file] [remote path/filename]`  |Uploads a file to the target path and specific filename
-|`:: play_audio [audio file (mp3)]`  |Plays an audio file on the compromised host.
+|`:: play_audio [audio file (WAV)]`  |Plays a WAV audio file on the compromised host.
+|`:: screenshot`  |Takes a screenshot of the compromised hosts desktop.
+
+
+
+![fudgec2_implant_example](https://user-images.githubusercontent.com/6460785/75062098-09120100-54da-11ea-8b56-25f359c04535.png)
 
 
 ### Contributing
