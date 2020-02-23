@@ -50,3 +50,9 @@ function {{ ron.obf_download_file }} ($b){
         #    Does the file to be uploaded exist local?
         #    Is the command to be executed dangerous?
         return True
+
+    def create_module_data_string(self, cmd_entry):
+        # This function is responsible for creating the string which is send to the implant
+        encoded_target_file = base64.b64encode(cmd_entry['args'].encode()).decode()
+        to_return = f"{encoded_target_file}"
+        return to_return

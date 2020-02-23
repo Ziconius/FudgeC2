@@ -57,7 +57,6 @@ class NetworkProfileManager:
         return a
 
     def get_listener_interface(self, profile_tag):
-        print(f"get_listener_interface(){profile_tag}")
         for x in self.profiles:
             if x.profile_tag == profile_tag:
                 return x.get_listener_interface()

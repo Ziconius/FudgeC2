@@ -1,12 +1,13 @@
-
+import base64
 import os
+
+
 class PlayAudio:
     type = "PS"
     args = "Local sound file location"
     input = "play_audio"
 
     def process_implant_response(self, data, args):
-        print(data)
         if data.decode()=="1":
             return f"Audio success: {args}", None
         else:
@@ -41,4 +42,13 @@ function {{ ron.obf_remote_play_audio }}($data){
             return f"WAV file does not exist: {path}"
         # return True
 
+    def create_module_data_string(self, cmd_entry):
+        # This function is responsible for creating the string which is send to the implant
+        # Format for the implant core string is:
+        #   < command type > <command id><optional command arguments>
 
+        path = f"{os.getcwd()}/Storage/implant_resources/{cmd_entry['args']}"
+        with open(path, 'rb') as file:
+            audio = base64.standard_b64encode(file.read()).decode()
+            final_audio = f"{audio}"
+        return final_audio

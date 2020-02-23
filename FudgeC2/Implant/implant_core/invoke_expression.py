@@ -1,3 +1,6 @@
+import base64
+
+
 class InvokeExpression:
     # Module notes:
     #   IM should be renames to IE, after initial testing.
@@ -21,3 +24,11 @@ function {{ ron.obf_invoke_module }} ($data) {
         #    Does the file to be uploaded exist local?
         #    Is the command to be executed dangerous?
         return True
+
+    def create_module_data_string(self, cmd_entry):
+        # This function is responsible for creating the string which is send to the implant
+        # Format for the implant core string is:
+        #   < command type > <command id><optional command arguments>
+        encoded_arg = base64.b64encode(cmd_entry['args'].encode()).decode()
+
+        return f"{encoded_arg}"
