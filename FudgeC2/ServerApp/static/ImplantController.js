@@ -78,7 +78,8 @@ async function get_active_implant_command_queue (cid){
     $.ajax({
         url:`/api/v1/campaign/${cid}/implants/queued`,
         type:"GET",
-        success: function (response) {
+        success: function (response, status, xhr) {
+
             document.getElementById('await_commands_tbl').innerHTML = ""
             for (element in response){
                 if (response[element].read_by_implant == 0){
@@ -99,7 +100,7 @@ async function get_active_implant_state (cid){
 $.ajax({
             url: `/api/v1/campaign/${cid}/implants/state`,
             type:"GET",
-            success: function (response) {
+            success: function (response, status, xhr) {
 
                 var implant_status_text = ""
                 response = order_response_by_time ( response )

@@ -73,7 +73,7 @@ def page_not_found(e):
 
 @app.errorhandler(401)
 def page_not_found(e):
-    return redirect(url_for('login'), 302)
+    return redirect(url_for('login'), code=302)
 
 
 # -- Authentication endpoints -- #
@@ -212,6 +212,10 @@ def get_listener_details():
     bb = Listener.get_all_listeners()
     for x in bb:
         x['interface'] = 0
+        if x['state'] == 1:
+            x['state'] = "Active"
+        elif x['state'] == 0:
+            x['state'] = "Inactive"
         to_return.append(x)
     return jsonify(test=to_return)
 

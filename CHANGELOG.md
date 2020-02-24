@@ -1,3 +1,23 @@
+#### 0.5.5 Changes
+ _*N.b This version of FudgeC2 will not function with older versions*_
+ 
+ - Added screenshot modules
+ - Added screenshot modal to display larger images
+
+Active Implant selection page now highlight the implant text to make finding living implants easier
+Reworked appearance of the commands awaiting section to improve their presentation.
+Improvements to handling data types in the database. This is a DB breaking change!
+Removed output from persistence mechanism in the powershell terminal
+
+Code improvements to builtin commands to allow checking of submitted arguments, i.e. checking for local files before attempting to upload them (File uploads, module loads, playing audio), or checking for dangerous commands.
+
+Play_audio module updates:
+ - Now plays wav files instead of mp3.
+ - No longer writes temp files to disk, uses MemoryStream to remain off disk
+ - Utilises the command argument checks to ensure the wav files exists before registering the command on the C2
+
+Refactored sections of the code base are responsible for generating the strings used to communicate with the implant, and which are used to generate the implant core execution string. This makes creating modules, and network profiles simplier to understand.
+
 #### 0.5.4 Changes
 
 Added HTTPS listener which currently mirrors BasicHttpProfile, except via TLS and endpoint changes.

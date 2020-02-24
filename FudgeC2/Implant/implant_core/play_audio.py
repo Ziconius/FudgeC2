@@ -34,8 +34,11 @@ function {{ ron.obf_remote_play_audio }}($data){
         # I.e.
         #    Does the file to be uploaded exist local?
         #    Is the command to be executed dangerous?
+        # Check file extension for ".wav"
         path = f"{os.getcwd()}/Storage/implant_resources/{argument_string}"
+        print(path)
         file_exists = os.path.exists(path)
+        print(file_exists)
         if file_exists:
             return True
         else:
