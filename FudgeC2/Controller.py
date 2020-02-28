@@ -20,6 +20,13 @@ def check_tls_certificates(cert, key):
 
 def check_key_folders():
     # Placeholder for initialisation checking.
+    if not os.path.isdir(Settings.file_download_folder):
+        print("The folder is missing.")
+        os.mkdir(f"{Settings.file_download_folder}")
+
+    if not os.path.isdir(Settings.implant_resource_folder):
+        print("Missing the resource folder.")
+        os.mkdir(f"{Settings.implant_resource_folder}")
     return
 
 

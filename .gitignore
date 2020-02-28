@@ -19,3 +19,4 @@ log.txt
 dev_notes.txt
 FudgeC2/Storage/implant_resources/*
 FudgeC2/Storage/campaign_downloads/*
+venv/
