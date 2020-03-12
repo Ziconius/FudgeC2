@@ -76,6 +76,7 @@ class ImplantTemplate(Base):
     initial_delay = Column(INTEGER(10))
     network_profiles = Column(TextPickleType(), nullable=False)
     obfuscation_level = Column(INTEGER(1), nullable=False)
+    encryption = Column(TextPickleType(), nullable=False)
 
 
 class GeneratedImplants(Base):

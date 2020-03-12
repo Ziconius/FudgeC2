@@ -2,6 +2,10 @@ class GetLoadedModules:
     type = "ML"
     args = None
     input = "list_modules"
+    # this must be unique across ALL implants, any matching keys will be merged causing errors.
+    # To safely format this use the following format "<type>_variablename":"value" i.e.
+    #   fd_base64_var: base64filecontents
+    obfuscation_keypairs = {}
 
     def process_implant_response(self, data, args):
         return f"Module listing: \n{data.decode()}", None

@@ -6,6 +6,10 @@ class PlayAudio:
     type = "PS"
     args = "Local sound file location"
     input = "play_audio"
+    # this must be unique across ALL implants, any matching keys will be merged causing errors.
+    # To safely format this use the following format "<type>_variablename":"value" i.e.
+    #   fd_base64_var: base64filecontents
+    obfuscation_keypairs = {}
 
     def process_implant_response(self, data, args):
         if data.decode()=="1":

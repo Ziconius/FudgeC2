@@ -7,6 +7,10 @@ class InvokeExpression:
     type = "IM"
     args = "Module name"
     input = "exec_module"
+    # this must be unique across ALL implants, any matching keys will be merged causing errors.
+    # To safely format this use the following format "<type>_variablename":"value" i.e.
+    #   fd_base64_var: base64filecontents
+    obfuscation_keypairs = {}
 
     def process_implant_response(self, data, args):
         return f"Exec'ing module: {args}\n{data.decode()}", None

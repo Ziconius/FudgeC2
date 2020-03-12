@@ -36,10 +36,11 @@ class DatabaseImplant:
             stager_key=stager_key,
             callback_url=config['url'],
             beacon=config['beacon'],
+            encryption=config['encryption'],
             kill_date=config['kill_date'],
             initial_delay=config['initial_delay'],
             obfuscation_level=config['obfuscation_level'],
-            network_profiles = config['protocol']
+            network_profiles=config['protocol']
         )
         self.Session.add(new_implant)
         try:

@@ -133,6 +133,7 @@ class ImplantManagement:
             "beacon": None,
             "inital_delay": None,
             "obfuscation_level": None,
+            "encryption": [],
             "protocol": {},
             "kill_date": None
         }
@@ -178,6 +179,8 @@ class ImplantManagement:
                     implant_configuration['description'] = form['description']
                     implant_configuration['beacon'] = form['beacon_delay']
 
+                if "staticEncryption" in form:
+                    implant_configuration['encryption'].append('static_encryption')
                 # Verify the input against all loaded network profiles.
                 validated_network_protocols = self._verify_network_profile_(form)
                 if len(validated_network_protocols) != 0:

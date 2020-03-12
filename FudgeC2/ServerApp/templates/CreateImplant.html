@@ -51,8 +51,23 @@
                   </label>
                 </div>
             </div>
+            <div class="form-group"><b class="font-weight-bold">Payload encryption:</b>
+                <p>Payload encryption stops the implants code being intercepted and trivially read by defenders. If persistence is enabled the on-disk payload is also encrypted.</p>
+                <div class="form-check">
+                  <label class="form-check-label active">
+                    <input type="checkbox" name="staticEncryption" class="form-check-input" id="staticEncryption">
+                    <label class="form-check-label" for="staticEncryption">Static encryption key. (AES256 EAX)</label>
+                  </label>
+                </div>
+<!--                <div class="form-check">-->
+<!--                  <label class="form-check-label active">-->
+<!--                    <input type="checkbox" name="staticEncryption" class="form-check-input" id="networkEncryption" disabled="" >-->
+<!--                    <label class="form-check-label" for="staticEncryption">DEV: Key stored on C2 server, require decryption beacon. (AES256 EAX)</label>-->
+<!--                  </label>-->
+<!--                </div>-->
+            </div>
 
-            <span>Implant kill date</span><br>
+            <span class="font-weight-bold">Implant kill date</span><br>
             <span class="font-italic">Leave blank to remove kill date functionality</span>
             <div class="form-group">
                 <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
@@ -73,7 +88,7 @@
 
             {% if profiles%}
             <h4>Network Profiles<span class="text-danger">*</span></h4>
-            <div>To include a network profile in your implant simple enter the port it's listener will be listening on. At least one profile is required per implant template, any blank entries are not included</div>
+            <div>To include a network profile in your implant simple enter the port it's listener will be listening on. At least one profile is required per implant template, any blank entries are not included.</div>
                 {% for profile in profiles%}
                     <hr>
                     {{ profile | safe }}

