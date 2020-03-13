@@ -77,9 +77,9 @@ class ImplantSingleton:
 
             if len(NewSplicedImplantData) == 1:
                 NewSplicedImplantData = NewSplicedImplantData[0]
-            rendered_implant = self.ImpGen.generate_implant_from_template(NewSplicedImplantData)
-            db.implant.Set_GeneratedImplantCopy(NewSplicedImplantData, rendered_implant)
-            return rendered_implant
+            encrypted_implant, cleartext_implant = self.ImpGen.generate_implant_from_template(NewSplicedImplantData)
+            db.implant.Set_GeneratedImplantCopy(NewSplicedImplantData, encrypted_implant, cleartext_implant)
+            return encrypted_implant
 
         # TODO:
         # create functions for all listener/webapp/stager actions to avoid direct DB

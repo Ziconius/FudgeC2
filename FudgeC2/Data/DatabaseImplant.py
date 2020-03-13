@@ -130,13 +130,13 @@ class DatabaseImplant:
             return active_implant_record
         return False
 
-    def Set_GeneratedImplantCopy(self, new_spliced_implant_data, generated_implant):
+    def Set_GeneratedImplantCopy(self, new_spliced_implant_data, encrypted_implant, cleartext_implant):
         # This will store a copy of the PS implant to the "Generated_Implants" table
         #   This will allow RT to send analysable copy to BT for signaturing etc.
         try:
             uik = new_spliced_implant_data['unique_implant_id']
             self.Session.query(GeneratedImplants).filter(
-                GeneratedImplants.unique_implant_id == uik).update({"implant_copy": generated_implant})
+                GeneratedImplants.unique_implant_id == uik).update({"implant_copy": cleartext_implant})
 
             self.Session.commit()
         except Exception as E:

