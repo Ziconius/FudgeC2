@@ -21,6 +21,8 @@ class StagerGeneration:
                     ret_data[implant['title']] = {
                         "description": implant['description'],
                         "url": implant['callback_url'],
+                        "kill_date":implant['kill_date'],
+                        "encryption":implant['encryption'],
                         "powershell_stager": self._generate_powershell_stager_string(implant),
                         "docm_macro_stager": self._generate_docx_stager_string(implant),
                         "stager_key": implant['stager_key']}

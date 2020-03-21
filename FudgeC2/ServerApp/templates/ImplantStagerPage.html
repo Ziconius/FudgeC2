@@ -8,7 +8,10 @@
         <p>
             <span class="font-weight-bold">Name:</span> {{ implant }}<br>
             <span class="font-weight-bold">Description:</span> {{ implantList[implant].description  }}<br>
-            <span class="font-weight-bold">URL:</span> {{ implantList[implant].url }}
+            <span class="font-weight-bold">URL:</span> {{ implantList[implant].url }}<br>
+            <span class="font-weight-bold">Kill Date:</span> {{ implantList[implant].kill_date }}<br>
+            <span class="font-weight-bold">Encryption:</span> {% if implantList[implant].encryption|length >= 1 %} Yes {% else %} No {% endif %}
+
         </p>
         <p class="font-weight-bold text-success" >Powershell stager</p>
             {% for x in implantList[implant].powershell_stager %}
