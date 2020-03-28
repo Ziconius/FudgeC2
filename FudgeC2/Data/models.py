@@ -77,6 +77,7 @@ class ImplantTemplate(Base):
     network_profiles = Column(TextPickleType(), nullable=False)
     obfuscation_level = Column(INTEGER(1), nullable=False)
     encryption = Column(TextPickleType(), nullable=False)
+    operating_hours = Column(TextPickleType(), nullable=False)
 
 
 class GeneratedImplants(Base):

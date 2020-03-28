@@ -1,8 +1,8 @@
 {% extends "BaseNavbar.html" %}
 {% block main %}
 <div class="row h-100 no-gutters">
-    <div class="col-lg-2 p-2">
-        <div class="p-3 rounded iplm">
+    <div class="col-md-2 col-sm-3 min-vw-100">
+        <div class="p-4 iplm h-100 mr-3">
             <div class="font-weight-bold"><p> <a href="/{{ cid }}">{{ campaign }}</a></p></div>
             <p><a href="/{{ cid }}/implant/create">Create Implant</a></p>
             <p><a href="/{{ cid }}/implant/stagers">Stagers</a></p>
@@ -12,8 +12,8 @@
             <p><a href="javascript:export_campaign({{ cid }})">Export Campaign</a></p>
         </div>
     </div>
-    <div class="col-lg-10 p-2">
-        <div class="col-lg-10 p-3 rounded iplm w-100 mw-100 ">
+    <div class="col-md-10 col-sm-7">
+        <div class="col-lg-10 p-4 iplm w-100 mw-100">
             {% if Msg %}<div class="text-danger font-weight-bold">{{ Msg }}</div> {% endif %}
             {%  block main2 %}{% endblock %}
         </div>

@@ -40,7 +40,8 @@ class DatabaseImplant:
             kill_date=config['kill_date'],
             initial_delay=config['initial_delay'],
             obfuscation_level=config['obfuscation_level'],
-            network_profiles=config['protocol']
+            network_profiles=config['protocol'],
+            operating_hours=config['operating_hours']
         )
         self.Session.add(new_implant)
         try:

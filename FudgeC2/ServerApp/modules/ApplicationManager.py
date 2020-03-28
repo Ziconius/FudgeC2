@@ -1,9 +1,11 @@
 import requests
 from distutils.version import LooseVersion
+import logging
 
 from Data.Database import Database
 from Storage.settings import Settings
 
+logger = logging.getLogger(__name__)
 
 class AppManager:
     db = None

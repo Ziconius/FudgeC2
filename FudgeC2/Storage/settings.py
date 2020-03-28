@@ -17,3 +17,6 @@ class Settings:
     file_download_folder = "./Storage/campaign_downloads/"
     # The folder which contains uploads, and modules for execution:
     implant_resource_folder = "./Storage/implant_resources"
+
+    # Logging conmfiguration file
+    logging_config = "./Storage/logging.yaml"

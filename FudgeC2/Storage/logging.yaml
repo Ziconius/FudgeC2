@@ -1,0 +1,33 @@
+version: 1
+formatters:
+  simple:
+    format: '[ %(asctime)s ][ %(levelname)-8s %(name)0s %(funcName)s() ] %(message)s'
+    datefmt: '%m/%d/%Y %H:%M:%S'
+  fileoutput:
+    format: '[ %(asctime)s ][ %(levelname)-8s %(name)0s %(funcName)s() ] %(message)s'
+    datefmt: '%m/%d/%Y %H:%M:%S'
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: simple
+    stream: ext://sys.stdout
+
+  info_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: WARNING
+    formatter: fileoutput
+    filename: Storage/info.log
+    maxBytes: 10485760 # 10MB
+    backupCount: 20
+    encoding: utf8
+
+loggers:
+  sampleLogger:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+root:
+  level: DEBUG
+  handlers: [console, info_file_handler]

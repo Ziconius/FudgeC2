@@ -4,6 +4,7 @@
 *.xml
 *.db
 *.pyc
+*.log
 Dev_docs/*
 .__pycharm__/*
 __pycache__/*

@@ -3,7 +3,10 @@ from Implant.Implant import ImplantSingleton
 from Implant.ImplantFunctionality import ImplantFunctionality
 from NetworkProfiles.NetworkProfileManager import NetworkProfileManager
 
-import datetime
+import logging
+from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 class ImplantManagement:
     # -- The implant management class is responsible for performing pre-checks and validation before sending data
@@ -24,6 +27,7 @@ class ImplantManagement:
                 obfuscation_value = 4
             return obfuscation_value
         except:
+            logger.warning(f"{self}")
             return None
 
     def _validate_command(self, command):
@@ -58,15 +62,39 @@ class ImplantManagement:
             try:
                 # Checking to ensure a the time is not before current time.
                 #  This time must match the webapp submission format.
-                user_time = datetime.datetime.strptime(form['kill_date'], '%d/%m/%Y, %H:%M')
-                current_time = datetime.datetime.now()
+                print(form)
+                user_time = datetime.strptime(form['kill_date'], '%d/%m/%Y, %H:%M')
+                current_time = datetime.now()
                 if user_time < current_time:
                     return None
                 else:
                     # Reformatting the datetime to match implant datetime format string
-                    return datetime.datetime.strftime(user_time, '%Y-%m-%d %H:%M:%S')
+                    return datetime.strftime(user_time, '%Y-%m-%d %H:%M:%S')
             except Exception as E:
+                print(E)
+                error_logging.error(f"kill_date vaule not in form: {__name__}", E)
                 return None
+
+    def _validate_template_operating_hours(self, form):
+        # This returns a dict no matter what.
+        time_dict = {}
+        timemask = "%H:%M"
+        if "oh_start" in form and "oh_stop" in form:
+            time_dict['oh_start'] = form['oh_start']
+            time_dict['oh_stop'] = form['oh_stop']
+            try:
+                start = datetime.strptime(time_dict['oh_start'], timemask)
+                stop = datetime.strptime(time_dict['oh_stop'], timemask)
+                # Ensure the start is less than stop
+                if start >= stop:
+                    print(f"Start {start} is greater than stop {stop}")
+                return time_dict
+            except Exception as e:
+                print(f"Formatting error: {e}")
+                return {}
+        else:
+            return {}
+
 
     def get_network_profile_options(self):
         return self.NetProMan.get_implant_template_code()
@@ -135,7 +163,8 @@ class ImplantManagement:
             "obfuscation_level": None,
             "encryption": [],
             "protocol": {},
-            "kill_date": None
+            "kill_date": None,
+            "operating_hours": None
         }
         try:
             User = self.db.user.Get_UserObject(user)
@@ -148,6 +177,7 @@ class ImplantManagement:
             if "CreateImplant" in form:
                 obfuscation_level = self._form_validated_obfucation_level_(form)
                 implant_configuration['kill_date'] = self._validate_template_kill_date(form)
+                implant_configuration['operating_hours'] = self._validate_template_operating_hours(form)
 
                 if obfuscation_level is None:
                     raise ValueError('Missing, or invalid obfuscation level.')

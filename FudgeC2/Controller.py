@@ -1,20 +1,27 @@
 #!/usr/bin/python3
+import logging.config
 import _thread
 import time
 import os
+import yaml
 
 from Storage.settings import Settings
-from ServerApp import ImplantManager
 
+with open(Settings.logging_config, 'r') as f:
+    config = yaml.safe_load(f.read())
+    logging.config.dictConfig(config)
+
+from ServerApp import ImplantManager
 from NetworkProfiles.NetworkListenerManagement import NetworkListenerManagement
-NLM = NetworkListenerManagement.instance
+
+logger = logging.getLogger(__name__)
 
 
 def check_tls_certificates(cert, key):
-    cert_result = os.path.isfile(os.getcwd() + "/Storage/" + cert)
-    key_result = os.path.isfile(os.getcwd() + "/Storage/" + key)
+    cert_result = os.path.isfile(f"{os.getcwd()}/Storage/{cert}")
+    key_result = os.path.isfile(f"{os.getcwd()}/Storage/{key}")
     if key_result is False or cert_result is False:
-        print("Warning: Missing crypto keys for TLS listeners. These will fail to boot.")
+        logger.warning("Missing private keys for TLS listeners, this will cause them to fail.")
     return
 
 
@@ -27,7 +34,8 @@ def check_key_folders():
         if not os.path.isdir(Settings.implant_resource_folder):
             os.mkdir(f"{Settings.implant_resource_folder}")
         return True
-    except:
+    except Exception as Error:
+        logger.warning(f"Exception setting up important directories: {Error}")
         return False
 
 
@@ -39,21 +47,22 @@ def start_controller():
                 port=Settings.server_app_port,
                 threaded=True,
                 ssl_context=Settings.server_app_ssl)
-    return
 
 
-Manager = ImplantManager.app
-NLM.startup_auto_run_listeners()
+if __name__ == "__main__":
+    NLM = NetworkListenerManagement.instance
+    Manager = ImplantManager.app
+    NLM.startup_auto_run_listeners()
 
-try:
-    check_tls_certificates(Settings.tls_listener_cert, Settings.tls_listener_key)
-    check_key_folders()
-    _thread.start_new_thread(start_controller, ())
-except Exception as E:
-    print(f"Error: Unable to start FudgeC2 server thread, exception: {E}")
-    exit()
+    try:
+        check_tls_certificates(Settings.tls_listener_cert, Settings.tls_listener_key)
+        check_key_folders()
+        _thread.start_new_thread(start_controller, ())
+    except Exception as E:
+        print(f"Unable to start FudgeC2 server thread: {E}")
+        exit()
 
-while 1:
-    # Hold the application threads open
-    time.sleep(15)
-    pass
+    while 1:
+        # Hold the application threads open
+        time.sleep(15)
+        pass

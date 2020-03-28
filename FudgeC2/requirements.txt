@@ -1,7 +1,8 @@
-flask==1.0.2
-flask_sqlalchemy==2.3.2
-flask_login==0.4.1
-bcrypt==3.1.6
-requests==2.21.0
+flask==1.1.1
+flask_sqlalchemy==2.4.1
+flask_login==0.5.0
+bcrypt==3.1.7
+requests==2.23.0
 cryptography==2.8
 pycryptodome==3.9.7
+pyyaml==5.3.1
