@@ -16,7 +16,9 @@ class Settings:
     # This is the folder in which all implant file download will be sent to.
     file_download_folder = "./Storage/campaign_downloads/"
     # The folder which contains uploads, and modules for execution:
-    implant_resource_folder = "./Storage/implant_resources"
+    implant_resource_folder = "./Storage/implant_resources/"
+
+    campaign_export_folder = "./Storage/ExportedCampaigns/"
 
     # Logging conmfiguration file
     logging_config = "./Storage/logging.yaml"

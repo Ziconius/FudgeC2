@@ -7,7 +7,6 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-
 function unix_to_human_time(unixtime){
     var utcSeconds = unixtime;
     var d = new Date(0);

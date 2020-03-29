@@ -1,8 +1,8 @@
 {% extends "BaseNavbar.html" %}
 {% block main %}
 
-<div class="row justify-content-lg-center m-4">
-    <div class="col-lg-10 p-3 m-3 rounded iplm">
+<div class="row justify-content-lg-center">
+    <div class="page_scroll col-lg-10 pt-3 pl-5 pr-5 pb-5 iplm">
         <h2>Global Settings</h2><br>
         <h4>User Management</h4><hr>
         <form action="/settings" method="POST" role="form" id="AnswerForm">
@@ -15,7 +15,7 @@
                 <input class="form-check-input" type="checkbox" value="" name="is_admin" id="defaultCheck1">
                 <label class="form-check-label" for="defaultCheck1">Admin account</label>
             </div>
-            <button type="submit" class="btn btn-default" id="AddUserBtn">Submit</button>
+            <button type="submit" class="btn btn-secondary" id="AddUserBtn">Submit</button>
         </form>
         <br>
         {% if users %}

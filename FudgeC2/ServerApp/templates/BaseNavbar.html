@@ -1,50 +1,53 @@
 {% extends "HeaderTemplate.html" %}
 {% block NavbarBlock %}
-
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark p-0 m-0">
-  <a class="navbar-brand pl-5" href="/">FudgeC2</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNavDropdown">
-    <ul class="navbar-nav">
-      <li class="nav-item active pl-2">
-        <a class="nav-link" href="/CreateCampaign">New Campaign <i class="fas fa-book-medical pl-1"></i> <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item pl-2">
-        <a class="nav-link" href="{{ url_for('global_settings_page') }}">Global Settings <i class="fas fa-cogs pl-1 "></i> </a>
-      </li>
-
-      <li class="nav-item dropdown pl-2">
-        <a class="nav-link dropdown-toggle" href="/1234" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Campaigns <i class="fas fa-book-open pl-1"></i>
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-        {% if campaignlist %}
-          {% for key  in campaignlist %}
-          <a class="dropdown-item" href="/{{ key }}">{{ campaignlist[key]}}</a>
-          {% endfor %}
-        {% endif %}
-        </div>
-      </li>
-      <li class="nav-item pl-2">
-        <a class="nav-link" href="{{ url_for('GlobalListenerPage') }}">Listeners <i class="fas fa-cogs pl-1"></i> </a>
-      </li>
-    </ul>
-  </div>
-    <ul class="nav navbar-nav navbar-right">
-      <li class="pr-3">
-        <a class="nav-link" href="{{ url_for('help_page') }}">Documentation <i class="fas fa-question-circle pl-1"></i></a>
-      </li>
-    </ul>
-    <ul class="nav navbar-nav navbar-right">
-      <li class="pr-3">
-        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
-      </li>
-    </ul>
-
-</nav>
 <div class="container-flex">
+  <div class="row no-gutters">
+    <div class="col">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-0 m-0 ">
+      <a class="navbar-brand pl-5" href="/">FudgeC2</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav">
+          <li class="nav-item active pl-2">
+            <a class="nav-link" href="/CreateCampaign">New Campaign <i class="fas fa-book-medical pl-1"></i> <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item pl-2">
+            <a class="nav-link" href="{{ url_for('global_settings_page') }}">Global Settings <i class="fas fa-cogs pl-1 "></i> </a>
+          </li>
+
+          <li class="nav-item dropdown pl-2">
+            <a class="nav-link dropdown-toggle" href="/1234" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Campaigns <i class="fas fa-book-open pl-1"></i>
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            {% if campaignlist %}
+              {% for key  in campaignlist %}
+              <a class="dropdown-item" href="/{{ key }}">{{ campaignlist[key]}}</a>
+              {% endfor %}
+            {% endif %}
+            </div>
+          </li>
+          <li class="nav-item pl-2">
+            <a class="nav-link" href="{{ url_for('GlobalListenerPage') }}">Listeners <i class="fas fa-cogs pl-1"></i> </a>
+          </li>
+        </ul>
+      </div>
+        <ul class="nav navbar-nav navbar-right">
+          <li class="pr-3">
+            <a class="nav-link" href="{{ url_for('help_page') }}">Documentation <i class="fas fa-question-circle pl-1"></i></a>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li class="pr-3">
+            <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+          </li>
+        </ul>
+    </nav>
+      </div>
+  </div>
+
   {%  block main %}{% endblock %}
 </div>
 

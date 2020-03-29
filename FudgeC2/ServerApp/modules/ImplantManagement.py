@@ -26,8 +26,8 @@ class ImplantManagement:
             elif obfuscation_value > 4:
                 obfuscation_value = 4
             return obfuscation_value
-        except:
-            logger.warning(f"{self}")
+        except Exception as Error:
+            logger.warning(f"Obfuscation val cannot be cast to int, or does not exist: {form['obfuscation']}: {Error}")
             return None
 
     def _validate_command(self, command):
@@ -70,9 +70,8 @@ class ImplantManagement:
                 else:
                     # Reformatting the datetime to match implant datetime format string
                     return datetime.strftime(user_time, '%Y-%m-%d %H:%M:%S')
-            except Exception as E:
-                print(E)
-                error_logging.error(f"kill_date vaule not in form: {__name__}", E)
+            except Exception as Error:
+                logger.error(f"kill_date value not in form: {Error}")
                 return None
 
     def _validate_template_operating_hours(self, form):
@@ -94,7 +93,6 @@ class ImplantManagement:
                 return {}
         else:
             return {}
-
 
     def get_network_profile_options(self):
         return self.NetProMan.get_implant_template_code()

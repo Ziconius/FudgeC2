@@ -22,7 +22,7 @@
                 <input onfocus="this.placeholder=''" type="text" name="cmd" class="form-control" id="implantCmd" placeholder="cmd">
             </div>
 
-            <button type="submit" class="btn btn-default" id="AnswerBtn">Submit</button>
+            <button type="submit" class="btn btn-secondary" id="AnswerBtn">Submit</button>
         </form>
     </div>
 </div>
@@ -62,7 +62,8 @@
 
 <script src="{{ url_for('static', filename='ImplantController.js') }}"></script>
 <script>
-implant_page_controller({{cid}})
+    implant_page_controller({{cid}})
+    document.getElementById("sidebar_main").classList.add('side_bar_active')
 </script>
 {% endblock %}
 

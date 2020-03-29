@@ -33,6 +33,8 @@ def check_key_folders():
 
         if not os.path.isdir(Settings.implant_resource_folder):
             os.mkdir(f"{Settings.implant_resource_folder}")
+        if not os.path.isdir(Settings.implant_resource_folder):
+            os.mkdir(f"{Settings.implant_resource_folder}")
         return True
     except Exception as Error:
         logger.warning(f"Exception setting up important directories: {Error}")

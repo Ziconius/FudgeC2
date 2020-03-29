@@ -1,21 +1,29 @@
 {% extends "BaseNavbar.html" %}
 {% block main %}
-<div class="row h-100 no-gutters">
-    <div class="col-md-2 col-sm-3 min-vw-100">
-        <div class="p-4 iplm h-100 mr-3">
-            <div class="font-weight-bold"><p> <a href="/{{ cid }}">{{ campaign }}</a></p></div>
-            <p><a href="/{{ cid }}/implant/create">Create Implant</a></p>
-            <p><a href="/{{ cid }}/implant/stagers">Stagers</a></p>
-            <p><a href="/{{ cid }}/implant/active">Active Implant Details</a></p>
-            <p><a href="/{{ cid }}/logs">Implant Logs</a></p>
-            <p><a href="/{{ cid }}/settings">Campaign Settings</a></p>
-            <p><a href="javascript:export_campaign({{ cid }})">Export Campaign</a></p>
+<style>
+
+
+</style>
+<div class="row no-gutters h-100">
+    <div class="col-md-2">
+        <div class="iplm h-100 mr-4">
+            <div class="side_button" id="sidebar_main"><a href="/{{ cid }}">{{ campaign }}</a></div>
+            <div class="side_button" id="sidebar_create_implant"><a href="/{{ cid }}/implant/create">Create Implant</a></div>
+            <div class="side_button" id="sidebar_implant_stagers"><a href="/{{ cid }}/implant/stagers">Stagers</a></div>
+            <div class="side_button" id="sidebar_active_implants"><a href="/{{ cid }}/implant/active">Active Implant Details</a></div>
+            <div class="side_button" id="sidebar_logs"><a href="/{{ cid }}/logs">Implant Logs</a></div>
+            <div class="side_button" id="sidebar_settings"><a href="/{{ cid }}/settings">Campaign Settings</a></div>
+            <div class="side_button"><a href="javascript:export_campaign({{ cid }})">Export Campaign</a></div>
+
         </div>
     </div>
-    <div class="col-md-10 col-sm-7">
-        <div class="col-lg-10 p-4 iplm w-100 mw-100">
-            {% if Msg %}<div class="text-danger font-weight-bold">{{ Msg }}</div> {% endif %}
-            {%  block main2 %}{% endblock %}
+    <div class="page_scroll col-md-10 col-sm-7 col-lg-10 pb-4 m-0">
+        <div class="p-4 pt-1 iplm w-100 mw-100">
+            {% if Msg %}
+                <div class="text-danger font-weight-bold">{{ Msg }}</div>
+            {% endif %}
+                {%  block main2 %}
+            {% endblock %}
         </div>
     </div>
 </div>
