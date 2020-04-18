@@ -30,11 +30,15 @@ def check_key_folders():
     try:
         if not os.path.isdir(Settings.file_download_folder):
             os.mkdir(f"{Settings.file_download_folder}")
+            logger.info(f"Missing directory, now creating: {Settings.file_download_folder}")
 
         if not os.path.isdir(Settings.implant_resource_folder):
             os.mkdir(f"{Settings.implant_resource_folder}")
-        if not os.path.isdir(Settings.implant_resource_folder):
-            os.mkdir(f"{Settings.implant_resource_folder}")
+            logger.info(f"Missing directory, now creating: {Settings.implant_resource_folder}")
+
+        if not os.path.isdir(Settings.campaign_export_folder):
+            os.mkdir(f"{Settings.campaign_export_folder}")
+            logger.info(f"Missing directory, now creating: {Settings.campaign_export_folder}")
         return True
     except Exception as Error:
         logger.warning(f"Exception setting up important directories: {Error}")
