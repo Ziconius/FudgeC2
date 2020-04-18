@@ -2,17 +2,17 @@
 
 New features:
  - Optional payload encryption. This uses AES256 EAX with embedded keys.
- - Operating hours to control which times the implant is functioning
+ - Operating hours to control which times the implant is functioning.
  
 Improvements
  - UI updates to improve the webapp visuals.
- - Updates to how command execution functions
- - Improvements to setup during fresh installation
- - Added error logging, which will be expanded for bug reporting
+ - Updates to how command execution functions.
+ - Improvements to setup during fresh installation.
+ - Added error logging, which will be expanded for bug reporting.
  
 Documentation
- - Added new Docker repo for major releases
- - Added docker compose file
+ - Added new Docker repo for major releases.
+ - Added docker compose file.
 
 Bug fixes
  - Download file now correctly notifies the user of an error if the download fail
