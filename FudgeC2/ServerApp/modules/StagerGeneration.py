@@ -25,7 +25,9 @@ class StagerGeneration:
                         "encryption":implant['encryption'],
                         "powershell_stager": self._generate_powershell_stager_string(implant),
                         "docm_macro_stager": self._generate_docx_stager_string(implant),
-                        "stager_key": implant['stager_key']}
+                        "stager_key": implant['stager_key'],
+                        "operating_hours": implant['operating_hours']
+                    }
             return ret_data
         else:
             return ret_data

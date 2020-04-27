@@ -251,7 +251,7 @@ function get_campaign_info_by_id(rrr, cid){
                 B = response[item]['generated_title']
                 b = response[item]['unique_implant_id']
                 B =`<a class="text-warning" href="/${cid}/implant/active/${b}">${B}</a>`
-                C = response[item]['last_check_in']
+                C = unix_to_human_time(response[item]['last_check_in'])
                 D = response[item]['callback_url']
 
                 E = document.getElementById('t_body_implants').innerHTML;

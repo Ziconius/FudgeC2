@@ -2,8 +2,6 @@
 {% block main2 %}
 <div class="m-0 p-3">
     <h4>Active Implant Information: {{ campaign }}</h4>
-    <p class="text-warning">Dev note: This is an early work in process to allow users to review all data collected by an active implant.</p>
-
     {% if imp %}
     <div class="dropdown">
       <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -49,6 +47,12 @@
                     <td>Obfuscation level</td>
                     <td>{{ render.obfuscation_level }}</td>
                 </tr>
+                {% if render.operating_hours %}
+                <tr>
+                    <td>Operating Hours</td>
+                    <td>Start: {{ render.operating_hours.oh_start }}<br>Stop: {{ render.operating_hours.oh_stop }}</td>
+                </tr>
+                {% endif %}
             </tbody>
         </table>
     </div>

