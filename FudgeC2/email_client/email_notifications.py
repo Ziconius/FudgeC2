@@ -10,10 +10,10 @@
 #
 import logging
 
-from email_client.email_client import email_client
+from email_client.email_client import EmailClient
 
 logger = logging.getLogger(__name__)
-ec = email_client()
+ec = EmailClient()
 
 
 class EmailNotification:

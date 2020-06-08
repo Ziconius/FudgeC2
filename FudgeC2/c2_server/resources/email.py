@@ -6,7 +6,7 @@ from email_client.email_client import EmailClient
 
 from Data.Database import Database
 db = Database()
-email_client = email_client()
+email_client = EmailClient()
 
 # Endpoints for email configuration.
 class Email(Resource):
