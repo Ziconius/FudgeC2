@@ -1,7 +1,7 @@
 import time
 import random
 import secrets
-import json
+import string
 
 from Data.models import ImplantResponse, ImplantTemplate, ImplantCommands, Campaigns, CampaignUsers, GeneratedImplants, HostData
 from Data.CampaignLogging import CampaignLoggingDecorator
@@ -95,6 +95,26 @@ class DatabaseImplant:
             else:
                 return False
 
+    def get_all_implants_by_user(self, user_email):
+        # Gets all implants across all campaigns for a specific user.
+        user_id = self.db_methods.__get_userid__(user_email)
+        if user_id is False:
+            return []
+
+        campaigns = self.Session.query(CampaignUsers.cid).filter(CampaignUsers.uid == user_id).all()
+        all_active_implants = []
+        for campaign in campaigns:
+            all_active_implants.append(self.Get_AllGeneratedImplantsFromCID(campaign[0]))
+
+        processes_active_implants = []
+        for implant_by_cid in all_active_implants:
+            for implant in implant_by_cid:
+                entry = {
+                    "implant_id": implant['unique_implant_id'],
+                    "campaign_id": implant['cid']
+                     }
+                processes_active_implants.append(entry)
+        return processes_active_implants
 
     @CL.log_implant_activation
     def Register_NewImplantFromStagerKey(self, stager_key):
@@ -103,7 +123,7 @@ class DatabaseImplant:
 
         implant = self.Session.query(ImplantTemplate).filter(ImplantTemplate.stager_key == stager_key).first()
         if implant is not None:
-            unique_implant_key = random.randint(000000, 999999)
+            unique_implant_key = ''.join(random.choice(string.ascii_lowercase) for i in range(8))
             # new_title = str(implant.title) + "_" + str(unique_implant_key)
             new_title = f"{implant.title}_{unique_implant_key}"
             generated_implant = GeneratedImplants(unique_implant_id=unique_implant_key,

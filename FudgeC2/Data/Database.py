@@ -18,6 +18,7 @@ from Data.DatabaseUser import DatabaseUser
 from Data.DatabaseCampaign import DatabaseCampaign
 from Data.DatabaseImplant import DatabaseImplant
 from Data.DatabaseListeners import DatabaseListener
+from Data.EmailSettings import EmailSettings
 
 CL = CampaignLoggingDecorator()
 
@@ -38,6 +39,7 @@ class Database:
         self.campaign = DatabaseCampaign(self, self.Session)
         self.implant = DatabaseImplant(self, self.Session)
         self.listener = DatabaseListener(self, self.Session)
+        self.email = EmailSettings(self, self.Session)
 
         self.__does_admin_exist()
 
@@ -121,7 +123,7 @@ class Database:
         # -- Checking for admin existance, for first-time launches.
         if not self.__get_userid__("admin"):
             print("Creating first-time admin account.")
-            if not self.user.add_new_user("admin", "letmein", True):
+            if not self.user.add_new_user("Admin user","admin", "", "letmein", True):
                 raise ValueError("Error creating admin account in empty database.")
 
     # -- App Logging Classes -- #

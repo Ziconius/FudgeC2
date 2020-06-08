@@ -6,6 +6,7 @@
 *.pyc
 *.log
 Dev_docs/*
+FudgeC2/_scratch/*
 .__pycharm__/*
 __pycache__/*
 modules/__pycache__/*

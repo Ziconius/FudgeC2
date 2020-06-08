@@ -8,8 +8,13 @@
         <form action="/settings" method="POST" role="form" id="AnswerForm">
             <div class="form-group">
                 <label for="NewUser" >Add New User</label>
-
-                <input onfocus="this.placeholder=''" type="text" name="UserName" class="form-control" id="implantCmd" placeholder="Username">
+                <input onfocus="this.placeholder=''" type="text" name="name" class="form-control" id="create_user_name" placeholder="Bob Dole">
+            </div>
+            <div class="form-group">
+                <input onfocus="this.placeholder=''" type="text" name="username" class="form-control" id="create_user_username" placeholder="bob.dole">
+            </div>
+            <div class="form-group">
+                <input onfocus="this.placeholder=''" type="text" name="user_email" class="form-control" id="create_user_user_email" placeholder="bob.dole@example.com">
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="" name="is_admin" id="defaultCheck1">
@@ -78,6 +83,57 @@
             {% endfor %}
             </tbody>
         </table>
+        <div>
+
+            <!-- Email Configuration forms -->
+            <h4>Email Configuration</h4><hr>
+            <p>SMTP configuration is used to set up an email address that FudgeC2 can use to notify users of changes, password resets, amoung others.</p>
+            <form id="smtp_configuration">
+                <div class="form-group row">
+                    <label class="col-4 col-form-label" for="email_cfg_server">SMTP Server Address</label>
+                    <div class="col-8">
+                        <input id="email_cfg_server" name="text" type="text" required="required" class="form-control" placeholder="smtp.example.com">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-4 col-form-label" for="email_cfg_port">SMTP Server Port</label>
+                    <div class="col-8">
+                        <input id="email_cfg_port" name="text" type="text" required="required" class="form-control" placeholder="587">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-4 col-form-label" for="email_cfg_account">SMTP Account</label>
+                    <div class="col-8">
+                        <input id="email_cfg_account" name="text" type="text" required="required" class="form-control" placeholder="fudge@example.com">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-4 col-form-label" for="email_cfg_password">Password</label>
+                    <div class="col-8">
+                        <input id="email_cfg_password" name="text" type="password" required="required" class="form-control" placeholder="">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-4 col-form-label" for="email_cfg_from_addr">Sent From Address</label>
+                    <div class="col-8">
+                        <input id="email_cfg_from_addr" name="text" type="text" required="required" class="form-control" placeholder="fudge@example.com">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4 text-center"></div><div class="col-8"> <span id="email_warning_span" class="text-danger"></span></div>
+                </div>
+                <div class="form-group row">
+                    <div class="offset-4 col-8">
+                        <button id="email_test_connection_btn" type="submit" class="btn btn-primary">Test Connection</button>
+                        <button id="email_save_connection_btn" name="submit" type="submit" class="btn btn-primary" disabled>Save</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
     </div>
 
     <!-- Modal -->
@@ -102,4 +158,114 @@
     </div>
 
 </div>
+
+
+<script>
+// Populate the email configuration
+window.onload = function() {
+    const userAction = async () => {
+      const response = await fetch('/api/v1/email');
+      const myJson = await response.json(); //extract JSON from the http response
+      document.getElementById('email_cfg_server').value = myJson.data.host;
+      document.getElementById('email_cfg_port').value = myJson.data.port;
+      document.getElementById('email_cfg_account').value = myJson.data.email_account;
+    }
+userAction()
+};
+
+
+$('#email_test_connection_btn').on('click', function (e) {
+    event.preventDefault();
+
+    var myBody = {
+        "server_host": document.getElementById('email_cfg_server').value,
+        "server_port": document.getElementById('email_cfg_port').value,
+        "server_email": document.getElementById('email_cfg_account').value,
+        "server_password": document.getElementById('email_cfg_password').value,
+        "server_from_addr": document.getElementById('email_cfg_from_addr').value,
+        "check_config": true
+    }
+
+    const a = email_config_endpoint(myBody)
+    a.then(function(result) {
+        statusCode = result[0]
+        msg = result[1]
+        if (statusCode == 200) {
+            document.getElementById('email_save_connection_btn').disabled = false;
+            var element = document.getElementById("email_save_connection_btn");
+            element.classList = "btn btn-warning"
+            var element = document.getElementById("email_test_connection_btn");
+            element.classList = "btn btn-success"
+            document.getElementById('email_warning_span').innerHTML = "Connection test successful"
+            document.getElementById('email_warning_span').classList = "text-success"
+        } else {
+            document.getElementById('email_warning_span').innerHTML = msg.result
+            document.getElementById('email_warning_span').classList = "text-danger"
+            document.getElementById("email_test_connection_btn").classList = "btn btn-warning"
+            var element = document.getElementById("email_save_connection_btn");
+            element.classList = "btn btn-danger"
+            document.getElementById('email_save_connection_btn').disabled = true;
+
+        }
+    })
+})
+
+
+
+$('#email_save_connection_btn').on('click', function (e) {
+    event.preventDefault();
+
+    var myBody = {
+        "server_host": document.getElementById('email_cfg_server').value,
+        "server_port": document.getElementById('email_cfg_port').value,
+        "server_email": document.getElementById('email_cfg_account').value,
+        "server_password": document.getElementById('email_cfg_password').value,
+        "server_from_addr": document.getElementById('email_cfg_from_addr').value
+    }
+
+    const a = email_config_endpoint(myBody)
+    a.then(function(result) {
+        statusCode = result[0]
+        msg = result[1]
+        if (statusCode == 200) {
+            document.getElementById('email_save_connection_btn').disabled = false;
+            var element = document.getElementById("email_save_connection_btn");
+            element.classList = "btn btn-success";
+            document.getElementById('email_warning_span').innerHTML = "Email client configured."
+            document.getElementById('email_warning_span').classList = "text-success"
+
+        } else {
+            document.getElementById('email_warning_span').innerHTML = msg.result
+            document.getElementById('email_warning_span').classList = "text-danger"
+            var element = document.getElementById("email_save_connection_btn");
+            element.classList = "btn btn-danger"
+            document.getElementById("email_save_connection_btn").disabled = true;
+            document.getElementById("email_test_connection_btn").classList = "btn btn-warning"
+        }
+    })
+})
+
+
+const email_config_endpoint = async (myBody) => {
+    const response = await fetch('/api/v1/email', {
+            method: 'POST',
+            body: JSON.stringify(myBody), // string or object
+            headers: {
+              'Content-Type': 'application/json'
+            }
+    });
+    const myJson = await response.json(); //extract JSON from the http response
+    const responseCode = await response.status;
+    return [responseCode, myJson]
+}
+
+
+
+
+
+
+
+
+</script>
+
 {% endblock %}

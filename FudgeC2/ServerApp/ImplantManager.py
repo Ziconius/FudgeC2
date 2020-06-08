@@ -29,6 +29,28 @@ login = LoginManager(app)
 login.init_app(app)
 
 
+# Additional Blueprint work
+from flask import Blueprint
+from flask_restful import Api
+from FudgeC2.c2_server.resources.campaigns import Campaigns
+from FudgeC2.c2_server.resources.users import Users
+from FudgeC2.c2_server.resources.email import Email, EmailTest
+from FudgeC2.c2_server.resources.implants import Implants
+from FudgeC2.c2_server.resources.implants import ImplantDetails
+
+
+blueprint = Blueprint('api', __name__)
+api = Api(app)
+
+api.add_resource(Campaigns, '/api/v1/campaigns', "/api/v1/campaigns/<int:cid>")
+api.add_resource(Users,'/api/v1/users/','/api/v1/users')
+api.add_resource(Email, '/api/v1/email')
+api.add_resource(EmailTest, '/api/v1/email/test')
+# In development
+api.add_resource(Implants, '/api/vi/implants')
+api.add_resource(ImplantDetails, '/api/vi/implants/<string:implant_id>')
+
+
 # -- Context Processors --#
 @app.context_processor
 def inject_dict_for_all_auth_templates():
@@ -80,6 +102,7 @@ def page_not_found(e):
 # ------------------------------ #
 @app.route("/auth/login", methods=['GET', 'POST'])
 def login():
+    print(current_user)
     error = None
     if request.method == "POST":
 
@@ -156,7 +179,12 @@ def create_new_campaign():
 def global_settings_page():
     if request.method == "POST":
         # -- Add user returns a dict with action/result/reason keys.
-        result = UsrMgmt.add_new_user(request.form, current_user.user_email)
+        result = {
+            "action": "Add New User",
+            "result": None,
+            "reason": None}
+
+        result['result'], result['reason'] = UsrMgmt.process_new_user_account(request.form, current_user.user_email)
         return jsonify(result)
     # Getting server & user logs, reversing for newest first.
     logs = AppManager.get_application_logs(current_user.user_email)

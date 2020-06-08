@@ -1,9 +1,12 @@
 import time
 import uuid
 import bcrypt
+import logging
 
 from Data.models import Users
 from Data.CampaignLogging import CampaignLoggingDecorator
+
+logger = logging.getLogger(__name__)
 
 CL = CampaignLoggingDecorator()
 
@@ -32,19 +35,28 @@ class DatabaseUser:
         return True
 
     # Test / Remove / Refactor
-    def add_new_user(self, username, password, admin=False):
+    def add_new_user(self, name, username, email, password, admin=False):
         # -- TODO: This needs a more robust response Try/Except.
-        query = self.Session.query(Users.password, Users.uid).filter(Users.user_email == username).all()
-        for x in query:
-            return False
-        users = Users(user_email=username,
-                      password=self.db_methods.__hash_cleartext_password__(password),
-                      admin=admin,
-                      last_login=time.time())
-        self.Session.add(users)
-        self.Session.commit()
-        self.db_methods.app_logging("auth", f"New user created: {username}")
-        return True
+        # query = self.Session.query(Users.password, Users.uid).filter(Users.user_email == username).all()
+        # for x in query:
+        #     return False
+        try:
+            users = Users(
+                name=name,
+                username=username,
+                # TODO: This NEEDS to be an email.
+                user_email=username,
+                password=self.db_methods.__hash_cleartext_password__(password),
+                admin=admin,
+                last_login=time.time())
+            self.Session.add(users)
+            self.Session.commit()
+            self.db_methods.app_logging("resources", f"New user created: {username}")
+            return True, "User created."
+        except Exception as error:
+            error_msg = f"User creation failed, reason: {error}."
+            logger.debug(error_msg)
+            return False, error_msg
 
     # Test / Remove / Refactor
     def User_ChangePasswordOnFirstLogon(self, guid, current_password, new_password):
@@ -82,18 +94,18 @@ class DatabaseUser:
         if user is not None:
             if bcrypt.checkpw(password.encode(), user.password):
                 if int(user.active_account) != 1:
-                    self.db_methods.app_logging("auth", f"Failed login attempt for disabled account: {email} ")
+                    self.db_methods.app_logging("resources", f"Failed login attempt for disabled account: {email} ")
                     return False
 
                 self.__update_last_logged_in__(email)
-                self.db_methods.app_logging("auth", f"Successful login for user: {email}")
+                self.db_methods.app_logging("resources", f"Successful login for user: {email}")
 
                 return user
             else:
-                self.db_methods.app_logging("auth", f"Failed login attempt for user {email} ")
+                self.db_methods.app_logging("resources", f"Failed login attempt for user {email} ")
                 return False
         else:
-            self.db_methods.app_logging("auth", f"Failed login attempt for unknown account: {email} ")
+            self.db_methods.app_logging("resources", f"Failed login attempt for unknown account: {email} ")
             return False
     def change_account_active_state(self, user, state):
         '''

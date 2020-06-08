@@ -33,10 +33,12 @@ class TextPickleType(TypeDecorator):
         return value
 
 
-# TODO: Create a auth log table.
+# TODO: Create a resources log table.
 class Users(Base):
     __tablename__ = 'users'
     uid = Column(INTEGER, primary_key=True)
+    name = Column(String(255), nullable=False)
+    username = Column(String(255), nullable=False)
     user_email = Column(String(255), nullable=False)
     password = Column(String(255), nullable=False)
     last_login = Column(String(255), nullable=False)
@@ -62,6 +64,14 @@ class Users(Base):
         """False, as anonymous users aren't supported."""
         return False
 
+class EmailClient(Base):
+    __tablename__ = "email_client"
+    id = Column(INTEGER(11), nullable=False, index=True, primary_key=True)
+    email_account = Column(String)
+    email_password = Column(String)
+    from_address = Column(String)
+    host  = Column(String)
+    port  = Column(String)
 
 class ImplantTemplate(Base):
     __tablename__ = 'implant_template'
@@ -82,7 +92,7 @@ class ImplantTemplate(Base):
 
 class GeneratedImplants(Base):
     __tablename__ = 'generated_implants'
-    unique_implant_id = Column(INTEGER(16), unique=True, nullable=False, primary_key=True)
+    unique_implant_id = Column(String(16), unique=True, nullable=False, primary_key=True)
     last_check_in = Column(INTEGER(16))
     last_check_in_protocol = Column(String())
     current_beacon = Column(INTEGER(16))
@@ -90,7 +100,7 @@ class GeneratedImplants(Base):
     generated_title = Column(String(255), nullable=False)
     time = Column(INTEGER(16), nullable=False)
     implant_copy = Column(String())
-    delivered_payload = Column(String()) # If encryption of 3rd party obfuscation is used
+    delivered_payload = Column(String()) # If encryption or 3rd party obfuscation is used
 
 
 class ImplantCommands(Base):
