@@ -9,6 +9,7 @@ class Implants(Resource):
     method_decorators = [login_required]
 
     def get(self):
+
         parser = reqparse.RequestParser()
         parser.add_argument('campaign_id', type=int, help='Campaign IDs are numeric.')
         args = parser.parse_args()
@@ -24,9 +25,10 @@ class Implants(Resource):
 
 class ImplantDetails(Resource):
     method_decorators = [login_required]
-
+    # Return the configuration of an implant
     def get(self, implant_id):
         # Take UID and return info on it.
+
         pass
         return {}
 
@@ -38,5 +40,11 @@ class ImplantRegistered(Resource):
 
 class ImplantResponses(Resource):
     method_decorators = [login_required]
-    def get(self):
-        pass
+    def get(self, implant_id):
+        # get all implant responses (pagination will be implemented later
+        response_list = []
+        campaign_id = db.campaign.get_campaign_id_from_implant_id(implant_id)
+        if db.campaign.Verify_UserCanAccessCampaign(current_user.user_email, campaign_id):
+            response_list = db.implant.get_implant_responses(implant_id)
+
+        return {"data": response_list}

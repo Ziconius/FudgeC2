@@ -22,15 +22,19 @@ class Email(Resource):
             return {"message":data}, 302
 
     def post(self):
-        rj = request.json
+        rj = {}
+        try:
+            rj = request.json
+        except:
+            print(request.text)
+
         # Validate the contents of this and send to the Meail class
-        server_email = rj.get("server_email", None)
-        server_password = rj.get("server_password", None)
-        server_host = rj.get("server_host", None)
-        server_port = rj.get("server_port", None)
-        from_address = rj.get("server_from_addr", None)
+        server_email = rj.get("smtp_account", None)
+        server_password = rj.get("password", None)
+        server_host = rj.get("host", None)
+        server_port = rj.get("port", None)
+        from_address = rj.get("from_address", None)
         check_config= rj.get("check_config", False)
-        print(f"State:\n{server_host}\n{server_port}\n{server_email}\n{server_password}\n{from_address}\n{check_config}")
         state, msg = email_client.configure_email_client(server_host, server_port, server_email, server_password, from_address, check_config)
         if state:
             return {"result":msg}, 200

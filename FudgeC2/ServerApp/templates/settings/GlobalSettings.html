@@ -178,11 +178,11 @@ $('#email_test_connection_btn').on('click', function (e) {
     event.preventDefault();
 
     var myBody = {
-        "server_host": document.getElementById('email_cfg_server').value,
-        "server_port": document.getElementById('email_cfg_port').value,
-        "server_email": document.getElementById('email_cfg_account').value,
-        "server_password": document.getElementById('email_cfg_password').value,
-        "server_from_addr": document.getElementById('email_cfg_from_addr').value,
+        "host": document.getElementById('email_cfg_server').value,
+        "port": document.getElementById('email_cfg_port').value,
+        "smtp_account": document.getElementById('email_cfg_account').value,
+        "password": document.getElementById('email_cfg_password').value,
+        "from_address": document.getElementById('email_cfg_from_addr').value,
         "check_config": true
     }
 
@@ -216,11 +216,11 @@ $('#email_save_connection_btn').on('click', function (e) {
     event.preventDefault();
 
     var myBody = {
-        "server_host": document.getElementById('email_cfg_server').value,
-        "server_port": document.getElementById('email_cfg_port').value,
-        "server_email": document.getElementById('email_cfg_account').value,
-        "server_password": document.getElementById('email_cfg_password').value,
-        "server_from_addr": document.getElementById('email_cfg_from_addr').value
+        "host": document.getElementById('email_cfg_server').value,
+        "port": document.getElementById('email_cfg_port').value,
+        "smtp_account": document.getElementById('email_cfg_account').value,
+        "password": document.getElementById('email_cfg_password').value,
+        "from_address": document.getElementById('email_cfg_from_addr').value
     }
 
     const a = email_config_endpoint(myBody)

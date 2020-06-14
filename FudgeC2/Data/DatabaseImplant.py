@@ -312,6 +312,7 @@ class DatabaseImplant:
 
     def Get_CampaignImplantResponses(self, cid):
         # Used by web app
+        # To be removed
         # -- TODO: Refactor
         a = self.Session.query(ImplantResponse).filter(ImplantResponse.cid == cid).all()
         return_list = []
@@ -326,3 +327,8 @@ class DatabaseImplant:
                 a['title'] = b[0]
             return_list.append(a)
         return return_list
+
+    def get_implant_responses(self, implant_id):
+        responses = self.Session.query(ImplantResponse).filter(ImplantResponse.uik == implant_id).all()
+        processed_responses = self.db_methods._sqlalc_rows_to_list(responses)
+        return processed_responses

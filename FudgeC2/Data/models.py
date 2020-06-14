@@ -119,7 +119,7 @@ class ImplantCommands(Base):
 class ImplantResponse(Base):
     __tablename__ = 'implant_response'
     log_id = Column(INTEGER(11), nullable=False, index=True, primary_key=True)
-    cid = Column(INTEGER(11), nullable=False, index=True)
+    cid = Column(INTEGER(11), nullable=False, index=True) # This can be removed as implant_id should be the only linking element
     uik = Column(INTEGER(11), nullable=False, index=True)
     log_entry = Column(String(255), nullable=False)
     time = Column(INTEGER(11), nullable=False, index=True)

@@ -44,7 +44,6 @@ class EmailClient:
             if self.enable is not False:
                 func(self, *args, **kwargs)
             else:
-                print("NOT CONFIGURED")
                 return False
         return decorate
 

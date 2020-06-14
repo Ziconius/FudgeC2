@@ -37,6 +37,7 @@ from FudgeC2.c2_server.resources.users import Users
 from FudgeC2.c2_server.resources.email import Email, EmailTest
 from FudgeC2.c2_server.resources.implants import Implants
 from FudgeC2.c2_server.resources.implants import ImplantDetails
+from FudgeC2.c2_server.resources.implants import ImplantResponses
 
 
 blueprint = Blueprint('api', __name__)
@@ -46,9 +47,10 @@ api.add_resource(Campaigns, '/api/v1/campaigns', "/api/v1/campaigns/<int:cid>")
 api.add_resource(Users,'/api/v1/users/','/api/v1/users')
 api.add_resource(Email, '/api/v1/email')
 api.add_resource(EmailTest, '/api/v1/email/test')
-# In development
-api.add_resource(Implants, '/api/vi/implants')
-api.add_resource(ImplantDetails, '/api/vi/implants/<string:implant_id>')
+# In development these endpoints are not considered production ready.
+api.add_resource(Implants, '/api/v1/implants')
+api.add_resource(ImplantDetails, '/api/v1/implants/<string:implant_id>')
+api.add_resource(ImplantResponses, '/api/v1/implants/<string:implant_id>/responses')
 
 
 # -- Context Processors --#
