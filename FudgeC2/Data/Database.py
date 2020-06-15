@@ -66,6 +66,17 @@ class Database:
     #         print(q[0])
 
     # This needs to be alterd and renamed
+
+    def _sqlalc_to_dict_(self, sqlacl_obj):
+        sqlalc_dict = sqlacl_obj.__dict__
+        del sqlalc_dict['_sa_instance_state']
+        return  sqlalc_dict
+
+    def _combine_sqlacl_dicts(self, sqlalc_obj):
+        combined_obj = {**sqlalc_obj[0].__dict__, **sqlalc_obj[1].__dict__}
+        del combined_obj['_sa_instance_state']
+        return combined_obj
+
     def __sa_to_dict__(self, sa_obj):
 
         if len(sa_obj) == 1:

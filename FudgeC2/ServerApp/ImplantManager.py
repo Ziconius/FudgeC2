@@ -1,5 +1,6 @@
 import time
 import uuid
+import logging
 
 from flask import Flask, render_template, flash, request, jsonify, g, url_for, redirect, send_file
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user

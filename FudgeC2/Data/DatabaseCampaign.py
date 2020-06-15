@@ -143,6 +143,8 @@ class DatabaseCampaign:
             return False
         results = self.db_methods.__splice_implants_and_generated_implants__(implant)
         return results
-    def get_campaign_id_from_implant_id(self, imaplant_id):
-        campaign_id = self.Session.query(ImplantTemplate.cid).filter(ImplantTemplate.iid==GeneratedImplants.iid, GeneratedImplants.unique_implant_id == imaplant_id).one()
+    def get_campaign_id_from_implant_id(self, implant_id):
+        campaign_id = self.Session.query(ImplantTemplate.cid).filter(
+            ImplantTemplate.iid==GeneratedImplants.iid,
+            GeneratedImplants.unique_implant_id == implant_id).first()
         return campaign_id[0]

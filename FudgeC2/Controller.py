@@ -41,7 +41,7 @@ def check_key_folders():
             logger.info(f"Missing directory, now creating: {Settings.campaign_export_folder}")
         return True
     except Exception as Error:
-        logger.warning(f"Exception setting up important directories: {Error}")
+        logger.critical(f"Exception setting up important directories: {Error}")
         return False
 
 

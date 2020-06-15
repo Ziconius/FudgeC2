@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 class EmailSettings:
 
     def __init__(self, source_database, session):
-        # TODO: Check sesion type
+        # TODO: Check session type
         self.Session = session
         self.db_methods = source_database
 
@@ -30,9 +30,8 @@ class EmailSettings:
                 return True
 
             except Exception as e:
-                error = f"Error in create_new_implant_template() SQLAlc error: {e}"
-                logger.exception(error)
-                return error
+                logger.exception(f"Error in set_email_server_configuration() SQLAlc error: {e}")
+                return f"Error in set_email_server_configuration() SQLAlc error: {e}"
         # Update existing record
         self.Session.query(EmailClient).update(
             {"email_account":email_account,
@@ -56,10 +55,10 @@ class EmailSettings:
             return True, r
 
         elif len(results) == 0:
-            return False, "No email configuration exists"
+            return False, "No email configuration exists."
         else:
             logger.warning("There is more than one record for email clients. There should only be a single record.")
-            return False, "Error occured - more than one SMTP server configured"
+            return False, "Error occurred - more than one SMTP server configured"
 
     def get_full_email_server_configuration(self):
         # Returns everything including the encrypted password.
@@ -73,5 +72,5 @@ class EmailSettings:
             return False, "No email configuration exists"
         else:
             logger.warning("There is more than one record for email clients. There should only be a single record.")
-            return False, "Error occured - more than one SMTP server configured"
+            return False, "Error occurred - more than one SMTP server configured"
 

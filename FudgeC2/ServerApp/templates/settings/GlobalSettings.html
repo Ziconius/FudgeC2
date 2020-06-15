@@ -6,14 +6,17 @@
         <h2>Global Settings</h2><br>
         <h4>User Management</h4><hr>
         <form action="/settings" method="POST" role="form" id="AnswerForm">
+            <h4>Add new user</h4>
             <div class="form-group">
-                <label for="NewUser" >Add New User</label>
+                <label for="create_user_name">Name</label>
                 <input onfocus="this.placeholder=''" type="text" name="name" class="form-control" id="create_user_name" placeholder="Bob Dole">
             </div>
             <div class="form-group">
+                <label for="create_user_username">Username</label>
                 <input onfocus="this.placeholder=''" type="text" name="username" class="form-control" id="create_user_username" placeholder="bob.dole">
             </div>
             <div class="form-group">
+                <label for="create_user_user_email">Email</label>
                 <input onfocus="this.placeholder=''" type="text" name="user_email" class="form-control" id="create_user_user_email" placeholder="bob.dole@example.com">
             </div>
             <div class="form-check">
@@ -55,35 +58,7 @@
         {% endfor %}
         {% endif %}
         <br>
-        <h5>Logs</h5><hr>
-        <div class="row">
-            <div class="col-md-6 ">Number of records:<span class="counter pull-right">0 items</span></div>
-            <div class="col-md-6">
-                <label>
-                    <input type="search" class="form form-control form-control-sm search" placeholder="Search logs" aria-controls="dtBasicExample">
-                </label>
-            </div>
-        </div>
-
-        <table class="table table-striped table-bordered table-sm results table-hover" id="dtBasicExample" cellspacing="0" width="100%">
-            <thead>
-                <tr>
-                    <th scope="col">Time</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Record</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for x in logs %}
-            <tr>
-              <td >{{x.time}}</td>
-              <td>{{ x.type }}</td>
-              <td>{{ x.data }}</td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        <div>
+        <div id="div_email_config">
 
             <!-- Email Configuration forms -->
             <h4>Email Configuration</h4><hr>
@@ -134,6 +109,36 @@
             </form>
 
         </div>
+
+        <h5>Logs</h5><hr>
+        <div class="row">
+            <div class="col-md-6 ">Number of records:<span class="counter pull-right">0 items</span></div>
+            <div class="col-md-6">
+                <label>
+                    <input type="search" class="form form-control form-control-sm search" placeholder="Search logs" aria-controls="dtBasicExample">
+                </label>
+            </div>
+        </div>
+
+        <table class="table table-striped table-bordered table-sm results table-hover" id="dtBasicExample" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th scope="col">Time</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Record</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for x in logs %}
+            <tr>
+              <td >{{x.time}}</td>
+              <td>{{ x.type }}</td>
+              <td>{{ x.data }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
     </div>
 
     <!-- Modal -->
@@ -166,9 +171,13 @@ window.onload = function() {
     const userAction = async () => {
       const response = await fetch('/api/v1/email');
       const myJson = await response.json(); //extract JSON from the http response
-      document.getElementById('email_cfg_server').value = myJson.data.host;
-      document.getElementById('email_cfg_port').value = myJson.data.port;
-      document.getElementById('email_cfg_account').value = myJson.data.email_account;
+      if (response.status == 200){
+          document.getElementById('email_cfg_server').value = myJson.data.host;
+          document.getElementById('email_cfg_port').value = myJson.data.port;
+          document.getElementById('email_cfg_account').value = myJson.data.email_account;
+      } else {
+            document.getElementById("div_email_config").style.display = "none";
+      }
     }
 userAction()
 };

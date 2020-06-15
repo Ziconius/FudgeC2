@@ -332,3 +332,9 @@ class DatabaseImplant:
         responses = self.Session.query(ImplantResponse).filter(ImplantResponse.uik == implant_id).all()
         processed_responses = self.db_methods._sqlalc_rows_to_list(responses)
         return processed_responses
+
+    def get_implant_information(self, implant_id):
+        information = self.Session.query(GeneratedImplants, ImplantTemplate).filter(
+            ImplantTemplate.iid == GeneratedImplants.iid,
+            GeneratedImplants.unique_implant_id == implant_id).first()
+        return self.db_methods._combine_sqlacl_dicts(information)

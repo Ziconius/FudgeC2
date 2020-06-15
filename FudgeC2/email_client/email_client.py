@@ -76,8 +76,8 @@ class EmailClient:
                 self.enable = True
                 return True, "Configuration successful"
         except Exception as e:
-            logger.warning(f"Email configuration for {email_account} @ {host}:{port} failed. Reason: {e}")
-            return False, f"Email configuration for {email_account} @ {host}:{port} failed. Reason: {e}"
+            logger.warning(f"SMTP configuration for {email_account}@{host}:{port} failed. Reason: {e}")
+            return False, f"SMTP configuration for {email_account}@{host}:{port} failed. Reason: {e}"
 
     @requires_enabled
     def send_email(self, to, msg):
@@ -91,5 +91,6 @@ class EmailClient:
             self.email.sendmail(email_config['from_address'], to, msg.as_string())
             self.email.quit()
             return True
-        except:
+        except Exception as e:
+            logger.warning(f"Sending email to: {to} failed. STMP config: {e}")
             return False

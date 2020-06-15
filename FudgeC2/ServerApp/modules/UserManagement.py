@@ -46,7 +46,8 @@ class UserManagementController:
                 if email_notification.send_email_new_user_account(name, user_email, password):
                     return True, f"{username} account created. Login information has been emailed to: {user_email}"
                 else:
-                    return False, f"User account creation failed. Check user email."
+                    return False, f"SMTP failed. New user account email notification failed. The temporary password for this account is: {password}<br>" \
+                             f"Please take note of this as it will not be visible again."
             else:
                 return True, f"{username} account created. The temporary password for this account is: {password}<br>" \
                              f"Please take note of this as it will not be visible again."
