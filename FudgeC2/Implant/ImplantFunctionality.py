@@ -29,6 +29,7 @@ class ImplantFunctionality:
         self.module_list.append(ScreenCapture())
 
     def get_list_of_implant_text(self):
+        # Returns a list of implant text values for constucting the implant.
         implant_text = []
         for module in self.module_list:
             implant_text.append(module.implant_text())
@@ -40,7 +41,7 @@ class ImplantFunctionality:
             try:
                 to_return.update(module.obfuscation_keypairs)
             except:
-                print(f"Issue with {module} obfucation_keypair value.")
+                print(f"Issue with {module} obfuscation_keypair value.")
         return to_return
     def command_listing(self):
         command_list = []

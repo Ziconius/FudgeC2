@@ -24,13 +24,11 @@ class EmailNotification:
         elif ec.enable is False:
             return False
         else:
-            logger.critical("EmailClient is returning a non-boolean value for EmailClient.enable")
+            logger.critical("EmailClient class is returning a non-boolean value for 'EmailClient.enable'")
         return ec.enable
 
     def send_email_new_user_account(self, name, email, password):
         # This will
-        # name = None
-        # email = None
         # TODO: Additional configurable field to override hardcoded value.
         server_address = "https://127.0.0.1:5001"
         #

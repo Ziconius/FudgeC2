@@ -8,6 +8,9 @@ function sleep(ms) {
 }
 
 function unix_to_human_time(unixtime){
+    if (unixtime == 0 ){
+        return "N/A"
+    }
     var utcSeconds = unixtime;
     var d = new Date(0);
     d.setUTCSeconds(utcSeconds);
@@ -126,17 +129,7 @@ $.ajax({
                 response = order_response_by_time ( response )
                 for (element in response){
                     var pageContainer = document.getElementById('ImplantStatusValues')
-                    var utcSeconds = response[element].last_checked_in;
-                    var d = new Date(0);
-                    d.setUTCSeconds(utcSeconds);
-                    var date = new Date(response[element].last_checked_in*1000);
-                    var year = date.getFullYear();
-                    var month = date.getMonth();
-                    var day = date.getDate();
-                    var hours = date.getHours();
-                    var minutes = "0" + date.getMinutes();
-                    var seconds = "0" + date.getSeconds();
-                    time_last_seen = hours+":"+minutes.substr(-2)+':'+seconds.substr(-2)+' '+day+'/'+month+'/'+year
+                    time_last_seen = unix_to_human_time(response[element].last_checked_in)
 
                     var CodeColour = "text-primary"
                     if (response[element].status=='Unresponsive'){
@@ -260,18 +253,18 @@ function get_listener_info(){
 
 
 
-function get_campaign_info_by_id(rrr, cid){
+function get_campaign_info_by_id(arg_response, cid){
     $.ajax({
         url:`/api/v1/campaign/${cid}/implants/active`,
         type:"GET",
         success: function (response) {
             for (item in response){
 
-                A = rrr[cid]
+                A = arg_response[cid]
                 A = `<a class="text-warning" href="/${cid}">${A}</a>`
                 B = response[item]['generated_title']
                 b = response[item]['unique_implant_id']
-                B =`<a class="text-warning" href="/${cid}/implant/active/${b}">${B}</a>`
+                B = `<a class="text-warning" href="/${cid}/implant/active/${b}">${B}</a>`
                 C = unix_to_human_time(response[item]['last_check_in'])
                 D = response[item]['callback_url']
 

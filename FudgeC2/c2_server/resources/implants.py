@@ -2,6 +2,13 @@ from flask_restful import Resource, reqparse
 from flask import request
 from flask_login import current_user, login_required
 
+from FudgeC2.Implant.ImplantFunctionality import ImplantFunctionality
+implant_functionality = ImplantFunctionality()
+
+from FudgeC2.Implant.Implant import ImplantSingleton
+
+implant_obj = ImplantSingleton.instance
+
 from Data.Database import Database
 db = Database()
 
@@ -34,18 +41,18 @@ class ImplantDetails(Resource):
         if db.campaign.Verify_UserCanReadCampaign(current_user.user_email, campaign_id) is False:
             return {"message": "Insufficient permissions"}
 
-        a = db.implant.get_implant_information(implant_id)
+        implant = db.implant.get_implant_information(implant_id)
         # Create simplfied dictionary with key attributes.
-        bb = {
-            "generated_title":a['generated_title'],
-            "current_beacon": a['current_beacon'],
-            "unique_implant_id": a['unique_implant_id'],
-            "callback_url": a['callback_url'],
-            "description": a['description'],
-            "initial_delay": a['initial_delay']
+        data = {
+            "generated_title": implant['generated_title'],
+            "current_beacon": implant['current_beacon'],
+            "unique_implant_id": implant['unique_implant_id'],
+            "callback_url": implant['callback_url'],
+            "description": implant['description'],
+            "initial_delay": implant['initial_delay']
         }
 
-        return {"data": a}
+        return {"data": data}
 
 
 class ImplantRegistered(Resource):
@@ -63,3 +70,34 @@ class ImplantResponses(Resource):
             response_list = db.implant.get_implant_responses(implant_id)
 
         return {"data": response_list}
+
+class ImplantExecute(Resource):
+    method_decorators = [login_required]
+    def get(self, implant_id):
+        # Returns a list of implants commands:
+        campaign_id = db.campaign.get_campaign_id_from_implant_id(implant_id)
+        if db.campaign.Verify_UserCanWriteCampaign(current_user.user_email, campaign_id) is not True:
+            return {"message": "You do no have sufficient access rights."}, 403
+        # Can user return execute commands? No Return a 401?
+
+        # Get implants modules:
+
+        imp_func = implant_functionality.command_listing()
+        return {"data": imp_func}
+
+    def post(self, implant_id):
+        # Register a command to be executed.
+        rj = request.json
+        command_type = rj.get("type", None)
+        command_args = rj.get("args", None)
+        command_dict = {"type": command_type, "args":command_args}
+        if implant_functionality.validate_pre_registered_command(command_dict):
+            campaign_id = db.campaign.get_campaign_id_from_implant_id(implant_id)
+            response = implant_obj.add_implant_command_to_server(current_user.user_email,
+                                                                 campaign_id,
+                                                                 implant_id,
+                                                                 command_dict)
+            if response:
+                return {"message": "Command successfully registered."}, 201
+
+        return {"message": "Command registration failed"}, 401

@@ -1,5 +1,5 @@
 class Settings:
-    version = "0.5.6"
+    version = "0.5.7"
     version_name = "Goblin Alchemist"
     # If the database does not exist it will be created in Storage/<name>.sql
     database_name = "fudge_c2.sql"

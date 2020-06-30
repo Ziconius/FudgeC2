@@ -16,7 +16,8 @@ class ImplantSingleton:
         def add_implant_command_to_server(self, user, cid, unique_implant_key, command):
             # AddCommand is responsible for creating new entries for implants to pickup.
             #   User validation checks must occur before a command is registered.
-            db.implant.Register_ImplantCommand(user, unique_implant_key, command, cid=cid)
+            return db.implant.Register_ImplantCommand(user, unique_implant_key, command, cid=cid)
+
 
         def issue_command(self, UIK=0, c2_protocol=None):
             if UIK != 0:

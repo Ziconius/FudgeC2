@@ -39,7 +39,7 @@ from FudgeC2.c2_server.resources.email import Email, EmailTest
 from FudgeC2.c2_server.resources.implants import Implants
 from FudgeC2.c2_server.resources.implants import ImplantDetails
 from FudgeC2.c2_server.resources.implants import ImplantResponses
-
+from FudgeC2.c2_server.resources.implants import ImplantExecute
 
 blueprint = Blueprint('api', __name__)
 api = Api(app)
@@ -52,7 +52,7 @@ api.add_resource(EmailTest, '/api/v1/email/test')
 api.add_resource(Implants, '/api/v1/implants')
 api.add_resource(ImplantDetails, '/api/v1/implants/<string:implant_id>')
 api.add_resource(ImplantResponses, '/api/v1/implants/<string:implant_id>/responses')
-
+api.add_resource(ImplantExecute, '/api/v1/implants/<string:implant_id>/execute')
 
 # -- Context Processors --#
 @app.context_processor

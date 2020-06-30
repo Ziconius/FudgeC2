@@ -1,3 +1,23 @@
+#### Release Notes for 0.5.7:
+New features:
+ - SMTP support for notification and user account creation - further email notifications will be released in 0.5.8
+ - RESTful API implementation created for the following functionality:
+   - Campaign creation
+   - SMTP/Email configuration
+   - Implant interaction
+
+Improvements/Changes:
+ - UI changes to the campaign pages
+ - Implants now display optional configurations, such as operating hours.
+ - The implants default user agent now match Edge 44, and not Powershell/5.1
+ - Dockerfile has been updated to pull from Kali Linux
+ - User profile now contains more information
+
+Documentation
+ - Early OpenAPIv3 documentation (+ yaml) can be found at https://docs.moozle.wtf (Work in Progress)
+
+Numerous bug fixes.
+
 #### Release Notes for 0.5.6:
 
 New features:
