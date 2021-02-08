@@ -338,3 +338,11 @@ class DatabaseImplant:
             ImplantTemplate.iid == GeneratedImplants.iid,
             GeneratedImplants.unique_implant_id == implant_id).first()
         return self.db_methods._combine_sqlacl_dicts(information)
+
+    def get_implant_templates_by_campaign_id(self, campaign_id):
+        sql_acl_obj = self.Session.query(ImplantTemplate).filter(ImplantTemplate.cid == campaign_id).all()
+        return self.db_methods._sqlalc_rows_to_list(sql_acl_obj)
+
+
+    def get_implant_template(self, implant_template_id):
+        pass

@@ -65,3 +65,21 @@ class StagerGeneration:
             return stager_list
         else:
             return stager_list
+
+
+
+'''
+Get Stagers:
+
+ - Types
+ 
+ - Stager
+ - Requires
+ - Info
+ 
+ 
+ 
+
+
+'''
+

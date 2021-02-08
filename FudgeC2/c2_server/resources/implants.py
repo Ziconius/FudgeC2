@@ -1,16 +1,16 @@
+import logging
 from flask_restful import Resource, reqparse
 from flask import request
 from flask_login import current_user, login_required
 
 from FudgeC2.Implant.ImplantFunctionality import ImplantFunctionality
-implant_functionality = ImplantFunctionality()
-
+from FudgeC2.Data.Database import Database
 from FudgeC2.Implant.Implant import ImplantSingleton
 
-implant_obj = ImplantSingleton.instance
-
-from Data.Database import Database
+implant_functionality = ImplantFunctionality()
 db = Database()
+logger = logging.getLogger(__name__)
+implant_obj = ImplantSingleton.instance
 
 class Implants(Resource):
     method_decorators = [login_required]
@@ -31,6 +31,20 @@ class Implants(Resource):
             return processed_implants
         else:
             return a
+
+class ImplantTemplates(Resource):
+    # Returns the name and id of all implant templates for the specified campaign
+    def get(self, campaign_id):
+        if db.campaign.Verify_UserCanAccessCampaign(current_user.user_email, campaign_id) is not True:
+            return [], 401
+        list_of_implant_templates = db.implant.get_implant_templates_by_campaign_id(campaign_id)
+        campaigns = {"data": []}
+        for template in list_of_implant_templates:
+            try:
+                campaigns['data'].append({"id":template['iid'], "name":template['title']})
+            except Exception as E:
+                logger.warning(f"Implant template missing key/pair: {E}")
+        return campaigns
 
 class ImplantDetails(Resource):
     method_decorators = [login_required]
