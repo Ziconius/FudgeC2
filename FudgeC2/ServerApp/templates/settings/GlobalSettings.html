@@ -59,9 +59,9 @@
         {% endif %}
         <br>
         <div id="div_email_config">
-
             <!-- Email Configuration forms -->
-            <h4>Email Configuration</h4><hr>
+            <h4>Email Configuration</h4>
+            <hr>
             <p>SMTP configuration is used to set up an email address that FudgeC2 can use to notify users of changes, password resets, amoung others.</p>
             <form id="smtp_configuration">
                 <div class="form-group row">
@@ -77,7 +77,15 @@
                         <input id="email_cfg_port" name="text" type="text" required="required" class="form-control" placeholder="587">
                     </div>
                 </div>
-
+                <div class="form-group row">
+                    <label class="col-4 col-form-label" for="email_cfg_port">SMTP Server Port</label>
+                    <div class="col-8">
+                        <select class="form-control" id="email_cfg_encryption">
+                            <option>STARTTLS</option>
+                            <option>SSL</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="form-group row">
                     <label class="col-4 col-form-label" for="email_cfg_account">SMTP Account</label>
                     <div class="col-8">
@@ -174,9 +182,7 @@ window.onload = function() {
       if (response.status == 200){
           document.getElementById('email_cfg_server').value = myJson.data.host;
           document.getElementById('email_cfg_port').value = myJson.data.port;
-          document.getElementById('email_cfg_account').value = myJson.data.email_account;
-      } else {
-            document.getElementById("div_email_config").style.display = "none";
+          document.getElementById('email_cfg_account').value = myJson.data.username;
       }
     }
 userAction()
@@ -192,6 +198,7 @@ $('#email_test_connection_btn').on('click', function (e) {
         "smtp_account": document.getElementById('email_cfg_account').value,
         "password": document.getElementById('email_cfg_password').value,
         "from_address": document.getElementById('email_cfg_from_addr').value,
+        "encryption": document.getElementById('email_cfg_encryption').value,
         "check_config": true
     }
 
@@ -199,7 +206,7 @@ $('#email_test_connection_btn').on('click', function (e) {
     a.then(function(result) {
         statusCode = result[0]
         msg = result[1]
-        if (statusCode == 200) {
+        if (statusCode == 201) {
             document.getElementById('email_save_connection_btn').disabled = false;
             var element = document.getElementById("email_save_connection_btn");
             element.classList = "btn btn-warning"
@@ -236,7 +243,7 @@ $('#email_save_connection_btn').on('click', function (e) {
     a.then(function(result) {
         statusCode = result[0]
         msg = result[1]
-        if (statusCode == 200) {
+        if (statusCode == 201) {
             document.getElementById('email_save_connection_btn').disabled = false;
             var element = document.getElementById("email_save_connection_btn");
             element.classList = "btn btn-success";
@@ -267,14 +274,6 @@ const email_config_endpoint = async (myBody) => {
     const responseCode = await response.status;
     return [responseCode, myJson]
 }
-
-
-
-
-
-
-
-
 </script>
 
 {% endblock %}

@@ -11,18 +11,19 @@ class EmailSettings:
         self.Session = session
         self.db_methods = source_database
 
-    def set_email_server_configuration(self, host, port, email_account, password, from_address):
+    def set_email_server_configuration(self, host, port, encryption, email_account, password, from_address):
         # This will contain full optional updates to all fields, and will only be triggered if the configuration is
         #   considered to be valid.
         # Check for existing record
         results = self.Session.query(EmailClient).all()
-        if len(results) is 0:
+        if len(results) == 0:
             email_settings = EmailClient(
-                email_account=email_account,
+                username=email_account,
                 email_password=password,
                 from_address=from_address,
                 host=host,
-                port=port
+                port=port,
+                encryption=encryption
             )
             self.Session.add(email_settings)
             try:
@@ -31,14 +32,15 @@ class EmailSettings:
 
             except Exception as e:
                 logger.exception(f"Error in set_email_server_configuration() SQLAlc error: {e}")
-                return f"Error in set_email_server_configuration() SQLAlc error: {e}"
+                return False
         # Update existing record
         self.Session.query(EmailClient).update(
-            {"email_account":email_account,
-            "email_password":password,
-            "from_address":from_address,
-            "host":host,
-            "port":port })
+            {"email_account": email_account,
+            "email_password": password,
+            "from_address": from_address,
+            "host": host,
+            "port": port,
+            "encryption":encryption})
         self.Session.commit()
         pass
 

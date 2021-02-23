@@ -112,7 +112,6 @@ def page_not_found(e):
 # ------------------------------ #
 @app.route("/auth/login", methods=['GET', 'POST'])
 def login():
-    print(current_user)
     error = None
     if request.method == "POST":
 

@@ -67,11 +67,12 @@ class Users(Base):
 class EmailClient(Base):
     __tablename__ = "email_client"
     id = Column(INTEGER(11), nullable=False, index=True, primary_key=True)
-    email_account = Column(String)
+    username= Column(String)
     email_password = Column(String)
     from_address = Column(String)
-    host  = Column(String)
-    port  = Column(String)
+    host = Column(String)
+    port = Column(String)
+    encryption = Column(String)
 
 class ImplantTemplate(Base):
     __tablename__ = 'implant_template'

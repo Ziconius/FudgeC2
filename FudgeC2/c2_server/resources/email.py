@@ -28,18 +28,21 @@ class Email(Resource):
     def post(self):
         if current_user.admin != "1":
             return {"message": "Insufficient permissions"}, 403
-        rj = {}
+        rj = request.json
+
 
         # Validate the contents of this and send to the email class
         server_email = rj.get("smtp_account", None)
         server_password = rj.get("password", None)
         server_host = rj.get("host", None)
         server_port = rj.get("port", None)
+        server_encryption = rj.get("encryption", None)
         from_address = rj.get("from_address", None)
         check_config = rj.get("check_config", False)
         state, msg = email_client.configure_email_client(
             server_host,
             server_port,
+            server_encryption,
             server_email,
             server_password,
             from_address,
@@ -69,4 +72,5 @@ class EmailTest(Resource):
         rj = request.json
         to = rj.get("to", None)
         msg = rj.get("msg", None)
-        email_client.send_email(to, msg)
+        response = email_client.send_email(to, msg)
+        print(response)
