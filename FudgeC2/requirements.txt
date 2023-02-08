@@ -4,6 +4,6 @@ flask_login==0.5.0
 flask-restful==0.3.8
 bcrypt==3.1.7
 requests==2.23.0
-cryptography==3.2
+cryptography==39.0.1
 pycryptodome==3.9.7
 pyyaml==5.4
